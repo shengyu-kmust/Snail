@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace Snail.Entity
 {
-    public class Permission : BaseEntity
+    public class Permission<TKey> : BaseEntity<TKey>
     {
-        public int RoleId { get; set; }
-        public int ResourceId { get; set; }
-        public Role Role { get; set; }
-        public Resource Resource { get; set; }
+        public TKey RoleId { get; set; }
+        public TKey ResourceId { get; set; }
+        public Role<TKey> Role { get; set; }
+        public Resource<TKey> Resource { get; set; }
     }
 }

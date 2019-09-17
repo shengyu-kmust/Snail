@@ -52,7 +52,7 @@ namespace Snail.Database.Test
 
                 using (var connection = new OracleConnection(ConnectStringHelper.ConnForOracleOfOdpNetWithoutOra("oracle.test.rlair.net", "orcl", "B2C_OW_DBUSER", "owdbuser")))
                 {
-                    var table = connection.Query("select * from t_sys_role");
+                    var table = connection.Query("select * from t_user");
                 }
             }
             catch (Exception ex)

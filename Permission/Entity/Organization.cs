@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Snail.Entity
 {
-    public class Organization:BaseEntity
+    public class Organization<TKey>:BaseEntity<TKey>
     {
         public string Name { get; set; }
-        public int ParentId { get; set; }
+        public TKey ParentId { get; set; }
     }
 }

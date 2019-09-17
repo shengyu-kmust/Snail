@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Snail.Entity
 {
     [Table("Role")]
-    public class Role:BaseEntity
+    public class Role<TKey>:BaseEntity<TKey>
     {
         public string RoleName { get; set; }
     }

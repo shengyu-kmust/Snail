@@ -1,17 +1,12 @@
-﻿using Snail.Abstract;
+﻿using Snail.Abstract.Entity;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Snail.Entity
 {
     /// <summary>
     /// 实体的公共属性，如ID，创建时间，最后一次更新时间，是否有效
     /// </summary>
-    public class BaseEntity : IEntityId<int>, IEntityAudit<int>, IEntitySoftDelete
+    public class BaseEntity<TKey> : IEntityId<TKey>, IEntityAudit<TKey>, IEntitySoftDelete
     {
         ///// <summary>
         ///// 主键
@@ -21,10 +16,10 @@ namespace Snail.Entity
         //public DateTime CreateTime { get; set; }
         //public DateTime UpdateTime { get; set; }=DateTime.Now;
         //public int IsValid { get; set; } = 1;
-        public int Id { get;set;}
-        public int CreaterId { get;set;}
+        public TKey Id { get;set;}
+        public TKey CreaterId { get;set;}
         public DateTime CreateTime { get;set;}
-        public int UpdaterId { get;set;}
+        public TKey UpdaterId { get;set;}
         public DateTime UpdateTime { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
     }

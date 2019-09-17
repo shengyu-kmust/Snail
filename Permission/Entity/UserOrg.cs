@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Snail.Entity
 {
-    public class UserOrg:BaseEntity
+    public class UserOrg<TKey>:BaseEntity<TKey>
     {
         public int UserId { get; set; }
         public int OrgId { get; set; }
-        public User User { get; set; }
+        public User<TKey> User { get; set; }
         [ForeignKey("OrgId")]
-        public Organization Org { get; set; }
+        public Organization<TKey> Org { get; set; }
     }
 }
