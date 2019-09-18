@@ -9,5 +9,9 @@ namespace Snail.Entity
     {
         public string Name { get; set; }
         public TKey ParentId { get; set; }
+
+        #region 导航属性
+        public List<User<TKey>> Users { get; set; }
+        #endregion
     }
 }

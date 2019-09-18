@@ -11,7 +11,6 @@ namespace Snail.Entity
         public int UserId { get; set; }
         public int OrgId { get; set; }
         public User<TKey> User { get; set; }
-        [ForeignKey("OrgId")]
         public Organization<TKey> Org { get; set; }
     }
 }

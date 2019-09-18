@@ -23,4 +23,8 @@ namespace Snail.Entity
         public DateTime UpdateTime { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
     }
+    public class EntityId<TKey> : IEntityId<TKey>
+    {
+        public TKey Id { get; set; }
+    }
 }
