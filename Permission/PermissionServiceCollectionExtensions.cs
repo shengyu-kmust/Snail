@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Snail.Entity;
 using System;
 using System.Collections.Generic;
@@ -22,9 +23,13 @@ namespace Snail.Permission
 
         {
             #region 增加identity功能
-            var identityBuilder = identityOptionsAction == null ? services.AddIdentityCore<TUser>(a => { }) : services.AddIdentityCore<TUser>(identityOptionsAction).AddRoles<TRole>()
+            services.TryAddScoped<IPasswordHasher<TUser>, PermissionPasswordHasher<TUser>>();
+            services.AddScoped<IUserStore<TUser>, PermissionUserStore<TUser, TContext, TKey>>();
 
+            var identityBuilder = identityOptionsAction == null ? services.AddIdentityCore<TUser>(a => { }) : services.AddIdentityCore<TUser>(identityOptionsAction);
+            identityBuilder.AddRoles<TRole>();
             #endregion
+
 
         }
     }
