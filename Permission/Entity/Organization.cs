@@ -7,11 +7,7 @@ namespace Snail.Entity
 {
     public class Organization<TKey>:BaseEntity<TKey>
     {
-        public string Name { get; set; }
-        public TKey ParentId { get; set; }
-
-        #region 导航属性
-        public List<User<TKey>> Users { get; set; }
-        #endregion
+        public virtual string Name { get; set; }
+        public virtual TKey ParentId { get; set; }
     }
 }

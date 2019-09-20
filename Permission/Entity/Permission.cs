@@ -7,9 +7,7 @@ namespace Snail.Entity
 {
     public class Permission<TKey> : BaseEntity<TKey>
     {
-        public TKey RoleId { get; set; }
-        public TKey ResourceId { get; set; }
-        public Role<TKey> Role { get; set; }
-        public Resource<TKey> Resource { get; set; }
+        public virtual TKey RoleId { get; set; }
+        public virtual TKey ResourceId { get; set; }
     }
 }

@@ -8,9 +8,7 @@ namespace Snail.Entity
 {
     public class UserOrg<TKey>:BaseEntity<TKey>
     {
-        public int UserId { get; set; }
-        public int OrgId { get; set; }
-        public User<TKey> User { get; set; }
-        public Organization<TKey> Org { get; set; }
-    }
+        public virtual int UserId { get; set; }
+        public virtual int OrgId { get; set; }
+     }
 }

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Snail.Permission
+namespace Snail.Permission.IdentityStore
 {
     /// <summary>
     /// 
@@ -147,7 +147,7 @@ namespace Snail.Permission
             }
 
             _db.Attach(user);
-            user.UpdateTime = DateTime.Now;
+            //user.UpdateTime = DateTime.Now;
             _db.Update(user);
             await SaveChangesAsync(cancellationToken);
             return IdentityResult.Success;
