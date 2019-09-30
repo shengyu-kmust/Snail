@@ -9,7 +9,7 @@ namespace Snail.Database.Test
 {
     public class JwtHelper
     {
-        public bool TryGenerate(string key, string algName,string issuer = null, string audience = null, IEnumerable<Claim> claims = null, DateTime? notBefore = default(DateTime?), DateTime? expires = default(DateTime?),out string tokenStr)
+        public bool TryGenerate(string key, string algName, out string tokenStr,string issuer = null, string audience = null, IEnumerable<Claim> claims = null, DateTime? notBefore = default(DateTime?), DateTime? expires = default(DateTime?))
         {
             try
             {
