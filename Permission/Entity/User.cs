@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Snail.Abstract.Enum;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Entity
@@ -11,11 +12,7 @@ namespace Snail.Entity
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Pwd { get; set; }
-        public TKey Gender { get; set; }
-
-        #region 导航属性
-        public List<UserRole<TKey>> UserRoles { get; set; }
-        public List<UserOrg<TKey>> UserOrgs { get; set; }
-        #endregion
+        public Gender Gender { get; set; }   
     }
+
 }

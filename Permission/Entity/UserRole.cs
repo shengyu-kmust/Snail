@@ -10,9 +10,7 @@ namespace Snail.Entity
     [Table("UserRole")]
     public class UserRole<TKey>:BaseEntity<TKey>
     {
-        public int UserId { get; set; }
-        public int RoleId { get; set; }
-        public Role<TKey> Role { get; set; }
-        public User<TKey> User { get; set; }
+        public TKey UserId { get; set; }
+        public TKey RoleId { get; set; }
     }
 }

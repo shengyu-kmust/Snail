@@ -7,11 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Permission", "Permiss
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Abstract", "Snail.Abstract\Snail.Abstract.csproj", "{C2CAD69D-15F8-4E05-B9DE-3C7A467E0ED6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.Database", "Snail.Database\Snail.Database.csproj", "{115D3532-E265-45D5-92C8-F925821195B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Database", "Snail.Database\Snail.Database.csproj", "{115D3532-E265-45D5-92C8-F925821195B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.Database.Test", "Snail.Database.Test\Snail.Database.Test.csproj", "{F3DA2E10-CE5C-4FA7-9853-8F974B5A4F3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Database.Test", "Snail.Database.Test\Snail.Database.Test.csproj", "{F3DA2E10-CE5C-4FA7-9853-8F974B5A4F3E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{87806174-3460-4457-99C1-963A3D795497}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.Permission.Test", "Snail.Permission.Test\Snail.Permission.Test.csproj", "{BF83E16A-8A46-4159-B1F5-A3C396679A96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.Common", "Snail.Common\Snail.Common.csproj", "{ADCB6CCE-BAB8-4058-B445-F0E22C7D907E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,12 +39,21 @@ Global
 		{F3DA2E10-CE5C-4FA7-9853-8F974B5A4F3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3DA2E10-CE5C-4FA7-9853-8F974B5A4F3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3DA2E10-CE5C-4FA7-9853-8F974B5A4F3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF83E16A-8A46-4159-B1F5-A3C396679A96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF83E16A-8A46-4159-B1F5-A3C396679A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF83E16A-8A46-4159-B1F5-A3C396679A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF83E16A-8A46-4159-B1F5-A3C396679A96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADCB6CCE-BAB8-4058-B445-F0E22C7D907E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADCB6CCE-BAB8-4058-B445-F0E22C7D907E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADCB6CCE-BAB8-4058-B445-F0E22C7D907E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADCB6CCE-BAB8-4058-B445-F0E22C7D907E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F3DA2E10-CE5C-4FA7-9853-8F974B5A4F3E} = {87806174-3460-4457-99C1-963A3D795497}
+		{BF83E16A-8A46-4159-B1F5-A3C396679A96} = {87806174-3460-4457-99C1-963A3D795497}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64958474-38DF-48E9-AF4B-467E3EC01A98}

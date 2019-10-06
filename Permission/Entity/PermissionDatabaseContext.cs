@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Snail.Abstract.Entity;
+using Snail.Abstract.Enum;
 using System;
 
 namespace Snail.Entity
 {
-    public class PermissionDatabaseContext<TUser,TRole,TUserRole,TResource,TPermission,TOrganization,TUserOrg,TKey> : DbContext 
+    public abstract class PermissionDatabaseContext<TUser,TRole,TUserRole,TResource,TPermission,TOrganization,TUserOrg,TKey> : DbContext 
         where TUser: User<TKey>
         where TRole: Role<TKey>
         where TUserRole: UserRole<TKey>
@@ -37,14 +38,11 @@ namespace Snail.Entity
             modelBuilder.Entity<TUser>(i =>
             {
                 i.HasKey(u => u.Id);
-                i.HasMany<TUserRole>("UserRoles").WithOne("User").HasForeignKey(a => a.UserId);
-                i.HasMany<TUserOrg>("UserOrgs").WithOne("User").HasForeignKey(a => a.UserId);
+                i.Property(u => u.Gender).HasColumnName("int").HasConversion<int>();
             });
             modelBuilder.Entity<TRole>(i => 
             {
                 i.HasKey(r => r.Id);
-                i.HasMany<TUserRole>("RoleUsers").WithOne("Role").HasForeignKey(a => a.RoleId);
-                i.HasMany<TPermission>("Permissions").WithOne("Role").HasForeignKey(a => a.RoleId);
 
             });
             modelBuilder.Entity<TOrganization>(i =>
@@ -58,21 +56,15 @@ namespace Snail.Entity
             modelBuilder.Entity<TUserRole>(i =>
             {
                 i.HasKey(ur => ur.Id);
-                i.HasOne<TUser>("User").WithMany("UserRoles").HasForeignKey(a => a.UserId);
-                i.HasOne<TRole>("Role").WithMany("RoleUsers").HasForeignKey(a => a.RoleId);
             });
             modelBuilder.Entity<TUserOrg>(i =>
             {
                 i.HasKey(uo => uo.Id);
-                i.HasOne<TUser>("User").WithMany("UserOrgs").HasForeignKey(a => a.UserId);
-                i.HasOne<TOrganization>("Org").WithMany("Users").HasForeignKey(a => a.OrgId);
             });
           
             modelBuilder.Entity<TPermission>(i =>
             {
                 i.HasKey(p => p.Id);
-                i.HasOne<TRole>("Role").WithMany("Permissions").HasForeignKey(a => a.RoleId);
-                i.HasOne<TResource>("Resource").WithMany().HasForeignKey(a => a.ResourceId);
             });
 
 

@@ -111,7 +111,7 @@ namespace Snail.Permission
             {
                 throw new ArgumentNullException(nameof(user));
             }
-            return Task.FromResult(user.UserName);
+            return Task.FromResult(user.LoginName);
         }
 
         public Task SetNormalizedUserNameAsync(TUser user, string normalizedName, CancellationToken cancellationToken)

@@ -9,7 +9,5 @@ namespace Snail.Entity
     {
         public TKey RoleId { get; set; }
         public TKey ResourceId { get; set; }
-        public Role<TKey> Role { get; set; }
-        public Resource<TKey> Resource { get; set; }
     }
 }
