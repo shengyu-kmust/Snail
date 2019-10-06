@@ -9,17 +9,16 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
 using Snail.Entity;
+using Snail.Permission.IdentityStore;
 using System;
-using System.Collections.Generic;
 using System.Text;
-
-namespace Snail.Permission
+namespace Snail.Permission.Core
 {
     public static class PermissionServiceCollectionExtensions
     {
         public static void AddPermission<TUser, TRole, TUserRole, TResource, TPermission, TOrganization, TUserOrg, TContext, TKey>(this IServiceCollection services)
         where TUser : User<TKey>
-        where TRole : Role<TKey>
+        where TRole : InnerRole<TKey>
         where TUserRole : UserRole<TKey>
         where TResource : Resource<TKey>
         where TPermission : Permission<TKey>

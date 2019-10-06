@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Text;
 
 namespace Snail.Permission.Core
 {
-    public interface IPermission
+    public interface IPermission<TUser,TRole,TResource>
     {
-        bool HasPermission(ClaimsPrincipal user,Object resource);
-
+        bool HasPermission(TUser user, TResource resource);
     }
 }
