@@ -18,7 +18,7 @@ namespace Snail.Permission.Core
     {
         public static void AddPermission<TUser, TRole, TUserRole, TResource, TPermission, TOrganization, TUserOrg, TContext, TKey>(this IServiceCollection services)
         where TUser : User<TKey>
-        where TRole : InnerRole<TKey>
+        where TRole : Role<TKey>
         where TUserRole : UserRole<TKey>
         where TResource : Resource<TKey>
         where TPermission : Permission<TKey>
