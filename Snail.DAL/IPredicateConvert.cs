@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Snail.CRUD
+namespace Snail.DAL
 {
     /// <summary>
     /// 查询条件转换接口

@@ -1,4 +1,4 @@
-﻿using Snail.Abstract.Entity;
+﻿using Snail.Core.Entity;
 using System;
 
 namespace Snail.Entity

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Abstract.Entity
+namespace Snail.Core.Entity
 {
     public interface IIdField<T>
     {

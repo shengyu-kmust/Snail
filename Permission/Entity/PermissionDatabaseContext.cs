@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Snail.Abstract.Entity;
-using Snail.Abstract.Enum;
+using Snail.Core.Entity;
+using Snail.Core.Enum;
 using System;
 
 namespace Snail.Entity

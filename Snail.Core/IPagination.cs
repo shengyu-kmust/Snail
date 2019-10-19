@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Abstract
+namespace Snail.Core
 {
     public interface IPagination
     {

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Snail.Abstract;
-using Snail.Abstract.Entity;
+using Snail.Core;
+using Snail.Core.Entity;
 using Snail.Common;
 
-namespace Snail.CRUD
+namespace Snail.DAL
 {
     /// <summary>
     /// 

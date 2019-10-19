@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Snail.Abstract\Snail.Abstract.csproj" />
+    <ProjectReference Include="..\Snail.Abstract\Snail.Core.csproj" />
     <ProjectReference Include="..\Snail.Common\Snail.Common.csproj" />
   </ItemGroup>
 

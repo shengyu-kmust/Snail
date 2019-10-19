@@ -71,7 +71,7 @@ namespace Snail.Permission.Core
                         RoleClaimType = "roleId",
                         ValidIssuer = "snail issuer",
                         ValidAudience = "snail audience",
-                        IssuerSigningKey = new RsaSecurityKey(RSAHelper.GetRSAParametersFromFromPrivatePem(options))
+                        IssuerSigningKey = new RsaSecurityKey(RSAHelper.GetRSAParametersFromFromPrivatePem(""))//todo
                     };
                 });
             #endregion
