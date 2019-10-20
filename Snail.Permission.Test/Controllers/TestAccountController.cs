@@ -11,13 +11,18 @@ namespace Snail.Permission.Test.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]
-    public class TestAccountController : AccountController<TestUser,Guid>
-    //public class TestAccountController :ControllerBase
+    //public class TestAccountController : AccountController<TestUser,Guid>
+    public class TestAccountController : ControllerBase
     {
-        public TestAccountController(UserManager<TestUser> userManager, SignInManager<TestUser> signInManager, ILoggerFactory loggerFactory) : base(userManager, signInManager, loggerFactory)
+        //public TestAccountController(UserManager<TestUser> userManager, SignInManager<TestUser> signInManager, ILoggerFactory loggerFactory) : base(userManager, signInManager, loggerFactory)
+        //{
+        //}
+
+        public TestAccountController()
         {
+
         }
-      
+
          [HttpGet]
         public string Test1()
         {

@@ -16,23 +16,21 @@ namespace Snail.DAL
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TSource">查询的全量字段返回类型，具体的返回类型TResult会从Source对类映射出来</typeparam>
     /// <typeparam name="TKey"></typeparam>
-    public class EFCRUDService<TEntity,TSource,TKey> : ICRUDService<TEntity, TKey> where TEntity : class, IEntityId<TKey>
+    public abstract class EFCRUDService<TEntity,TSource,TKey> : ICRUDService<TEntity, TKey> where TEntity : class, IEntityId<TKey>
     {
         public DbContext db;
         private IMapper _mapper;
         public DbSet<TEntity> entities;
-        public EFCRUDService(DbContext db,IQueryable<TSource> querySource,IMapper mapper)
+        public IQueryable<TSource> QuerySource { get; set; }
+        public EFCRUDService(DbContext db,IMapper mapper)
         {
             this.db = db;
-            if (querySource==null)
-            {
-                QuerySource = _mapper.ProjectTo<TSource>(db.Set<TEntity>().AsQueryable());
-            }
+            QuerySource = InitQuerySource();
         }
 
-        public IQueryable<TSource> QuerySource { get; set; }
+        public abstract IQueryable<TSource> InitQuerySource();
 
-        public TEntity Add<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
+        public virtual TEntity Add<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
         {
             if (saveDto.Id == default || saveDto.Id==null)
             {
@@ -43,7 +41,7 @@ namespace Snail.DAL
             return entities.Find(saveDto.Id);
         }
 
-        public void Delete(object id)
+        public virtual void Delete(object id)
         {
             if (id == null)
             {
@@ -66,12 +64,12 @@ namespace Snail.DAL
             db.SaveChanges();
         }
 
-        public List<TResult> Query<TResult, TQueryDto>(TQueryDto queryDto) where TResult : class
+        public virtual List<TResult> Query<TResult, TQueryDto>(TQueryDto queryDto) where TResult : class
         {
             return QueryInternal<TResult, TQueryDto>(queryDto).ToList();
         }
 
-        public IPageResult<TResult> QueryPage<TResult, TQueryDto>(TQueryDto queryDto)
+        public virtual IPageResult<TResult> QueryPage<TResult, TQueryDto>(TQueryDto queryDto)
             where TResult : class
             where TQueryDto : IPagination
         {
@@ -111,7 +109,7 @@ namespace Snail.DAL
             return result;
         }
 
-        public TEntity Update<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
+        public virtual TEntity Update<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
         {
             if (saveDto.Id == default || saveDto.Id==null)
             {

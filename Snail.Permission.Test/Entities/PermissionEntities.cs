@@ -10,7 +10,7 @@ namespace Snail.Permission.Test.Entities
     {
         public string ExtraInfo { get; set; }
     }
-    public class RoleTest : InnerRole<Guid>
+    public class RoleTest : Role<Guid>
     {
         public string ExtraInfo { get; set; }
 
