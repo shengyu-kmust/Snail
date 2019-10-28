@@ -1,9 +1,9 @@
-﻿using Snail.Abstract;
-using Snail.Abstract.Entity;
+﻿using Snail.Core;
+using Snail.Core.Entity;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Snail.CRUD
+namespace Snail.DAL
 {
     /// <summary>
     /// 通用增、删、改、查处理

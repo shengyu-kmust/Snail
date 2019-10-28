@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.IdentityModel.Logging;
 using Snail.Common;
+using System.Threading.Tasks;
 
 namespace Snail.Database.Test
 {
@@ -155,6 +156,49 @@ q68H0YAe96orUsuZe9eT3cVfxZdICiowDp4+UvJTR1bvtFk13lJV
             }
             return cred;
 
+        }
+
+        [Fact]
+        public void LockStringTest()
+        {
+            try
+            {
+                var lockStr = "lock";
+                var count = 0;
+                var tasks = new List<Task>();
+                for (int i = 0; i < 10; i++)
+                {
+                    tasks.Add(Task.Run(() =>
+                    {
+                        lock (lockStr)
+                        {
+                            for (int j = 0; j < 10000; j++)
+                            {
+                                count = count + 1;
+                            }
+                            LockA();
+
+                        }
+
+                    }));
+                }
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch (Exception ex)
+            {
+                var ss = ex;
+            }
+        }
+        private static int c = 0;
+        private void LockA()
+        {
+            Task.Run(()=> { 
+             lock ("lock")
+            {
+                c = c + 1;
+            }
+            });
+           
         }
     }
 }

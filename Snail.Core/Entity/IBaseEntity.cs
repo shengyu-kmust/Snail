@@ -1,4 +1,4 @@
-﻿namespace Snail.Abstract.Entity
+﻿namespace Snail.Core.Entity
 {
     /// <summary>
     /// 继承此接口的即为entity
