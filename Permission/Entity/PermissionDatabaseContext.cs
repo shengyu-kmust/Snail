@@ -5,6 +5,17 @@ using System;
 
 namespace Snail.Entity
 {
+    /// <summary>
+    /// 外部系统的dbcontext可继承此类
+    /// </summary>
+    /// <typeparam name="TUser"></typeparam>
+    /// <typeparam name="TRole"></typeparam>
+    /// <typeparam name="TUserRole"></typeparam>
+    /// <typeparam name="TResource"></typeparam>
+    /// <typeparam name="TPermission"></typeparam>
+    /// <typeparam name="TOrganization"></typeparam>
+    /// <typeparam name="TUserOrg"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
     public abstract class PermissionDatabaseContext<TUser,TRole,TUserRole,TResource,TPermission,TOrganization,TUserOrg,TKey> : DbContext 
         where TUser: User<TKey>
         where TRole: Role<TKey>

@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Snail.Permission.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Snail.Permission.Controller
 {
-    public class PermissionController:ControllerBase
+    public class PermissionManagerController:ControllerBase
     {
+        private IPermissionDataManager permissionDataManager;
         #region 
         public object GetOrgTree()
         {

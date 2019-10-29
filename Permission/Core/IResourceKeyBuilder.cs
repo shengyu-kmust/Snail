@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Snail.Permission.Core
 {
-    public interface IPermission<TUser,TRole,TResource>
+    public interface IResourceKeyBuilder
     {
-        bool HasPermission(TUser user, TResource resource);
+        string BuildKey(object obj);
     }
 }

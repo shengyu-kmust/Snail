@@ -4,9 +4,8 @@ using System.Text;
 
 namespace Snail.Permission.Core
 {
-    public interface IUserManager<TUser>
+    public interface IPermissionDataStore<TUser,TRole,TUserRole,TResource,TRoleResource>
     {
-        void Save(TUser user);
-        void Delete(TUser user);
+
     }
 }
