@@ -10,6 +10,11 @@ using System.Text;
 
 namespace Snail.Permission.Core
 {
+    /// <summary>
+    /// 怎么用？
+    /// 用法一：自己实现entity时，
+    /// 用法二：默认完整用法
+    /// </summary>
     public static class PermissionServiceCollectionExtensions2
     {
         /// <summary>
@@ -84,6 +89,37 @@ namespace Snail.Permission.Core
             #endregion
         }
 
-        public static void 
+        /// <summary>
+        /// 自己定义各类IStore的实现，并注册进DI
+        /// </summary>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TRole"></typeparam>
+        /// <typeparam name="TUserRole"></typeparam>
+        /// <typeparam name="TResource"></typeparam>
+        /// <typeparam name="TRoleResource"></typeparam>
+        /// <typeparam name="TOrg"></typeparam>
+        /// <typeparam name="TUserOrg"></typeparam>
+        /// <param name="services"></param>
+        public static void AddPermission<TUser, TRole, TUserRole, TResource, TRoleResource,TOrg,TUserOrg>(this IServiceCollection services)
+        {
+
+        }
+
+        /// <summary>
+        /// 用ef
+        /// </summary>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TRole"></typeparam>
+        /// <typeparam name="TUserRole"></typeparam>
+        /// <typeparam name="TResource"></typeparam>
+        /// <typeparam name="TRoleResource"></typeparam>
+        /// <typeparam name="TOrg"></typeparam>
+        /// <typeparam name="TUserOrg"></typeparam>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <param name="services"></param>
+        public static void AddDefaultEFPermission<TUser, TRole, TUserRole, TResource, TRoleResource, TOrg, TUserOrg,TDbContext>(this IServiceCollection services)
+        {
+
+        }
     }
 }

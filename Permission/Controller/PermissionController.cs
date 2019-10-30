@@ -6,9 +6,46 @@ using System.Text;
 
 namespace Snail.Permission.Controller
 {
-    public class PermissionManagerController:ControllerBase
+    public class PermissionController:ControllerBase
     {
-        private IPermissionDataManager permissionDataManager;
+        private IPermissionManager _permissionManager;
+
+        #region 账号登录注册相关
+        /// <summary>
+        /// 获取token
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public object Token(string account, string password)
+        {
+            return _permissionManager.GetToken(account, password);
+        }
+
+        /// <summary>
+        /// 登录，登录信息放入cockies
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public void Login(string account, string password)
+        {
+            _permissionManager.SignIn(account, password);
+        }
+
+        /// <summary>
+        /// 注册
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public void Registor(string account,string password)
+        {
+            _permissionManager.Registor(account, password);
+        }
+
+        #endregion
+
+
+
         #region 
         public object GetOrgTree()
         {
