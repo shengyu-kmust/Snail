@@ -44,8 +44,6 @@ namespace Snail.Permission.Controller
 
         #endregion
 
-
-
         #region 
         public object GetOrgTree()
         {

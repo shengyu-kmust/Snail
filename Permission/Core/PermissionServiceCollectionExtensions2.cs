@@ -84,7 +84,7 @@ namespace Snail.Permission.Core
         public static void AddEFPermission<TUser,TRole,TUserRole,TResource,TRoleResource,TDbContext>(this IServiceCollection services)
         {
             #region 授权
-            services.AddScoped<IPermissionStore, EFPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource, TDbContext>>();
+            services.AddScoped<IPermissionStore, DefaultEFPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource, TDbContext>>();
             services.AddPermissionCore();
             #endregion
         }
@@ -119,7 +119,10 @@ namespace Snail.Permission.Core
         /// <param name="services"></param>
         public static void AddDefaultEFPermission<TUser, TRole, TUserRole, TResource, TRoleResource, TOrg, TUserOrg,TDbContext>(this IServiceCollection services)
         {
-
+            services.AddScoped<IPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource, TOrg, TUserOrg>, DefaultEFPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource, TOrg, TUserOrg, TDbContext>>();
+            
         }
+
+
     }
 }

@@ -6,10 +6,34 @@ using System.Text;
 
 namespace Snail.Permission
 {
-    public class EFPermissionStore<TUser,TRole,TUserRole,TResource,TRoleResource,TDbContext> : IPermissionStore
+    public class DefaultEFPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource,TOrg,TUserOrg,TDbContext> : IPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource, TOrg, TUserOrg>
     {
+        public List<TOrg> GetAllOrg()
+        {
+            throw new NotImplementedException();
+        }
 
-        public List<string> GetResourceKeys(TDbContext db)
+        public List<TRole> GetAllRole()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TUser> GetAllUser()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TUserOrg> GetAllUserOrg()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TUserRole> GetAllUserRole()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<TResource> GetResource()
         {
             throw new NotImplementedException();
         }
