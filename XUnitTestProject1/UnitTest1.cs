@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace XUnitTestProject1
+namespace Snail.FileStore
 {
     public class UnitTest1
     {
