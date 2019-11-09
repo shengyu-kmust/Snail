@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+/// <summary>
+/// 不再用，自己实现
+/// </summary>
 namespace Snail.Permission.IdentityStore
 {
     /// <summary>

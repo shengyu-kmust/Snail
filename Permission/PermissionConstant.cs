@@ -7,5 +7,6 @@ namespace Snail.Permission
     public class PermissionConstant
     {
         public const string PermissionAuthorizePolicy = nameof(PermissionAuthorizePolicy);
+        public const string PermissionScheme = nameof(PermissionScheme);
     }
 }

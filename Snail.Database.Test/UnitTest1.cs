@@ -118,13 +118,14 @@ q68H0YAe96orUsuZe9eT3cVfxZdICiowDp4+UvJTR1bvtFk13lJV
                 var jwt = new JwtSecurityToken("issuer", "audience", new List<Claim> { new Claim("name", "zhoujing") }, null, DateTime.Now.AddHours(1), cred);
                 var tokenStr = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                new JwtSecurityTokenHandler().ValidateToken(tokenStr, new TokenValidationParameters {
-                    IssuerSigningKeys=new List<SecurityKey> {
+                new JwtSecurityTokenHandler().ValidateToken(tokenStr, new TokenValidationParameters
+                {
+                    IssuerSigningKeys = new List<SecurityKey> {
                         new SymmetricSecurityKey(Encoding.UTF8.GetBytes("1234567890abcdefghij")),
                         new RsaSecurityKey(RSAHelper.GetRSAParametersFromFromPrivatePem(priKey))
                     },
-                    ValidateAudience=false,
-                    ValidateIssuer=false
+                    ValidateAudience = false,
+                    ValidateIssuer = false
                 }, out SecurityToken securityToken);
             }
             catch (Exception ex)
@@ -158,47 +159,58 @@ q68H0YAe96orUsuZe9eT3cVfxZdICiowDp4+UvJTR1bvtFk13lJV
 
         }
 
+
         [Fact]
-        public void LockStringTest()
+        public void GetTreeTest()
         {
             try
-            {
-                var lockStr = "lock";
-                var count = 0;
-                var tasks = new List<Task>();
-                for (int i = 0; i < 10; i++)
-                {
-                    tasks.Add(Task.Run(() =>
-                    {
-                        lock (lockStr)
-                        {
-                            for (int j = 0; j < 10000; j++)
-                            {
-                                count = count + 1;
-                            }
-                            LockA();
 
-                        }
-
-                    }));
-                }
-                Task.WaitAll(tasks.ToArray());
-            }
-            catch (Exception ex)
             {
-                var ss = ex;
+                var list = new List<TreeEntity>
+            {
+                new TreeEntity{Id=1,Name=1,ParentId=0},
+                new TreeEntity{Id=2,Name=1,ParentId=0},
+                new TreeEntity{Id=11,Name=1,ParentId=1},
+                new TreeEntity{Id=12,Name=1,ParentId=1},
+                new TreeEntity{Id=21,Name=1,ParentId=2},
+                new TreeEntity{Id=22,Name=1,ParentId=2}
+            };
+                var result = GetTree(list, 0);
             }
+
+            catch (Exception ss)
+            {
+
+                var a = ss;
+            }
+
         }
-        private static int c = 0;
-        private void LockA()
+
+        private TreeNode<TreeEntity> GetTree(List<TreeEntity> list, int parentId)
         {
-            Task.Run(()=> { 
-             lock ("lock")
+            var data = list.FirstOrDefault(a => a.Id == parentId);
+            var parent = list.FirstOrDefault(a => a.Id == data.ParentId);
+            var childs = list.Where(a => a.ParentId == parentId).Select(a => GetTree(list, a.Id)).ToList();
+            return new TreeNode<TreeEntity>
             {
-                c = c + 1;
-            }
-            });
-           
+                Data = data,
+                Parent = parent,
+                Childs = childs
+            };
         }
+    }
+
+    public class TreeNode<T>
+    {
+        public T Data { get; set; }
+        public T Parent { get; set; }
+        public List<TreeNode<T>> Childs { get; set; }
+    }
+
+    public class TreeEntity
+    {
+        public int Id { get; set; }
+        public int Name { get; set; }
+        public int ParentId { get; set; }
     }
 }

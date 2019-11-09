@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
+/// <summary>
+/// 要修改
+/// </summary>
 namespace Snail.Permission
 {
     public class PermissionPasswordHasher<TUser> : IPasswordHasher<TUser> where TUser:class
