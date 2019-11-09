@@ -3,7 +3,7 @@ using Snail.Core.Entity;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Snail.DAL
+namespace Snail.Core.Interface
 {
     /// <summary>
     /// 通用增、删、改、查处理

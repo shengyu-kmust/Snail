@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Snail.Common;
 using Snail.Core;
 using Snail.Core.Entity;
-using Snail.Common;
+using Snail.Core.Interface;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Snail.DAL
 {
@@ -74,13 +74,7 @@ namespace Snail.DAL
             where TQueryDto : IPagination
         {
             var resultQuery = QueryInternal<TResult, TQueryDto>(queryDto);
-            return new PageResult<TResult>
-            {
-                Items = resultQuery.AsNoTracking().ToList(),
-                PageIndex = queryDto.PageIndex,
-                PageSize = queryDto.PageSize,
-                Total = resultQuery.Count()
-            };
+            return resultQuery.ToPageList(queryDto);
         }
         private IQueryable<TResult> QueryInternal<TResult, TQueryDto>(TQueryDto queryDto)
         {

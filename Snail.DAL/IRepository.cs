@@ -74,7 +74,7 @@ namespace Snail.DAL
         void Delete(params object[] keyValues);
 
         /// <summary>
-        /// 查找单个实体
+        /// 通过主键查找单个实体
         /// </summary>
         /// <param name="keyValues"></param>
         /// <returns></returns>
