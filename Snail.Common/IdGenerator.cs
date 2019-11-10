@@ -14,6 +14,7 @@ namespace Snail.Common
             }
             if (typeof(TKey) == typeof(string))
             {
+                // todo默认用snow的
                 return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString($"{DateTime.Now.ToString("yyyyMMddHHmmss")}{new Random().Next(100).ToString().PadLeft(3,'0')}");
             }
             throw new NotSupportedException($"不支持此类型的id");

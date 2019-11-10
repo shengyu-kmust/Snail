@@ -8,6 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// 
+/// </summary>
+/// 
+// todo：实现createrId的赋值
 namespace Snail.DAL
 {
     /// <summary>
@@ -19,16 +24,18 @@ namespace Snail.DAL
     public abstract class EFCRUDService<TEntity,TSource,TKey> : ICRUDService<TEntity, TKey> where TEntity : class, IEntityId<TKey>
     {
         public DbContext db;
-        private IMapper _mapper;
+        public IMapper _mapper;
         public DbSet<TEntity> entities;
         public IQueryable<TSource> QuerySource { get; set; }
         public EFCRUDService(DbContext db,IMapper mapper)
         {
             this.db = db;
-            QuerySource = InitQuerySource();
+            this._mapper = mapper;
+            this.entities = db.Set<TEntity>();
         }
 
-        public abstract IQueryable<TSource> InitQuerySource();
+        public abstract TKey GetCurrentUserId();
+        public abstract void InitQuerySource();
 
         public virtual TEntity Add<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
         {
@@ -36,7 +43,18 @@ namespace Snail.DAL
             {
                 saveDto.Id = IdGenerator.Generate<TKey>();
             }
-            entities.Add(_mapper.Map<TEntity>(saveDto));
+            var entity = _mapper.Map<TEntity>(saveDto);
+            if (entity is IEntityAudit<TKey> entityAudit)
+            {
+                entityAudit.UpdateTime = DateTime.Now;
+                entityAudit.CreateTime = DateTime.Now;
+                if (GetCurrentUserId()!=null)
+                {
+                    entityAudit.CreaterId = GetCurrentUserId();
+                    entityAudit.UpdaterId = GetCurrentUserId();
+                }
+            }
+            entities.Add(entity);
             db.SaveChanges();
             return entities.Find(saveDto.Id);
         }
@@ -48,10 +66,17 @@ namespace Snail.DAL
                 throw new ArgumentNullException();
             }
             var entity = entities.Find(id);
-            
+            if (entity==null)
+            {
+                throw new BusinessException($"您要删除的对象不存在，id为{id}");
+            }
             if (entity is IEntityAudit<TKey> entityAudit)
             {
                 entityAudit.UpdateTime = DateTime.Now;
+                if (GetCurrentUserId() != null)
+                {
+                    entityAudit.UpdaterId = GetCurrentUserId();
+                }
             }
             if (entity is IEntitySoftDelete entitySoftDelete)
             {
@@ -80,7 +105,7 @@ namespace Snail.DAL
         {
             IQueryable<TSource> query = QuerySource;
             // 查询条件
-            if (queryDto is IPredicateConvert<TQueryDto, TSource> predicateConvert)
+            if (queryDto is IPredicateConvert<TSource> predicateConvert)
             {
                 var predicate = predicateConvert.GetExpression();
                 query = query.Where(predicate);
@@ -115,6 +140,15 @@ namespace Snail.DAL
                 throw new Exception("要修改的实体不存在");
             }
             _mapper.Map(saveDto, entity, typeof(TSaveDto), typeof(TEntity));
+            if (entity is IEntityAudit<TKey> entityAudit)
+            {
+                entityAudit.UpdateTime = DateTime.Now;
+                entityAudit.CreateTime = DateTime.Now;
+                if (GetCurrentUserId() != null)
+                {
+                    entityAudit.UpdaterId = GetCurrentUserId();
+                }
+            }
             db.SaveChanges();
             return entity;
         }

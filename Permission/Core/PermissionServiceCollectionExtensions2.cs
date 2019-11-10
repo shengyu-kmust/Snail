@@ -67,7 +67,7 @@ namespace Snail.Permission.Core
             //权限控制参考：https://docs.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-2.2
             //handler和requirement有几种关系：1 handler对多requirement(此时handler实现IAuthorizationHandler)；1对1（实现AuthorizationHandler<PermissionRequirement>），和多对1
             //所有的handler都要注入到services，用services.AddSingleton<IAuthorizationHandler, xxxHandler>()，而哪个requirement用哪个handler，低层会自动匹配。最后将requirement对到policy里即可
-            services.AddSingleton<PermissionManager>();
+            //services.AddSingleton<PermissionManager>();
             // 授权策略
             services.AddAuthorization(options =>
             {
@@ -84,7 +84,7 @@ namespace Snail.Permission.Core
         public static void AddEFPermission<TUser,TRole,TUserRole,TResource,TRoleResource,TDbContext>(this IServiceCollection services)
         {
             #region 授权
-            services.AddScoped<IPermissionStore, DefaultEFPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource, TDbContext>>();
+            //services.AddScoped<IPermissionStore, DefaultEFPermissionStore<TUser, TRole, TUserRole, TResource, TRoleResource, TDbContext>>();
             services.AddPermissionCore();
             #endregion
         }

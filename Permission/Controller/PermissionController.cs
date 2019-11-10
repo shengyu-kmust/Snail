@@ -8,7 +8,7 @@ namespace Snail.Permission.Controller
 {
     public class PermissionController:ControllerBase
     {
-        private IPermissionManager _permissionManager;
+        //private IPermissionManager _permissionManager;
 
         #region 账号登录注册相关
         /// <summary>
@@ -18,7 +18,8 @@ namespace Snail.Permission.Controller
         [HttpGet]
         public object Token(string account, string password)
         {
-            return _permissionManager.GetToken(account, password);
+            throw new NotImplementedException();
+            //return _permissionManager.GetToken(account, password);
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace Snail.Permission.Controller
         [HttpPost]
         public void Login(string account, string password)
         {
-            _permissionManager.SignIn(account, password);
+            //_permissionManager.SignIn(account, password);
         }
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace Snail.Permission.Controller
         /// <returns></returns>
         public void Registor(string account,string password)
         {
-            _permissionManager.Registor(account, password);
+            //_permissionManager.Registor(account, password);
         }
 
         #endregion
