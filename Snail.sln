@@ -17,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Core", "Snail.Core\Sn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.DAL", "Snail.DAL\Snail.DAL.csproj", "{724FE0A8-48B1-4CD7-AB36-5B17FB6C3826}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTestProject1", "XUnitTestProject1\XUnitTestProject1.csproj", "{220BB987-37D7-4E7F-83B3-8F0A59A61A0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestProject1", "XUnitTestProject1\XUnitTestProject1.csproj", "{220BB987-37D7-4E7F-83B3-8F0A59A61A0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.FileStore", "Snail.FileStore\Snail.FileStore.csproj", "{41E4A182-E853-42E3-9767-B7393E0C7927}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.FileStore", "Snail.FileStore\Snail.FileStore.csproj", "{41E4A182-E853-42E3-9767-B7393E0C7927}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.Office", "Snail.Office\Snail.Office.csproj", "{1BB49260-F557-462A-9DD8-DD903FCB7261}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{41E4A182-E853-42E3-9767-B7393E0C7927}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41E4A182-E853-42E3-9767-B7393E0C7927}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41E4A182-E853-42E3-9767-B7393E0C7927}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BB49260-F557-462A-9DD8-DD903FCB7261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BB49260-F557-462A-9DD8-DD903FCB7261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BB49260-F557-462A-9DD8-DD903FCB7261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BB49260-F557-462A-9DD8-DD903FCB7261}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
