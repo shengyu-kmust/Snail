@@ -39,7 +39,7 @@ namespace Snail.DAL
 
         public virtual TEntity Add<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
         {
-            if (saveDto.Id == default || saveDto.Id==null)
+            if (saveDto.Id.Equals(default(TKey)) || saveDto.Id==null)
             {
                 saveDto.Id = IdGenerator.Generate<TKey>();
             }
@@ -130,7 +130,7 @@ namespace Snail.DAL
 
         public virtual TEntity Update<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
         {
-            if (saveDto.Id == default || saveDto.Id==null)
+            if (saveDto.Id.Equals(default) || saveDto.Id==null)
             {
                 throw new Exception("修改时，必须转入id");
             }
