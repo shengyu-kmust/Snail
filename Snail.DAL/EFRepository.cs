@@ -10,6 +10,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 
+/// <summary>
+/// 完成
+/// </summary>
 namespace Snail.DAL
 {
 
@@ -34,21 +37,13 @@ namespace Snail.DAL
         public virtual void Add(TEntity entity)
         {
             var userId = (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(_applicationContext.GetCurrentUserId());
+            var now= DateTime.Now;
             if (entity.Id.Equals(default) || entity.Id==null)
             {
                 entity.Id = IdGenerator.Generate<TKey>();
             }
-            if (entity is IEntityAudit<TKey> entityAudit)
-            {
-                entityAudit.UpdaterId = userId;
-                entityAudit.UpdateTime = DateTime.Now;
-                entityAudit.CreaterId = userId;
-                entityAudit.
 
-                entityAudit.UpdaterId = _applicationContext.GetCurrentUserId();
-            }
-
-
+            DealAudit(entity);
             _dbSet.Add(entity);
             _dbContext.SaveChanges();
         }
@@ -56,7 +51,11 @@ namespace Snail.DAL
         #region delete
         public virtual void Delete(TKey key)
         {
-            throw new NotImplementedException();
+            var userId = (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(_applicationContext.GetCurrentUserId());
+            var now = DateTime.Now;
+            var entity = _dbSet.Find(key);
+            DealSoftDelete(entity);
+            _dbContext.SaveChanges();
         }
         #endregion
         #region update
@@ -67,11 +66,13 @@ namespace Snail.DAL
             {
                 entityEntry.Property(property).IsModified = true;
             }
+            DealAudit(entityEntry.Entity);
             _dbContext.SaveChanges();
         }
 
         public virtual void Update(TEntity entity)
         {
+            DealAudit(entity);
             _dbContext.Update(entity);
             _dbContext.SaveChanges();
         }
@@ -96,6 +97,40 @@ namespace Snail.DAL
 
         #endregion
 
-      
+        #region 帮助方法
+        private void DealAudit(TEntity entity)
+        {
+            if (entity is IEntityAudit<TKey> entityAudit)
+            {
+                var userId = (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(_applicationContext.GetCurrentUserId());
+                var now = DateTime.Now;
+                entityAudit.Updater = userId;
+                entityAudit.UpdateTime = now;
+                entityAudit.Creater = userId;
+                entityAudit.CreateTime = now;
+            }
+        }
+
+        private void DealSoftDelete(TEntity entity)
+        {
+            if (entity is IEntitySoftDelete entitySoftDelete)
+            {
+                var userId = (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(_applicationContext.GetCurrentUserId());
+                var now = DateTime.Now;
+                if (entity is IEntityAudit<TKey> entityAudit)
+                {
+                    entityAudit.Updater = userId;
+                    entityAudit.UpdateTime = now;
+                }
+                entitySoftDelete.IsDeleted = true;
+            }
+            else
+            {
+                _dbSet.Remove(entity);
+            }
+        }
+
+        #endregion
+
     }
 }

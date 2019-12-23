@@ -10,9 +10,9 @@ namespace Snail.Core.Entity
     /// <typeparam name="T">key类型</typeparam>
     public interface IEntityAudit<T>
     {
-        T CreaterId { get; set; }
+        T Creater { get; set; }
         DateTime CreateTime { get; set; }
-        T UpdaterId { get; set; }
+        T Updater { get; set; }
         DateTime UpdateTime { get; set; }
     }
 }

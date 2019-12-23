@@ -19,7 +19,7 @@ namespace Snail.Core.Interface
         List<TCacheItem> GetAll<TEntity, TCacheItem>() where TEntity : class;
 
         /// <summary>
-        /// 从数据库里加载实体缓存
+        /// 从数据库里加载所有实体缓存
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TCacheItem"></typeparam>

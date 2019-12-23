@@ -50,8 +50,8 @@ namespace Snail.DAL
                 entityAudit.CreateTime = DateTime.Now;
                 if (GetCurrentUserId()!=null)
                 {
-                    entityAudit.CreaterId = GetCurrentUserId();
-                    entityAudit.UpdaterId = GetCurrentUserId();
+                    entityAudit.Creater = GetCurrentUserId();
+                    entityAudit.Updater = GetCurrentUserId();
                 }
             }
             entities.Add(entity);
@@ -75,7 +75,7 @@ namespace Snail.DAL
                 entityAudit.UpdateTime = DateTime.Now;
                 if (GetCurrentUserId() != null)
                 {
-                    entityAudit.UpdaterId = GetCurrentUserId();
+                    entityAudit.Updater = GetCurrentUserId();
                 }
             }
             if (entity is IEntitySoftDelete entitySoftDelete)
@@ -146,7 +146,7 @@ namespace Snail.DAL
                 entityAudit.CreateTime = DateTime.Now;
                 if (GetCurrentUserId() != null)
                 {
-                    entityAudit.UpdaterId = GetCurrentUserId();
+                    entityAudit.Updater = GetCurrentUserId();
                 }
             }
             db.SaveChanges();

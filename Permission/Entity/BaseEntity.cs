@@ -17,9 +17,9 @@ namespace Snail.Entity
         //public DateTime UpdateTime { get; set; }=DateTime.Now;
         //public int IsValid { get; set; } = 1;
         public TKey Id { get;set;}
-        public TKey CreaterId { get;set;}
+        public TKey Creater { get;set;}
         public DateTime CreateTime { get;set;}
-        public TKey UpdaterId { get;set;}
+        public TKey Updater { get;set;}
         public DateTime UpdateTime { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
     }
