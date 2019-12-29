@@ -9,7 +9,7 @@ using Snail.Permission.Test;
 namespace Snail.Permission.Test.Migrations
 {
     [DbContext(typeof(TestDbContext))]
-    [Migration("20190921113348_init")]
+    [Migration("20191228092312_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -19,120 +19,122 @@ namespace Snail.Permission.Test.Migrations
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Snail.Permission.Test.TestOrganization", b =>
+            modelBuilder.Entity("Snail.Entity.Org", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreateTime");
 
-                    b.Property<Guid>("CreaterId");
+                    b.Property<string>("Creater");
 
                     b.Property<bool>("IsDeleted");
 
                     b.Property<string>("Name");
 
-                    b.Property<Guid>("ParentId");
+                    b.Property<string>("ParentId");
 
                     b.Property<DateTime>("UpdateTime");
 
-                    b.Property<Guid>("UpdaterId");
+                    b.Property<string>("Updater");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Organizations");
+                    b.ToTable("Orgs");
                 });
 
-            modelBuilder.Entity("Snail.Permission.Test.TestPermission", b =>
+            modelBuilder.Entity("Snail.Entity.Resource", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Code");
 
                     b.Property<DateTime>("CreateTime");
 
-                    b.Property<Guid>("CreaterId");
-
-                    b.Property<bool>("IsDeleted");
-
-                    b.Property<Guid>("ResourceId");
-
-                    b.Property<Guid>("RoleId");
-
-                    b.Property<DateTime>("UpdateTime");
-
-                    b.Property<Guid>("UpdaterId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Permissions");
-                });
-
-            modelBuilder.Entity("Snail.Permission.Test.TestResource", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("CreateTime");
-
-                    b.Property<Guid>("CreaterId");
+                    b.Property<string>("Creater");
 
                     b.Property<string>("Description");
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<string>("Key");
+                    b.Property<string>("Name");
 
-                    b.Property<int>("ParentId");
+                    b.Property<string>("ParentId");
 
                     b.Property<DateTime>("UpdateTime");
 
-                    b.Property<Guid>("UpdaterId");
-
-                    b.Property<string>("Value");
+                    b.Property<string>("Updater");
 
                     b.HasKey("Id");
 
                     b.ToTable("Resources");
                 });
 
-            modelBuilder.Entity("Snail.Permission.Test.TestRole", b =>
+            modelBuilder.Entity("Snail.Entity.Role", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreateTime");
 
-                    b.Property<Guid>("CreaterId");
+                    b.Property<string>("Creater");
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<string>("RoleName");
+                    b.Property<string>("Name");
 
                     b.Property<DateTime>("UpdateTime");
 
-                    b.Property<Guid>("UpdaterId");
+                    b.Property<string>("Updater");
 
                     b.HasKey("Id");
 
                     b.ToTable("Role");
                 });
 
-            modelBuilder.Entity("Snail.Permission.Test.TestUser", b =>
+            modelBuilder.Entity("Snail.Entity.RoleResource", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreateTime");
 
-                    b.Property<Guid>("CreaterId");
-
-                    b.Property<string>("Email");
-
-                    b.Property<Guid>("Gender");
+                    b.Property<string>("Creater");
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<string>("LoginName");
+                    b.Property<string>("ResourceId");
+
+                    b.Property<string>("RoleId");
+
+                    b.Property<DateTime>("UpdateTime");
+
+                    b.Property<string>("Updater");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions");
+                });
+
+            modelBuilder.Entity("Snail.Entity.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Account");
+
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<string>("Creater");
+
+                    b.Property<string>("Email");
+
+                    b.Property<int>("Gender");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<string>("Name");
 
                     b.Property<string>("Phone");
 
@@ -140,57 +142,55 @@ namespace Snail.Permission.Test.Migrations
 
                     b.Property<DateTime>("UpdateTime");
 
-                    b.Property<Guid>("UpdaterId");
-
-                    b.Property<string>("UserName");
+                    b.Property<string>("Updater");
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Snail.Permission.Test.TestUserOrg", b =>
+            modelBuilder.Entity("Snail.Entity.UserOrg", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreateTime");
 
-                    b.Property<Guid>("CreaterId");
+                    b.Property<string>("Creater");
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<int>("OrgId");
+                    b.Property<string>("OrgId");
 
                     b.Property<DateTime>("UpdateTime");
 
-                    b.Property<Guid>("UpdaterId");
+                    b.Property<string>("Updater");
 
-                    b.Property<int>("UserId");
+                    b.Property<string>("UserId");
 
                     b.HasKey("Id");
 
                     b.ToTable("UserOrgs");
                 });
 
-            modelBuilder.Entity("Snail.Permission.Test.TestUserRole", b =>
+            modelBuilder.Entity("Snail.Entity.UserRole", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreateTime");
 
-                    b.Property<Guid>("CreaterId");
+                    b.Property<string>("Creater");
 
                     b.Property<bool>("IsDeleted");
 
-                    b.Property<int>("RoleId");
+                    b.Property<string>("RoleId");
 
                     b.Property<DateTime>("UpdateTime");
 
-                    b.Property<Guid>("UpdaterId");
+                    b.Property<string>("Updater");
 
-                    b.Property<int>("UserId");
+                    b.Property<string>("UserId");
 
                     b.HasKey("Id");
 

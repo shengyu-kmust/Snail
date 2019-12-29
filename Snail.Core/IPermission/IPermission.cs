@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 
 namespace Snail.Core.IPermission
@@ -9,6 +10,8 @@ namespace Snail.Core.IPermission
     /// </summary>
     public interface IPermission
     {
+        #region 注册
+        #endregion
         #region 登录
         /// <summary>
         /// 获取登录token
@@ -19,25 +22,29 @@ namespace Snail.Core.IPermission
         string GetLoginToken(string account, string pwd);
 
         /// <summary>
-        /// 获取用户信息
+        /// 获取用户信息，用于给前端用户展示
         /// </summary>
         /// <param name="token"></param>
         IUserInfo GetUserInfo(string token);
 
         /// <summary>
-        /// 获取所有资源和角色的对应关系信息
+        /// 获取所有的资源以及资源角色的对应关系信息
         /// </summary>
         /// <returns></returns>
-        List<IResourceRole> GetAllResourceRoles();
+        IEnumerable<IResourceRoleInfo> GetAllResourceRoles();
+
+        string GetUserKey(ClaimsPrincipal claimsPrincipal);
         #endregion
 
-        bool HasPermission(string resourceCode,string userId);
+        string HashPwd(string pwd);
+
+        bool HasPermission(string resourceKey,string userKey);
 
         /// <summary>
         /// 生成resource code
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        string GenerateResourceCode(object obj);
+        string GetRequestResourceKey(object obj);
     }
 }

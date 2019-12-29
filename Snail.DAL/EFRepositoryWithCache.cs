@@ -17,7 +17,7 @@ namespace Snail.DAL
         private static string cachePrifex = "entityRepositoryCache";
         private IMemoryCache _memoryCache;
         private string _cacheKey;
-        public EFRepositoryWithCache(DbContext db,IMemoryCache memoryCache):base(db)
+        public EFRepositoryWithCache(DbContext db,IMemoryCache memoryCache,IApplicationContext applicationContext):base(db, applicationContext)
         {
             _memoryCache = memoryCache;
             _cacheKey = $"{cachePrifex}_{typeof(TEntity).Name}";

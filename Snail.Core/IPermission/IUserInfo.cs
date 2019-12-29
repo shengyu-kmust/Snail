@@ -12,11 +12,11 @@ namespace Snail.Core.IPermission
         /// <summary>
         /// 用户ID，系统的唯一键
         /// </summary>
-        string Id { get; set; }
+        string UserKey { get; set; }
         /// <summary>
         /// 用户姓名
         /// </summary>
-        string Name { get; set; }
+        string UserName { get; set; }
         /// <summary>
         /// 用户账号
         /// </summary>
@@ -24,6 +24,10 @@ namespace Snail.Core.IPermission
         /// <summary>
         /// 用户角色ID
         /// </summary>
-        List<string> RoleIds { get; set; }
+        List<string> RoleKeys { get; set; }
+        /// <summary>
+        /// 用户角色名
+        /// </summary>
+        List<string> RoleNames { get; set; }
     }
 }

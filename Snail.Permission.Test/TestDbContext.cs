@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Snail.Database;
 using Snail.Entity;
 using System;
 using System.Collections.Generic;
@@ -7,15 +8,27 @@ using System.Threading.Tasks;
 
 namespace Snail.Permission.Test
 {
-    public class TestDbContext: PermissionDatabaseContext<TestUser,TestRole,TestUserRole,TestResource,TestPermission,TestOrganization,TestUserOrg,Guid>
+    public class TestDbContext : PermissionDatabaseContext
     {
-        public TestDbContext(DbContextOptions options):base(options)
+        public TestDbContext()
+        {
+
+        }
+        public TestDbContext(DbContextOptions options) : base(options)
         {
         }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+     
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            if (optionsBuilder.IsConfigured)
+            {
+                return;
+            }
+            else
+            {
+                optionsBuilder.UseMySql(ConnectStringHelper.ConnForMySql("localhost", "testPermission", "root", "root"));
+            }
+
         }
     }
 }

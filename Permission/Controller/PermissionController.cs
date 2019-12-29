@@ -1,133 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Snail.Permission.Core;
-using System;
+using Snail.Core.IPermission;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Snail.Permission.Controller
 {
+    [Route("[Controller]/[Action]")]
     public class PermissionController:ControllerBase
     {
-        //private IPermissionManager _permissionManager;
+        private IPermission _permission;
+        public PermissionController(IPermission permission)
+        {
+            _permission = permission;
+        }
 
-        #region 账号登录注册相关
+     
         /// <summary>
         /// 获取token
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public object Token(string account, string password)
+        public string GetLoginToken([FromQuery]string account, [FromQuery]string password)
         {
-            throw new NotImplementedException();
-            //return _permissionManager.GetToken(account, password);
+            return _permission.GetLoginToken(account, password);
         }
 
         /// <summary>
-        /// 登录，登录信息放入cockies
+        /// 获取用户信息
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
-        public void Login(string account, string password)
+        [HttpGet]
+        public IUserInfo GetUserInfo(string token)
         {
-            //_permissionManager.SignIn(account, password);
+            return _permission.GetUserInfo(token);
         }
 
         /// <summary>
-        /// 注册
+        /// 获取所有的资源以及资源角色的对应关系信息
         /// </summary>
-        /// <param name="account"></param>
-        /// <param name="password"></param>
         /// <returns></returns>
-        public void Registor(string account,string password)
+        [HttpGet]
+        public IEnumerable<IResourceRoleInfo> GetUserInfo()
         {
-            //_permissionManager.Registor(account, password);
+            return _permission.GetAllResourceRoles();
         }
 
-        #endregion
-
-        #region 
-        public object GetOrgTree()
-        {
-            throw new NotImplementedException();
-        }
-
-        #region 角色-资源
-        /// <summary>
-        /// 为角色增加的资源权限
-        /// </summary>
-        /// <param name="roleId">角色ID</param>
-        /// <param name="resourceIds">资源</param>
-        /// <returns></returns>
-        public ActionResult AddPermission(object roleId, List<object> resourceIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 移除角色的的资源权限
-        /// </summary>
-        /// <param name="roleId">角色ID</param>
-        /// <param name="resourceIds">资源ID</param>
-        /// <returns></returns>
-        public ActionResult RemovePermission(object roleId, List<object> resourceIds)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 获取角色所有的权限
-        /// </summary>
-        /// <param name="roleId"></param>
-        /// <returns></returns>
-        public ActionResult RoleAllPermission(object roleId)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
-
-        #region 用户-角色
-        /// <summary>
-        /// 设置用户的角色
-        /// </summary>
-        /// <param name="userIds"></param>
-        /// <param name="roleIds"></param>
-        /// <returns></returns>
-        public ActionResult AddRolesToUser(object userId, object roleIds)
-        {
-            throw new NotImplementedException();
-        }
-        /// <summary>
-        /// 删除用户的角色
-        /// </summary>
-        /// <param name="userIds"></param>
-        /// <param name="roleIds"></param>
-        /// <returns></returns>
-        public ActionResult RemoveRolesFromUsers(int userId, string roleIds)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        #endregion
-
-        #region 资源
-
-
-        #endregion
-
-        #region 角色
-
-        public ActionResult AddRole(object roleName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ActionResult DeleteRole(object roleId)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-        #endregion
     }
 }

@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace Snail.Permission.Test.Controllers
 {
+    [Route("[Controller]/[Action]")]
     public class AccountController
     {
-        private PermissionTestDbContext _dbContext;
-        public AccountController(PermissionTestDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        
 
         [HttpGet]
         public string Test()

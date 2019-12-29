@@ -24,7 +24,7 @@ namespace Snail.Common
         }
 
         /// <summary>
-        /// 计算基于密钥的哈希值，并返回166进制表示的字符串
+        /// 计算基于密钥的哈希值，并返回16进制表示的字符串
         /// </summary>
         /// <param name="content"></param>
         /// <param name="key"></param>

@@ -8,17 +8,12 @@ namespace Snail.Core.IPermission
     /// <summary>
     /// 资源（指所有要权限控制的资源，如接口,菜单）
     /// </summary>
-    public interface IResource
+    public interface IResource:IHasKeyAndName
     {
         /// <summary>
-        /// 资源唯一code
+        /// 用于绑定到前端 
         /// </summary>
-        string Code { get; set; }
-
-        /// <summary>
-        /// 资源类型
-        /// </summary>
-        EResourceType ResourceType { get; set; }
-
+        /// <returns></returns>
+        string GetResourceCode();
     }
 }

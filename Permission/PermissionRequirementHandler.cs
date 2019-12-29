@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Snail.Core.IPermission;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,13 +10,20 @@ namespace Snail.Permission
 {
     public class PermissionRequirementHandler : AuthorizationHandler<PermissionRequirement>
     {
+        private IPermission _permission;
+        public PermissionRequirementHandler(IPermission permission)
+        {
+            _permission = permission;
+        }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
-            var user = context.User;
-            var resource = context.Resource;
-            context.Succeed(requirement);
+            var resourceKey=_permission.GetRequestResourceKey(context);
+            var userKey = _permission.GetUserKey(context.User);
+            if (_permission.HasPermission(resourceKey,userKey))
+            {
+                context.Succeed(requirement);
+            }
             return Task.CompletedTask;
-
         }
     }
 }

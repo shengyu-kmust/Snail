@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Snail.Permission.Core;
 
 namespace Snail.Permission.Test
 {
@@ -27,11 +20,14 @@ namespace Snail.Permission.Test
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddDbContext<TestDbContext>(options =>
-            {
-                options.UseMySql("Server=localhost;Port=3306;Database=permissionTest;User Id=root;Password = root;");
-            });
-            services.AddPermission<TestUser, TestRole, TestUserRole, TestResource, TestPermission, TestOrganization, TestUserOrg, TestDbContext, Guid>();
+            services.AddPermission();
+            services.AddDbContext<DbContext,TestDbContext>();
+
+            //services.AddDbContext<TestDbContext>(options =>
+            //{
+            //    options.UseMySql("Server=localhost;Port=3306;Database=permissionTest;User Id=root;Password = root;");
+            //});
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
