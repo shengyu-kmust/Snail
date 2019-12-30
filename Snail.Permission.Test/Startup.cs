@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Snail.Permission.Test
 {
@@ -20,14 +21,19 @@ namespace Snail.Permission.Test
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddPermission();
-            services.AddDbContext<DbContext,TestDbContext>();
-
+            services.AddDbContext<TestDbContext>();
+            services.AddPermission<TestDbContext>(options =>
+            {
+                options.RsaPrivateKey = Configuration.GetSection("PermissionOptions:RsaPrivateKey").Value;
+                options.RsaPublicKey = Configuration.GetSection("PermissionOptions:RsaPublicKey").Value;
+                options.PasswordSalt = Configuration.GetSection("PermissionOptions:PasswordSalt").Value;
+                options.ResourceAssemblies = new Assembly[] { Assembly.GetExecutingAssembly() };
+            });
             //services.AddDbContext<TestDbContext>(options =>
             //{
             //    options.UseMySql("Server=localhost;Port=3306;Database=permissionTest;User Id=root;Password = root;");
             //});
-           
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -5,17 +5,13 @@ namespace Snail.Entity
     public class Resource:BaseEntity,IResource
     {
         /// <summary>
-        /// 资源键，如接口名，菜单名
+        /// 资源键，如接口名，菜单名，唯一键
         /// </summary>
         public string Code { get; set; }
         /// <summary>
-        /// 资源值，如url地址
-        /// </summary>
-        public string Name { get; set; }
-        /// <summary>
         /// 资源描述，如接口的名称、菜单的名称
         /// </summary>
-        public string Description { get; set; }
+        public string Name { get; set; }
         /// <summary>
         /// 父资源id
         /// </summary>

@@ -10,9 +10,7 @@ namespace Snail.Core.IPermission
     /// </summary>
     public interface IPermission
     {
-        #region 注册
-        #endregion
-        #region 登录
+        
         /// <summary>
         /// 获取登录token
         /// </summary>
@@ -34,7 +32,7 @@ namespace Snail.Core.IPermission
         IEnumerable<IResourceRoleInfo> GetAllResourceRoles();
 
         string GetUserKey(ClaimsPrincipal claimsPrincipal);
-        #endregion
+
 
         string HashPwd(string pwd);
 
@@ -46,5 +44,10 @@ namespace Snail.Core.IPermission
         /// <param name="obj"></param>
         /// <returns></returns>
         string GetRequestResourceKey(object obj);
+
+        /// <summary>
+        /// 初始化所有的资源 
+        /// </summary>
+        void InitResource();
     }
 }

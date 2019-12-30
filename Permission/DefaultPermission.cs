@@ -1,24 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Snail.Common;
 using Snail.Common.Extenssions;
 using Snail.Core;
+using Snail.Core.Attributes;
 using Snail.Core.IPermission;
+using Snail.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace Snail.Permission
 {
-    public class DefaultPermission<TUser, TRole, TUserRole, TResource, TRoleResource> : IPermission
+    public class DefaultPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource> : IPermission
         where TUser : class, IUser, new()
         where TRole : class, IRole, new()
         where TUserRole : class, IUserRole, new()
         where TResource : class, IResource, new()
         where TRoleResource : class, IRoleResource, new()
+        where TDbContext : DbContext
     {
         private static List<TUser> _users;
         private static List<TRole> _roles;
@@ -30,20 +37,33 @@ namespace Snail.Permission
         private PermissionOptions _permissionOptions;
 
         private IMemoryCache cache;
-        public DefaultPermission(DbContext dbContext, IToken token, IOptionsMonitor<PermissionOptions> permissionOptions)
+        public DefaultPermission(TDbContext dbContext, IToken token, IOptionsMonitor<PermissionOptions> permissionOptions)
         {
             _dbContext = dbContext;
             _token = token;
             _permissionOptions = permissionOptions?.CurrentValue ?? new PermissionOptions();
             LoadDatas();
         }
+
+        /// <summary>
+        /// 已经适配类型为AuthorizationFilterContext或是ControllerActionDescriptor的obj获取key
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public string GetRequestResourceKey(object obj)
         {
             var resourceKey = string.Empty;
             var resourceCode = string.Empty;
-            if (obj is ControllerActionDescriptor controllerActionDescriptor)
+            if (obj is AuthorizationFilterContext authorizationFilterContext)
             {
-                resourceCode = controllerActionDescriptor.ControllerName + "_" + controllerActionDescriptor.ActionName;
+                if (authorizationFilterContext.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+                {
+                    resourceCode = GetResourceCode(controllerActionDescriptor.ControllerName, controllerActionDescriptor.ActionName);
+                }
+            }
+            if (obj is ControllerActionDescriptor controllerActionDescriptor1)
+            {
+                resourceCode = GetResourceCode(controllerActionDescriptor1.ControllerName, controllerActionDescriptor1.ActionName);
             }
             if (resourceCode.HasValue())
             {
@@ -51,6 +71,8 @@ namespace Snail.Permission
             }
             return resourceKey;
         }
+
+
 
         public IEnumerable<IResourceRoleInfo> GetAllResourceRoles()
         {
@@ -64,7 +86,7 @@ namespace Snail.Permission
         public string GetLoginToken(string account, string pwd)
         {
             var user = _users.FirstOrDefault(a => a.GetAccount() == account);
-            if (user!=null && HashPwd(pwd).Equals(user.GetPassword()))
+            if (user != null && HashPwd(pwd).Equals(user.GetPassword()))
             {
                 var roleKeys = _userRoles.Where(a => a.GetUserKey() == user.GetKey()).Select(a => a.GetRoleKey()) ?? new List<string>();
                 var roleNames = _roles.Where(a => roleKeys.Contains(a.GetKey())).Select(a => a.GetName()) ?? new List<string>();
@@ -91,11 +113,11 @@ namespace Snail.Permission
             var claims = _token.ResolveFromToken(token);
             return new UserInfo
             {
-                UserKey = claims.FirstOrDefault(a => a.Type == PermissionConstant.userIdClaim).Value,
-                Account = claims.FirstOrDefault(a => a.Type == PermissionConstant.accountClaim).Value,
-                UserName = claims.FirstOrDefault(a => a.Type == PermissionConstant.userNameClaim).Value,
-                RoleKeys = claims.FirstOrDefault(a => a.Type == PermissionConstant.roleIdsClaim).Value?.Split(',').ToList(),
-                RoleNames = claims.FirstOrDefault(a => a.Type == PermissionConstant.rolesNameClaim).Value?.Split(',').ToList(),
+                UserKey = claims.FirstOrDefault(a => a.Type == PermissionConstant.userIdClaim)?.Value,
+                Account = claims.FirstOrDefault(a => a.Type == PermissionConstant.accountClaim)?.Value,
+                UserName = claims.FirstOrDefault(a => a.Type == PermissionConstant.userNameClaim)?.Value,
+                RoleKeys = claims.FirstOrDefault(a => a.Type == PermissionConstant.roleIdsClaim)?.Value?.Split(',').ToList(),
+                RoleNames = claims.FirstOrDefault(a => a.Type == PermissionConstant.rolesNameClaim)?.Value?.Split(',').ToList(),
             };
         }
 
@@ -131,6 +153,54 @@ namespace Snail.Permission
             return HashHelper.Md5($"{pwd}{_permissionOptions.PasswordSalt}");
         }
 
+        public void InitResource()
+        {
+            var resources = new List<Resource>();
+            _permissionOptions.ResourceAssemblies?.ToList().ForEach(assembly =>
+            {
+                assembly.GetTypes().Where(type => typeof(ControllerBase).IsAssignableFrom(type)).ToList().ForEach(controller =>
+                 {
+                     var controllerIsAdded = false;
+                     var parentId = IdGenerator.Generate<string>();
+                     controller.GetMethods().ToList().ForEach(method =>
+                     {
+                         if (method.IsDefined(typeof(AuthorizeAttribute), true))
+                         {
+                             if (!controllerIsAdded)
+                             {
+                                 resources.Add(new Resource
+                                 {
+                                     Id = parentId,
+                                     Code = GetResourceCode(controller.Name, method.Name),
+                                     CreateTime = DateTime.Now,
+                                     IsDeleted = false,
+                                     Name = method.IsDefined(typeof(PermissionAttribute)) ? ((PermissionAttribute)method.GetCustomAttribute(typeof(PermissionAttribute))).Description : GetResourceCode(controller.Name, method.Name)
+                                 });
+                                 controllerIsAdded = true;
+                             }
+                             resources.Add(new Resource
+                             {
+                                 Id = IdGenerator.Generate<string>(),
+                                 Code = GetResourceCode(controller.Name, method.Name),
+                                 CreateTime = DateTime.Now,
+                                 IsDeleted = false,
+                                 ParentId=parentId,
+                                 Name = method.IsDefined(typeof(PermissionAttribute)) ? ((PermissionAttribute)method.GetCustomAttribute(typeof(PermissionAttribute))).Description : GetResourceCode(controller.Name, method.Name)
+                             });
+                         }
+                     });
+                 });
+            });
+            _dbContext.Add(resources);
+            _dbContext.SaveChanges();
+        }
+
+
         #endregion
+
+        private string GetResourceCode(string className, string methodName)
+        {
+            return $"{className.Replace("Controller", "")}_{methodName}";
+        }
     }
 }

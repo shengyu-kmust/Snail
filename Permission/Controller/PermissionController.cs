@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Snail.Core.IPermission;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Snail.Permission.Controller
 {
-    [Route("[Controller]/[Action]")]
+    [Route("[Controller]/[Action]"), Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)]
     public class PermissionController:ControllerBase
     {
         private IPermission _permission;
@@ -13,12 +15,11 @@ namespace Snail.Permission.Controller
             _permission = permission;
         }
 
-     
         /// <summary>
         /// 获取token
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet,AllowAnonymous]
         public string GetLoginToken([FromQuery]string account, [FromQuery]string password)
         {
             return _permission.GetLoginToken(account, password);
@@ -28,7 +29,8 @@ namespace Snail.Permission.Controller
         /// 获取用户信息
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet, AllowAnonymous]
+        [Display()]
         public IUserInfo GetUserInfo(string token)
         {
             return _permission.GetUserInfo(token);
@@ -39,10 +41,18 @@ namespace Snail.Permission.Controller
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<IResourceRoleInfo> GetUserInfo()
+        public IEnumerable<IResourceRoleInfo> GetAllResourceRoles()
         {
             return _permission.GetAllResourceRoles();
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public void InitResource()
+        {
+            _permission.InitResource();
+        }
+
 
     }
 }

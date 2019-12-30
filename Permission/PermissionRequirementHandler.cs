@@ -17,7 +17,7 @@ namespace Snail.Permission
         }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
-            var resourceKey=_permission.GetRequestResourceKey(context);
+            var resourceKey=_permission.GetRequestResourceKey(context.Resource);
             var userKey = _permission.GetUserKey(context.User);
             if (_permission.HasPermission(resourceKey,userKey))
             {

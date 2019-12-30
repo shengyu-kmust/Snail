@@ -14,14 +14,26 @@ namespace Snail.Permission
 {
     public static class PermissionServiceCollectionExtensions
     {
-        public static void AddPermission<TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services)
+        /// <summary>
+        /// 自定义权限表，实现权限功能
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TRole"></typeparam>
+        /// <typeparam name="TUserRole"></typeparam>
+        /// <typeparam name="TResource"></typeparam>
+        /// <typeparam name="TRoleResource"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void AddPermission<TDbContext,TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services,Action<PermissionOptions> action)
          where TUser : class, IUser, new()
         where TRole : class, IRole, new()
         where TUserRole : class, IUserRole, new()
         where TResource : class, IResource, new()
         where TRoleResource : class, IRoleResource, new()
+        where TDbContext:DbContext
         {
-            services.TryAddScoped<IPermission, DefaultPermission<TUser, TRole, TUserRole, TResource, TRoleResource>>();
+            services.TryAddScoped<IPermission, DefaultPermission<TDbContext,TUser, TRole, TUserRole, TResource, TRoleResource>>();
             services.TryAddScoped<IToken, Token>();
             #region 授权
 
@@ -37,12 +49,19 @@ namespace Snail.Permission
                 });
             });
             services.AddSingleton<IAuthorizationHandler, PermissionRequirementHandler>();
+            services.Configure(action);
             #endregion
         }
 
-        public static void AddPermission(this IServiceCollection services)
+        /// <summary>
+        /// 用默认的User, Role, UserRole, Resource, RoleResource表实现权限,即TDbContext已经有默认的这几张表，TDbContext可以通过继承PermissionDatabaseContext来简化实现过程
+        /// </summary>
+        /// <typeparam name="TDbContext">权限的表是在哪个dbcontext</typeparam>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void AddPermission<TDbContext>(this IServiceCollection services, Action<PermissionOptions> action) where TDbContext:DbContext
         {
-            services.AddPermission<User, Role, UserRole, Resource, RoleResource>();
+            services.AddPermission<TDbContext,User, Role, UserRole, Resource, RoleResource>(action);
         }
     }
 }

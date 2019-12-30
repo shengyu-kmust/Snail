@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Permission\Snail.Permission.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
 </Project>
