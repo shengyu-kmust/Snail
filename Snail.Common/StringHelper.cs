@@ -15,6 +15,15 @@ namespace Snail.Common
             NewWord
         }
 
+        public static T ConvertTo<T>(string str)
+        {
+            if (str == null)
+            {
+                return default(T);
+            }
+            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromInvariantString(str);
+        }
+
         /// <summary>
         /// 转小跎峰
         /// </summary>
