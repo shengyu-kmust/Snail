@@ -10,7 +10,6 @@ namespace Snail.Common.Test
         public void Test1()
         {
             var str = "AREYouOkAHOU";
-            var str1 = str.ToSnakeCase();
         }
     }
 }
