@@ -12,7 +12,7 @@ namespace Snail.Core.Interface
     /// 数据仓库接口
     /// </summary>
     /// <remarks>
-    /// 尽量简单
+    /// 尽量简单，只对数据库进行操作
     /// </remarks>
     /// <typeparam name="TEntity"></typeparam>
     public interface IRepository<TEntity,TKey> where TEntity : IEntityId<TKey>
