@@ -11,10 +11,11 @@ namespace Snail.Core.Interface
     /// <typeparam name="TEntity">实体</typeparam>
     /// <typeparam name="TKey"></typeparam>
     /// <remarks>
-    /// 默认提供EF的crud实现，即EFCRUDService
+    /// 默认提供EF的crud实现，即EFCRUDService，用此接口，需确认TEntity,TSource,TKey三个类型即可
     /// </remarks>
-    public interface ICRUDService<TEntity, TKey> where TEntity : IEntityId<TKey>
+    public interface ICRUDService<TEntity,TSource,TKey> where TEntity : IEntityId<TKey> where TSource:class
     {
+        IQueryable<TSource> GetQueryableSource();
         /// <summary>
         /// 分页查询 
         /// </summary>

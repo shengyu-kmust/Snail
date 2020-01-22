@@ -211,7 +211,7 @@ namespace Snail.Common
         #region 根据pem格式的key生成RSAParameters
 
         /// <summary>
-        /// 根据pem字符串得到私钥
+        /// 根据pem字符串得到私钥，注意pem的string的换行要为\n，而不是\r\n
         /// </summary>
         /// <param name="privatePem"></param>
         /// <returns></returns>
@@ -244,7 +244,7 @@ namespace Snail.Common
         }
 
         /// <summary>
-        /// 根据pem字符串得到公钥
+        /// 根据pem字符串得到公钥，注意pem的string的换行要为\n，而不是\r\n
         /// </summary>
         /// <param name="publicPem"></param>
         /// <returns></returns>

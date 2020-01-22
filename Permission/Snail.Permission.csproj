@@ -5,9 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Core\**" />
     <Compile Remove="Dtos\**" />
+    <Compile Remove="IEntity\**" />
+    <EmbeddedResource Remove="Core\**" />
     <EmbeddedResource Remove="Dtos\**" />
+    <EmbeddedResource Remove="IEntity\**" />
+    <None Remove="Core\**" />
     <None Remove="Dtos\**" />
+    <None Remove="IEntity\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,11 +32,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Snail.Core\Snail.Core.csproj" />
     <ProjectReference Include="..\Snail.Common\Snail.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Core\" />
-    <Folder Include="IEntity\" />
   </ItemGroup>
 
 </Project>
