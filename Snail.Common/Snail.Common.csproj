@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.0.1</Version>
+    <Authors>周晶</Authors>
+    <Product>Snail.Common</Product>
+    <Description>Snail.Common的公共库</Description>
+    <Company>昆明蜗牛科技</Company>
   </PropertyGroup>
 
   <ItemGroup>
