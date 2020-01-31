@@ -9,7 +9,7 @@ using Snail.Common;
 using Snail.Common.Extenssions;
 using Snail.Core;
 using Snail.Core.Attributes;
-using Snail.Core.IPermission;
+using Snail.Core.Permission;
 using Snail.Entity;
 using System;
 using System.Collections.Generic;

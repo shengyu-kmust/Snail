@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Permission
+namespace Snail.Core.Permission
 {
     public class PermissionConstant
     {

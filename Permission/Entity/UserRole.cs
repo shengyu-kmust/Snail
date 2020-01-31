@@ -1,4 +1,4 @@
-﻿using Snail.Core.IPermission;
+﻿using Snail.Core.Permission;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;

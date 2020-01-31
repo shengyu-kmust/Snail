@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Snail.Permission
+namespace Snail.Core.Permission
 {
     public class PermissionOptions
     {

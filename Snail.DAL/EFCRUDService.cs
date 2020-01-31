@@ -41,7 +41,7 @@ namespace Snail.DAL
         public virtual TEntity Add<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<TKey>
         {
             var userId = applicationContext.GetCurrentUserId().ConvertTo<TKey>();
-            if (saveDto.Id.Equals(default(TKey)) || saveDto.Id == null)
+            if (saveDto.Id == null || saveDto.Id.Equals(default(TKey)))
             {
                 saveDto.Id = IdGenerator.Generate<TKey>();
             }

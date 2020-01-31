@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Permission
+namespace Snail.Core.Permission
 {
     /// <summary>
     /// 用户信息，用于给前端的数据

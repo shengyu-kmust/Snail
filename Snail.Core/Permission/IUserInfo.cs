@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Core.IPermission
+namespace Snail.Core.Permission
 {
     /// <summary>
-    /// 用户信息
+    /// 用户信息，此信息将做为token信息返回给前端 
     /// </summary>
     public interface IUserInfo
     {
         /// <summary>
-        /// 用户ID，系统的唯一键
+        /// 用户ID，系统的唯一键，对应IUser的Key
         /// </summary>
         string UserKey { get; set; }
         /// <summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Core.IPermission
+namespace Snail.Core.Permission
 {
     public interface IRole:IHasKeyAndName
     {

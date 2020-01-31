@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
-using Snail.Core.IPermission;
+using Snail.Core.Permission;
 using Snail.Entity;
 using System;
 namespace Snail.Permission

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Snail.Core.IPermission;
+using Snail.Core.Permission;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -10,30 +10,21 @@ namespace Snail.Permission.Controller
     public class PermissionController:ControllerBase
     {
         private IPermission _permission;
-        public PermissionController(IPermission permission)
+        private IPermissionStore _permissionStore;
+        public PermissionController(IPermission permission, IPermissionStore permissionStore)
         {
             _permission = permission;
+            _permissionStore = permissionStore;
         }
 
         /// <summary>
         /// 获取token
         /// </summary>
         /// <returns></returns>
-        [HttpGet,AllowAnonymous]
-        public string GetLoginToken([FromQuery]string account, [FromQuery]string password)
+        [HttpPost,AllowAnonymous]
+        public LoginResult GetLoginToken(LoginDto loginDto)
         {
-            return _permission.GetLoginToken(account, password);
-        }
-
-        /// <summary>
-        /// 获取用户信息
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet, AllowAnonymous]
-        [Display()]
-        public IUserInfo GetUserInfo(string token)
-        {
-            return _permission.GetUserInfo(token);
+            return _permission.Login(loginDto);
         }
 
         /// <summary>
@@ -46,11 +37,14 @@ namespace Snail.Permission.Controller
             return _permission.GetAllResourceRoles();
         }
 
+        /// <summary>
+        /// 初始化权限资源。初始化后请注释此方法
+        /// </summary>
         [AllowAnonymous]
         [HttpGet]
         public void InitResource()
         {
-            _permission.InitResource();
+            _permissionStore.InitResource();
         }
 
 

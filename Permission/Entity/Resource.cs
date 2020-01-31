@@ -1,4 +1,4 @@
-﻿using Snail.Core.IPermission;
+﻿using Snail.Core.Permission;
 
 namespace Snail.Entity
 {
