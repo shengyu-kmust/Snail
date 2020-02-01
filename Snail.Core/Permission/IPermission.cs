@@ -17,6 +17,12 @@ namespace Snail.Core.Permission
         /// <param name="obj"></param>
         /// <returns></returns>
         string GetRequestResourceKey(object obj);
+        /// <summary>
+        /// 通过对象获取资源code
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        string GetRequestResourceCode(object obj);
 
         /// <summary>
         /// 用户是否有资源的权限
@@ -30,7 +36,7 @@ namespace Snail.Core.Permission
         /// </summary>
         /// <param name="claimsPrincipal">ClaimsPrincipal</param>
         /// <returns></returns>
-        IUserInfo GetUserInfo(ClaimsPrincipal claimsPrincipal);
+        UserInfo GetUserInfo(ClaimsPrincipal claimsPrincipal);
         #endregion
 
         #region 登录、前端界面权限控制必要方法
@@ -52,7 +58,7 @@ namespace Snail.Core.Permission
         /// <remarks>
         /// 前端调用此接口，获取所有的资源及资源的角色，用于渲染界面权限控制
         /// </remarks>
-        List<IResourceRoleInfo> GetAllResourceRoles();
+        List<ResourceRoleInfo> GetAllResourceRoles();
 
 
         /// <summary>
@@ -60,7 +66,7 @@ namespace Snail.Core.Permission
         /// </summary>
         /// <param name="userInfo"></param>
         /// <returns></returns>
-        ClaimsPrincipal GetClaimsPrincipal(IUserInfo userInfo);
+        List<Claim> GetClaimsPrincipal(IUserInfo userInfo);
 
         ///// <summary>
         ///// 获取登录token
@@ -90,7 +96,7 @@ namespace Snail.Core.Permission
         /// <returns>密码明文的hash</returns>
         string HashPwd(string pwd);
 
-     
+        void InitResource();
         #endregion
 
     }

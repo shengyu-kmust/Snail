@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Snail.Entity
+namespace Snail.Permission.Entity
 {
     public class Org : BaseEntity
     {

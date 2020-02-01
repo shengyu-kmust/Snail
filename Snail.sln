@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Office", "Snail.Offic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Common.Test", "Snail.Common.Test\Snail.Common.Test.csproj", "{4CD36342-037A-46E1-BC4E-CE42D06ECFBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.Core.Default", "Snail.Core.Default\Snail.Core.Default.csproj", "{57E2967D-9E19-42D8-A4AE-B9FC3C1C7C35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Core.Default", "Snail.Core.Default\Snail.Core.Default.csproj", "{57E2967D-9E19-42D8-A4AE-B9FC3C1C7C35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +78,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BF83E16A-8A46-4159-B1F5-A3C396679A96} = {87806174-3460-4457-99C1-963A3D795497}
 		{220BB987-37D7-4E7F-83B3-8F0A59A61A0D} = {87806174-3460-4457-99C1-963A3D795497}
+		{4CD36342-037A-46E1-BC4E-CE42D06ECFBB} = {87806174-3460-4457-99C1-963A3D795497}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64958474-38DF-48E9-AF4B-467E3EC01A98}

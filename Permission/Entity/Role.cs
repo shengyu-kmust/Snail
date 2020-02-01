@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Snail.Entity
+namespace Snail.Permission.Entity
 {
     [Table("Role")]
     public class Role :BaseEntity,IRole

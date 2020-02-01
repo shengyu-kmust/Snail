@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Snail.Core.Interface;
+using Snail.Core.Permission;
 using System;
 
 namespace Snail.Core.Default
@@ -14,7 +15,7 @@ namespace Snail.Core.Default
         }
         public string GetCurrentUserId()
         {
-            return _httpContextAccessor?.HttpContext?.User?.FindFirst(a => a.Type.Equals(ConstValues.UserId, StringComparison.OrdinalIgnoreCase))?.Value;
+            return _httpContextAccessor?.HttpContext?.User?.FindFirst(a => a.Type.Equals(PermissionConstant.userIdClaim, StringComparison.OrdinalIgnoreCase))?.Value;
         }
     }
 }

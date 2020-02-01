@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Snail.Permission.Test;
 
@@ -15,9 +16,10 @@ namespace Snail.Permission.Test.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Snail.Entity.Org", b =>
+            modelBuilder.Entity("Snail.Permission.Entity.Org", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -41,7 +43,7 @@ namespace Snail.Permission.Test.Migrations
                     b.ToTable("Orgs");
                 });
 
-            modelBuilder.Entity("Snail.Entity.Resource", b =>
+            modelBuilder.Entity("Snail.Permission.Entity.Resource", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -51,8 +53,6 @@ namespace Snail.Permission.Test.Migrations
                     b.Property<DateTime>("CreateTime");
 
                     b.Property<string>("Creater");
-
-                    b.Property<string>("Description");
 
                     b.Property<bool>("IsDeleted");
 
@@ -69,7 +69,7 @@ namespace Snail.Permission.Test.Migrations
                     b.ToTable("Resources");
                 });
 
-            modelBuilder.Entity("Snail.Entity.Role", b =>
+            modelBuilder.Entity("Snail.Permission.Entity.Role", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -91,7 +91,7 @@ namespace Snail.Permission.Test.Migrations
                     b.ToTable("Role");
                 });
 
-            modelBuilder.Entity("Snail.Entity.RoleResource", b =>
+            modelBuilder.Entity("Snail.Permission.Entity.RoleResource", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -115,7 +115,7 @@ namespace Snail.Permission.Test.Migrations
                     b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("Snail.Entity.User", b =>
+            modelBuilder.Entity("Snail.Permission.Entity.User", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -147,7 +147,7 @@ namespace Snail.Permission.Test.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Snail.Entity.UserOrg", b =>
+            modelBuilder.Entity("Snail.Permission.Entity.UserOrg", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -171,7 +171,7 @@ namespace Snail.Permission.Test.Migrations
                     b.ToTable("UserOrgs");
                 });
 
-            modelBuilder.Entity("Snail.Entity.UserRole", b =>
+            modelBuilder.Entity("Snail.Permission.Entity.UserRole", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();

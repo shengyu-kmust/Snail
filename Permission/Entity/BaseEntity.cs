@@ -1,7 +1,7 @@
 ﻿using Snail.Core.Entity;
 using System;
 
-namespace Snail.Entity
+namespace Snail.Permission.Entity
 {
     
     public class BaseEntity : IEntityId<string>, IEntityAudit<string>, IEntitySoftDelete

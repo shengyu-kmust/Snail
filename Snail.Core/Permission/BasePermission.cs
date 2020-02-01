@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
+using Snail.Common.Extenssions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,17 +15,51 @@ namespace Snail.Core.Permission
     /// </summary>
     public abstract class BasePermission : IPermission
     {
-        private IPermissionStore _permissionStore;
-        private PermissionOptions _permissionOptions;
+        protected IPermissionStore _permissionStore;
+        protected PermissionOptions _permissionOptions;
         public BasePermission(IPermissionStore permissionStore, IOptionsMonitor<PermissionOptions> permissionOptions)
         {
             _permissionStore = permissionStore;
-            _permissionOptions = permissionOptions.CurrentValue??new PermissionOptions();
+            _permissionOptions = permissionOptions.CurrentValue ?? new PermissionOptions();
         }
-        public string GetLoginToken(string account, string pwd)
+
+        #region 用于判断用户是否有资源权限的必要方法
+        public virtual string GetRequestResourceKey(object obj)
         {
-            var user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount() == account);
-            if (user != null && HashPwd(pwd).Equals(user.GetPassword()))
+            var resourceKey = string.Empty;
+            var resourceCode = GetRequestResourceCode(obj);
+            if (resourceCode.HasValue())
+            {
+                resourceKey = _permissionStore.GetAllResource().FirstOrDefault(a => a.GetResourceCode() == resourceCode)?.GetKey();
+            }
+            return resourceKey;
+        }
+        public abstract string GetRequestResourceCode(object obj);
+        public virtual bool HasPermission(string resourceKey, string userKey)
+        {
+            var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a => a.GetRoleKey());
+            var resource = _permissionStore.GetAllResource().FirstOrDefault(a => a.GetKey() == resourceKey);
+            var resourceRoleKeys = _permissionStore.GetAllRoleResource().Where(a => a.GetResourceKey() == resource.GetKey()).Select(a => a.GetRoleKey());
+            return userRoleKeys.Intersect(resourceRoleKeys).Any();
+        }
+        public virtual UserInfo GetUserInfo(ClaimsPrincipal claimsPrincipal)
+        {
+            return new UserInfo
+            {
+                Account = claimsPrincipal.FindFirst(PermissionConstant.accountClaim)?.Value,
+                RoleKeys = (claimsPrincipal.FindFirst(PermissionConstant.roleIdsClaim)?.Value ?? "").Split(',').ToList(),
+                RoleNames = (claimsPrincipal.FindFirst(PermissionConstant.rolesNamesClaim)?.Value ?? "").Split(',').ToList(),
+                UserKey = claimsPrincipal.FindFirst(PermissionConstant.userIdClaim)?.Value,
+                UserName = claimsPrincipal.FindFirst(PermissionConstant.userNameClaim)?.Value,
+            };
+        }
+        #endregion
+
+        #region 登录、前端界面权限控制必要方法
+        public virtual LoginResult Login(LoginDto loginDto)
+        {
+            var user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount() == loginDto.Account);
+            if (user != null && HashPwd(loginDto.Pwd).Equals(user.GetPassword()))
             {
                 var roleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == user.GetKey()).Select(a => a.GetRoleKey()) ?? new List<string>();
                 var roleNames = _permissionStore.GetAllRole().Where(a => roleKeys.Contains(a.GetKey())).Select(a => a.GetName()) ?? new List<string>();
@@ -36,82 +71,64 @@ namespace Snail.Core.Permission
                     UserKey = user.GetKey(),
                     UserName = user.GetName()
                 };
-                var claimsPrincipal=GetClaimsPrincipal(userInfo);
-                //var claims = new List<Claim>
-                //{
-                //    new Claim(PermissionConstant.userIdClaim,user.GetKey()),
-                //    new Claim(PermissionConstant.userNameClaim,user.GetName()),
-                //    new Claim(PermissionConstant.accountClaim,user.GetAccount()),
-                //    new Claim(PermissionConstant.roleIdsClaim,string.Join(",", roleKeys)),
-                //    new Claim(PermissionConstant.userNameClaim,string.Join(",", roleNames)),
-                //};
-
-                //var key = new RsaSecurityKey(RSAHelper.GetRSAParametersFromFromPrivatePem(_permissionOptions.RsaPrivateKey));
-                //var jwtSecurityToken = new JwtSecurityToken(null, null, claims, null, expireTime, new SigningCredentials(key, SecurityAlgorithms.RsaSha256));
-                //var tokenStr = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-                //_cache.Set(tokenStr, claims, expireTime);
-
-                return GenerateTokenStr(claimsPrincipal);
-                //return _token.ResolveToken(claims, DateTime.Now.Add(PermissionConstant.tokenExpire));
+                var claims = GetClaimsPrincipal(userInfo);
+                var tokenStr= GenerateTokenStr(claims);
+                return new LoginResult
+                {
+                    Token = tokenStr,
+                    UserInfo = userInfo
+                };
             }
             else
             {
                 throw new BusinessException($"用户名或密码错误");
             }
         }
-
-
-
-        public IEnumerable<IResourceRoleInfo> GetAllResourceRoles()
+        public virtual List<ResourceRoleInfo> GetAllResourceRoles()
         {
-            throw new NotImplementedException();
+            var allResource = _permissionStore.GetAllResource();
+            var allRole = _permissionStore.GetAllRole();
+            return _permissionStore.GetAllRoleResource().GroupBy(a => a.GetResourceKey()).Select(a =>
+            {
+                var resource = allResource.FirstOrDefault(i => i.GetKey() == a.Key);
+                return new ResourceRoleInfo
+                {
+                    ResourceCode = resource.GetResourceCode(),
+                    ResourceKey = resource.GetKey(),
+                    ResourceName = resource.GetName(),
+                    RoleKeys = a.Select(i => i.GetRoleKey()).Distinct().ToList()
+                };
+            }).ToList();
         }
-
-       
-
-        public string GetRequestResourceKey(object obj)
+        public virtual List<Claim> GetClaimsPrincipal(IUserInfo userInfo)
         {
-            throw new NotImplementedException();
+            return new List<Claim>
+            {
+                new Claim(PermissionConstant.userIdClaim,userInfo.UserKey),
+                new Claim(PermissionConstant.userNameClaim,userInfo.UserName),
+                new Claim(PermissionConstant.accountClaim,userInfo.Account),
+                new Claim(PermissionConstant.roleIdsClaim,string.Join(",",userInfo.RoleKeys??new List<string>()) ),
+                new Claim(PermissionConstant.rolesNamesClaim,string.Join(",",userInfo.RoleNames??new List<string>()) ),
+            };
         }
+        #endregion
 
-        public IUserInfo GetUserInfo(string token)
+
+
+
+        /// <summary>
+        /// 默认的密码hash算法
+        /// </summary>
+        /// <param name="pwd"></param>
+        /// <returns></returns>
+        public virtual string HashPwd(string pwd)
         {
-            throw new NotImplementedException();
+            return HashHelper.Md5($"{pwd}{_permissionOptions.PasswordSalt}");
         }
+   
+        public abstract string GenerateTokenStr(List<Claim> claims);
 
-        public string GetUserKey(ClaimsPrincipal claimsPrincipal)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string HashPwd(string pwd)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool HasPermission(string resourceKey, string userKey)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InitResource()
-        {
-            throw new NotImplementedException();
-        }
-
-        public abstract IUserInfo GetUserInfo(ClaimsPrincipal claimsPrincipal);
-
-        public abstract ClaimsPrincipal GetClaimsPrincipal(IUserInfo userInfo);
-        public abstract string GenerateTokenStr(ClaimsPrincipal claimsPrincipal);
-
-        public LoginResult Login(LoginDto loginDto)
-        {
-            throw new NotImplementedException();
-        }
-
-        List<IResourceRoleInfo> IPermission.GetAllResourceRoles()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void InitResource();
+        
     }
 }

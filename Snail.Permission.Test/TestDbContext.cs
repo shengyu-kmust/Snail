@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Snail.Database;
-using Snail.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Snail.Permission.Entity;
 
 namespace Snail.Permission.Test
 {
@@ -26,7 +21,7 @@ namespace Snail.Permission.Test
             }
             else
             {
-                optionsBuilder.UseMySql(ConnectStringHelper.ConnForMySql("localhost", "testPermission", "root", "root"));
+                optionsBuilder.UseSqlServer(@"Server =localhost\sqlexpress; Database =sample; User Id = sa; Password = test;");
             }
 
         }

@@ -12,7 +12,7 @@ namespace Snail.Core.Permission
         public const string userNameClaim = "userName";
         public const string accountClaim = "account";
         public const string roleIdsClaim = "roleIds";
-        public const string rolesNameClaim = "roleNames";
+        public const string rolesNamesClaim = "roleNames";
         public static readonly TimeSpan tokenExpire = new TimeSpan(6, 0, 0);
     }
 }

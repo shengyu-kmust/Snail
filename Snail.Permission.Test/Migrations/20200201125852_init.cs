@@ -55,7 +55,6 @@ namespace Snail.Permission.Test.Migrations
                     IsDeleted = table.Column<bool>(nullable: false),
                     Code = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
                     ParentId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>

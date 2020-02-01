@@ -3,7 +3,7 @@ using Snail.Core.Entity;
 using Snail.Core.Enum;
 using System;
 
-namespace Snail.Entity
+namespace Snail.Permission.Entity
 {
     /// <summary>
     /// 

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Snail.Permission.Test
@@ -22,12 +22,12 @@ namespace Snail.Permission.Test
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<TestDbContext>();
-            services.AddPermission<TestDbContext>(options =>
+            services.AddDefaultPermission<TestDbContext>(options =>
             {
                 options.RsaPrivateKey = Configuration.GetSection("PermissionOptions:RsaPrivateKey").Value;
                 options.RsaPublicKey = Configuration.GetSection("PermissionOptions:RsaPublicKey").Value;
                 options.PasswordSalt = Configuration.GetSection("PermissionOptions:PasswordSalt").Value;
-                options.ResourceAssemblies = new Assembly[] { Assembly.GetExecutingAssembly() };
+                options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
             });
             //services.AddDbContext<TestDbContext>(options =>
             //{

@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace Snail.Common
 {
+    /// <summary>
+    /// 自定义id生成
+    /// </summary>
     public static class IdGenerator
     {
         public static TKey Generate<TKey>()
@@ -14,8 +17,11 @@ namespace Snail.Common
             }
             if (typeof(TKey) == typeof(string))
             {
-                // todo默认用snow的
-                return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString($"{DateTime.Now.ToString("yyyyMMddHHmmss")}{new Random().Next(100).ToString().PadLeft(3,'0')}");
+                return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString(SnowflakeId.Create().ToString());
+            }
+            if (typeof(TKey)==typeof(long))
+            {
+                return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromInvariantString(SnowflakeId.Create().ToString());
             }
             throw new NotSupportedException($"不支持此类型的id");
         }

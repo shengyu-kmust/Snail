@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Snail.Entity
+namespace Snail.Permission.Entity
 {
     public class User:BaseEntity,IUser
     {

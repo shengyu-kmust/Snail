@@ -1,6 +1,6 @@
 ﻿using Snail.Core.Permission;
 
-namespace Snail.Entity
+namespace Snail.Permission.Entity
 {
     public class Resource:BaseEntity,IResource
     {
