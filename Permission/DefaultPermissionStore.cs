@@ -247,24 +247,28 @@ namespace Snail.Permission
         public void SetRoleResources(string roleKey, List<string> resourceKeys)
         {
             var userId = _applicationContext.GetCurrentUserId();
-            var allRoleResources = _db.Set<RoleResource>().Where(a => a.RoleId == roleKey).ToList();
+            var allRoleResources = _db.Set<RoleResource>().AsNoTracking().Where(a => a.RoleId == roleKey).ToList();
+            var allResource = _db.Set<Resource>().AsNoTracking().ToList();
             allRoleResources.Where(a => !resourceKeys.Contains(a.GetResourceKey())).ToList().ForEach(a =>
             {
                 _db.Remove(a);
             });
-            resourceKeys.Where(a => !allRoleResources.Select(i => i.GetResourceKey()).Contains(a)).ToList().ForEach(a =>
+            resourceKeys.Where(a => !allRoleResources.Select(i => i.GetResourceKey()).Contains(a)).ToList().ForEach(resourceKey =>
             {
-                _db.Add(new RoleResource
+                if (allResource.Any(a=>a.Id==resourceKey))
                 {
-                    Id = IdGenerator.Generate<string>(),
-                    Creater = userId,
-                    CreateTime = DateTime.Now,
-                    IsDeleted = false,
-                    ResourceId = a,
-                    RoleId = roleKey,
-                    Updater = userId,
-                    UpdateTime = DateTime.Now
-                });
+                    _db.Add(new RoleResource
+                    {
+                        Id = IdGenerator.Generate<string>(),
+                        Creater = userId,
+                        CreateTime = DateTime.Now,
+                        IsDeleted = false,
+                        ResourceId = resourceKey,
+                        RoleId = roleKey,
+                        Updater = userId,
+                        UpdateTime = DateTime.Now
+                    });
+                }
             });
             _db.SaveChanges();
             _memoryCache.Remove(roleResourceCacheKey);
@@ -273,24 +277,29 @@ namespace Snail.Permission
         public void SetUserRoles(string userKey, List<string> roleKeys)
         {
             var userId = _applicationContext.GetCurrentUserId();
-            var allUserRoles = _db.Set<UserRole>().Where(a => a.UserId == userKey).ToList();
+            var allUserRoles = _db.Set<UserRole>().AsNoTracking().Where(a => a.UserId == userKey).ToList();
+            var allRole = _db.Set<Role>().AsNoTracking().ToList();
             allUserRoles.Where(a => !roleKeys.Contains(a.GetRoleKey())).ToList().ForEach(a =>
             {
                 _db.Remove(a);
             });
-            roleKeys.Where(a => !allUserRoles.Select(i => i.RoleId).Contains(a) && a.HasValue()).ToList().ForEach(a =>
+            roleKeys.Where(a => !allUserRoles.Select(i => i.RoleId).Contains(a) && a.HasValue()).ToList().ForEach(roleKey =>
             {
-                _db.Add(new UserRole
+                if (allRole.Any(a=>a.Id==roleKey))
                 {
-                    Id = IdGenerator.Generate<string>(),
-                    Creater = userId,
-                    CreateTime = DateTime.Now,
-                    IsDeleted = false,
-                    UserId = userKey,
-                    RoleId = a,
-                    Updater = userId,
-                    UpdateTime = DateTime.Now
-                });
+                    _db.Add(new UserRole
+                    {
+                        Id = IdGenerator.Generate<string>(),
+                        Creater = userId,
+                        CreateTime = DateTime.Now,
+                        IsDeleted = false,
+                        UserId = userKey,
+                        RoleId = roleKey,
+                        Updater = userId,
+                        UpdateTime = DateTime.Now
+                    });
+                }
+               
             });
             _db.SaveChanges();
             _memoryCache.Remove(userRoleCacheKey);

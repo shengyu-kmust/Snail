@@ -1,11 +1,8 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Snail.Common;
-using Snail.Common.Extenssions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Snail.Core.Permission
@@ -16,11 +13,10 @@ namespace Snail.Core.Permission
     public abstract class BasePermission : IPermission
     {
         protected IPermissionStore _permissionStore;
-        protected PermissionOptions _permissionOptions;
-        public BasePermission(IPermissionStore permissionStore, IOptionsMonitor<PermissionOptions> permissionOptions)
+        protected abstract PermissionOptions PermissionOptions {set;get;}
+        public BasePermission(IPermissionStore permissionStore)
         {
             _permissionStore = permissionStore;
-            _permissionOptions = permissionOptions.CurrentValue ?? new PermissionOptions();
         }
 
         #region 用于判断用户是否有资源权限的必要方法
@@ -28,7 +24,7 @@ namespace Snail.Core.Permission
         {
             var resourceKey = string.Empty;
             var resourceCode = GetRequestResourceCode(obj);
-            if (resourceCode.HasValue())
+            if (!string.IsNullOrEmpty(resourceCode))
             {
                 resourceKey = _permissionStore.GetAllResource().FirstOrDefault(a => a.GetResourceCode() == resourceCode)?.GetKey();
             }
@@ -92,19 +88,22 @@ namespace Snail.Core.Permission
         }
         public virtual List<ResourceRoleInfo> GetAllResourceRoles()
         {
+            var result = new List<ResourceRoleInfo>();
             var allResource = _permissionStore.GetAllResource();
             var allRole = _permissionStore.GetAllRole();
-            return _permissionStore.GetAllRoleResource().GroupBy(a => a.GetResourceKey()).Select(a =>
+            var allRoleResource = _permissionStore.GetAllRoleResource();
+            allResource.ForEach(resource =>
             {
-                var resource = allResource.FirstOrDefault(i => i.GetKey() == a.Key);
-                return new ResourceRoleInfo
+                var resourceRoleKeys = allRoleResource.Where(a => a.GetResourceKey() == resource.GetKey()).Select(a => a.GetRoleKey()).Distinct().ToList();
+                result.Add(new ResourceRoleInfo
                 {
-                    ResourceCode = resource.GetResourceCode(),
-                    ResourceKey = resource.GetKey(),
-                    ResourceName = resource.GetName(),
-                    RoleKeys = a.Select(i => i.GetRoleKey()).Distinct().ToList()
-                };
-            }).ToList();
+                    ResourceCode=resource.GetResourceCode(),
+                    ResourceKey=resource.GetKey(),
+                    ResourceName=resource.GetName(),
+                    RoleKeys= resourceRoleKeys
+                });
+            });
+            return result;
         }
         public virtual List<Claim> GetClaims(IUserInfo userInfo)
         {
@@ -129,7 +128,7 @@ namespace Snail.Core.Permission
         /// <returns></returns>
         public virtual string HashPwd(string pwd)
         {
-            return HashHelper.Md5($"{pwd}{_permissionOptions.PasswordSalt}");
+            return BitConverter.ToString(HashAlgorithm.Create(HashAlgorithmName.MD5.Name).ComputeHash(Encoding.UTF8.GetBytes(pwd))).Replace("-", "");
         }
    
         public abstract string GenerateTokenStr(List<Claim> claims);

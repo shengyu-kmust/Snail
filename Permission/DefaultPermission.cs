@@ -24,8 +24,12 @@ namespace Snail.Permission
     public class DefaultPermission : BasePermission
     {
         public static readonly string superAdminRoleName = "SuperAdmin";
-        public DefaultPermission(IPermissionStore permissionStore, IOptionsMonitor<PermissionOptions> permissionOptions) : base(permissionStore, permissionOptions)
+
+        protected override PermissionOptions PermissionOptions { get; set; }
+
+        public DefaultPermission(IPermissionStore permissionStore, IOptionsMonitor<PermissionOptions> permissionOptions) : base(permissionStore)
         {
+            PermissionOptions = permissionOptions.CurrentValue ?? new PermissionOptions();
         }
 
         public override bool HasPermission(string resourceKey, string userKey)
@@ -39,21 +43,25 @@ namespace Snail.Permission
 
         public override string GenerateTokenStr(List<Claim> claims)
         {
-            var expireTimeSpan = (_permissionOptions.ExpireTimeSpan == null || _permissionOptions.ExpireTimeSpan == TimeSpan.Zero) ? new TimeSpan(6, 0, 0) : _permissionOptions.ExpireTimeSpan;
+            var expireTimeSpan = (PermissionOptions.ExpireTimeSpan == null || PermissionOptions.ExpireTimeSpan == TimeSpan.Zero) ? new TimeSpan(6, 0, 0) : PermissionOptions.ExpireTimeSpan;
             SigningCredentials creds;
-            if (_permissionOptions.IsAsymmetric)
+            if (PermissionOptions.IsAsymmetric)
             {
-                var key = new RsaSecurityKey(RSAHelper.GetRSAParametersFromFromPrivatePem(_permissionOptions.RsaPrivateKey));
+                var key = new RsaSecurityKey(RSAHelper.GetRSAParametersFromFromPrivatePem(PermissionOptions.RsaPrivateKey));
                 creds = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
             }
             else
             {
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_permissionOptions.SymmetricSecurityKey));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(PermissionOptions.SymmetricSecurityKey));
                 creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             }
-            var token = new JwtSecurityToken(_permissionOptions.Issuer, _permissionOptions.Audience, claims, DateTime.Now, DateTime.Now.Add(expireTimeSpan), creds);
+            var token = new JwtSecurityToken(PermissionOptions.Issuer, PermissionOptions.Audience, claims, DateTime.Now, DateTime.Now.Add(expireTimeSpan), creds);
             var tokenStr = new JwtSecurityTokenHandler().WriteToken(token);
             return tokenStr;
+        }
+        public override string HashPwd(string pwd)
+        {
+            return HashHelper.Md5($"{pwd}{PermissionOptions.PasswordSalt}");
         }
 
         /// <summary>
@@ -102,13 +110,13 @@ namespace Snail.Permission
         public override void InitResource()
         {
             var resources = new List<Resource>();
-            if (_permissionOptions.ResourceAssemblies == null)
+            if (PermissionOptions.ResourceAssemblies == null)
             {
-                _permissionOptions.ResourceAssemblies = new List<Assembly>();
+                PermissionOptions.ResourceAssemblies = new List<Assembly>();
             }
             var existResources = _permissionStore.GetAllResource();
-            _permissionOptions.ResourceAssemblies.Add(this.GetType().Assembly);
-            _permissionOptions.ResourceAssemblies?.Distinct().ToList().ForEach(assembly =>
+            PermissionOptions.ResourceAssemblies.Add(this.GetType().Assembly);
+            PermissionOptions.ResourceAssemblies?.Distinct().ToList().ForEach(assembly =>
             {
                 //对所有的controller类进行扫描
                 assembly.GetTypes().Where(type => typeof(ControllerBase).IsAssignableFrom(type)).ToList().ForEach(controller =>

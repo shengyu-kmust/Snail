@@ -15,10 +15,7 @@ namespace Snail.Permission.Entity
         public string Pwd { get; set; }
         public EGender Gender { get; set; }
 
-        public IUser Create(string account, string password,string id)
-        {
-            return new User { Account = account, Pwd = password,Id=id };
-        }
+      
 
         public string GetAccount()
         {

@@ -37,10 +37,5 @@ namespace Snail.Core.Permission
         void ReloadPemissionDatas();
         #endregion
 
-
-
-
-
-
     }
 }
