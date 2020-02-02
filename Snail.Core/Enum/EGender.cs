@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Snail.Core.Enum
 {
-    public enum Gender
+    public enum EGender
     {
         Male,
         Female

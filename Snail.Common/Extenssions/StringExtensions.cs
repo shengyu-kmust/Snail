@@ -4,7 +4,7 @@ namespace Snail.Common.Extenssions
 {
     public static class StringExtensions
     {
-        public static bool IsNullOrEmpty(this string str){
+        public static bool HasNotValue(this string str){
             return string.IsNullOrEmpty(str);
         }
 

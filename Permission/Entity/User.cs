@@ -1,4 +1,5 @@
-﻿using Snail.Core.Permission;
+﻿using Snail.Core.Enum;
+using Snail.Core.Permission;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,7 +13,7 @@ namespace Snail.Permission.Entity
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Pwd { get; set; }
-        public int Gender { get; set; }
+        public EGender Gender { get; set; }
 
         public IUser Create(string account, string password,string id)
         {

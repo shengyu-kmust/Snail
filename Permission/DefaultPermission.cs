@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
@@ -22,11 +23,19 @@ namespace Snail.Permission
 {
     public class DefaultPermission : BasePermission
     {
+        public static readonly string superAdminRoleName = "SuperAdmin";
         public DefaultPermission(IPermissionStore permissionStore, IOptionsMonitor<PermissionOptions> permissionOptions) : base(permissionStore, permissionOptions)
         {
         }
 
-
+        public override bool HasPermission(string resourceKey, string userKey)
+        {
+            if (IsSuperAdmin(userKey))
+            {
+                return true;
+            }
+            return base.HasPermission(resourceKey, userKey);
+        }
 
         public override string GenerateTokenStr(List<Claim> claims)
         {
@@ -45,25 +54,6 @@ namespace Snail.Permission
             var token = new JwtSecurityToken(_permissionOptions.Issuer, _permissionOptions.Audience, claims, DateTime.Now, DateTime.Now.Add(expireTimeSpan), creds);
             var tokenStr = new JwtSecurityTokenHandler().WriteToken(token);
             return tokenStr;
-        }
-
-        /// <summary>
-        /// 通过类名和方法名，获取
-        /// </summary>
-        /// <param name="className"></param>
-        /// <param name="methodName"></param>
-        /// <returns></returns>
-        private string GetResourceCode(MethodInfo methodInfo)
-        {
-            if (Attribute.IsDefined(methodInfo, typeof(ResourceAttribute)))
-            {
-                var attr = methodInfo.GetCustomAttribute<ResourceAttribute>();
-                if (attr != null && !string.IsNullOrEmpty(attr.ResourceCode))
-                {
-                    return attr.ResourceCode;
-                }
-            }
-            return $"{methodInfo.DeclaringType.Name.Replace("Controller", "")}_{methodInfo.Name}";
         }
 
         /// <summary>
@@ -94,6 +84,14 @@ namespace Snail.Permission
                 return GetResourceCode(methodInfo);
                 //resourceCode = GetResourceCode(controllerActionDescriptor1.ControllerName, controllerActionDescriptor1.ActionName);
             }
+
+            if (obj is RouteEndpoint endpoint)
+            {
+                //.net core 3.1后，AuthorizationHandlerContext.Resource为endpoint
+                methodInfo = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>()?.MethodInfo;
+                return GetResourceCode(methodInfo);
+
+            }
             return string.Empty;
         }
 
@@ -108,6 +106,7 @@ namespace Snail.Permission
             {
                 _permissionOptions.ResourceAssemblies = new List<Assembly>();
             }
+            var existResources = _permissionStore.GetAllResource();
             _permissionOptions.ResourceAssemblies.Add(this.GetType().Assembly);
             _permissionOptions.ResourceAssemblies?.Distinct().ToList().ForEach(assembly =>
             {
@@ -149,10 +148,53 @@ namespace Snail.Permission
                     });
                 });
             });
-            resources.ForEach(a =>
+            resources.ForEach(item =>
             {
-                _permissionStore.SaveResource(a);
+                // 计算resource的id，如果已经存在，id为已经存在的resource的id
+                var matchRs = existResources.FirstOrDefault(i => i.GetResourceCode() == item.Code);
+                if (matchRs!=null)
+                {
+                    item.Id = matchRs.GetKey();
+                }
+
+                // 计算资源的父id，如果父存在，则子资源的父id为已经存在的父数据的id，否则为新的id
+                if (!string.IsNullOrEmpty(item.ParentId))
+                {
+                    var pa = resources.FirstOrDefault(a => a.Id == item.ParentId);
+                    var matchPa = existResources.FirstOrDefault(i => i.GetResourceCode() == pa?.Code);
+                    if (matchPa!=null)
+                    {
+                        item.ParentId = matchPa.GetKey();
+                    }
+                }
+                _permissionStore.SaveResource(item);
             });
         }
+
+        private bool IsSuperAdmin(string userKey)
+        {
+            var superRole = _permissionStore.GetAllRole().FirstOrDefault(a => a.GetName().Equals(DefaultPermission.superAdminRoleName,StringComparison.OrdinalIgnoreCase));
+            return _permissionStore.GetAllUserRole().Any(a => a.GetUserKey() == userKey && a.GetRoleKey() == superRole.GetKey());
+        }
+
+        /// <summary>
+        /// 通过类名和方法名，获取
+        /// </summary>
+        /// <param name="className"></param>
+        /// <param name="methodName"></param>
+        /// <returns></returns>
+        private string GetResourceCode(MethodInfo methodInfo)
+        {
+            if (Attribute.IsDefined(methodInfo, typeof(ResourceAttribute)))
+            {
+                var attr = methodInfo.GetCustomAttribute<ResourceAttribute>();
+                if (attr != null && !string.IsNullOrEmpty(attr.ResourceCode))
+                {
+                    return attr.ResourceCode;
+                }
+            }
+            return $"{methodInfo.DeclaringType.Name.Replace("Controller", "")}_{methodInfo.Name}";
+        }
+
     }
 }

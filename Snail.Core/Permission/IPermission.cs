@@ -62,11 +62,11 @@ namespace Snail.Core.Permission
 
 
         /// <summary>
-        /// 通过userInfo生成ClaimsPrincipal，ClaimsPrincipal会用于生成token
+        /// 通过userInfo生成Claims，Claims会用于生成token
         /// </summary>
         /// <param name="userInfo"></param>
         /// <returns></returns>
-        List<Claim> GetClaimsPrincipal(IUserInfo userInfo);
+        List<Claim> GetClaims(IUserInfo userInfo);
 
         ///// <summary>
         ///// 获取登录token

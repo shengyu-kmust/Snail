@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NSwag;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -20,19 +21,41 @@ namespace Snail.Permission.Test
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<TestDbContext>();
             services.AddDefaultPermission<TestDbContext>(options =>
             {
-                options.RsaPrivateKey = Configuration.GetSection("PermissionOptions:RsaPrivateKey").Value;
-                options.RsaPublicKey = Configuration.GetSection("PermissionOptions:RsaPublicKey").Value;
-                options.PasswordSalt = Configuration.GetSection("PermissionOptions:PasswordSalt").Value;
+                Configuration.GetSection("PermissionOptions").Bind(options);
                 options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
             });
             //services.AddDbContext<TestDbContext>(options =>
             //{
             //    options.UseMySql("Server=localhost;Port=3306;Database=permissionTest;User Id=root;Password = root;");
             //});
+            services.AddControllers();
+            #region swagger
+            services.AddOpenApiDocument(conf => {
+                conf.Description = "change the description";
+                conf.DocumentName = "change the document name";
+                conf.GenerateExamples = true;
+                conf.Title = "change the title";
+                conf.PostProcess = document =>
+                {
+                    document.SecurityDefinitions.Add(
+                          "Jwt认证",
+                          new OpenApiSecurityScheme
+                          {
+                              Type = OpenApiSecuritySchemeType.Http,
+                              Name = "Authorization",//token会放到header的authorization里
+                              In = OpenApiSecurityApiKeyLocation.Header,
+                              Description = "请输入 : JWT token",
+                              Scheme = "bearer"//定义bearer，不能改
+                          });
+                    document.Security.Add(new OpenApiSecurityRequirement { { "Jwt认证", new string[0] } });
+
+                };
+            }); // add OpenAPI v3 document
+            #endregion
+
 
         }
 
@@ -43,8 +66,32 @@ namespace Snail.Permission.Test
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseAuthentication();
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(config =>
+            {
+                config.MapControllers();
+            });
+            
+
+            #region swag
+            //* 如果出现如下错误：Fetch errorundefined / swagger / v1 / swagger.json
+            //* 解决：原因是swagger 的api在解析时出错，在chrome f12看具体请求swagger.json的错误，解决
+            app.UseOpenApi(config =>
+            {
+                config.PostProcess = (document, req) =>
+                {
+                    //下面是向swag怎加https和http的两种方式
+                    document.Schemes.Add(OpenApiSchema.Https);
+                    document.Schemes.Add(OpenApiSchema.Http);
+                };
+            });
+            app.UseSwaggerUi3();
+            //app.UseReDoc();
+            #endregion
+
         }
     }
 }

@@ -14,11 +14,11 @@ namespace Snail.Core.Permission
         /// </summary>
         public string SymmetricSecurityKey { get; set; }
         public bool IsAsymmetric { get; set; }
-        public string Issuer { get; set; }
-        public string Audience { get; set; }
-        public string AccessDeniedPath { get; set; }
-        public string LoginPath { get; set; }
-        public TimeSpan ExpireTimeSpan { get; set; }
+        public string Issuer { get; set; } = "snail";
+        public string Audience { get; set; } = "snail";
+        public string AccessDeniedPath { get; set; } = "/forbid";
+        public string LoginPath { get; set; } = "/login";
+        public TimeSpan ExpireTimeSpan { get; set; } = new TimeSpan(12, 0, 0);
         /// <summary>
         /// 从哪些程序集里初始化resource
         /// </summary>

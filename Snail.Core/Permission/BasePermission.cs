@@ -39,6 +39,12 @@ namespace Snail.Core.Permission
         {
             var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a => a.GetRoleKey());
             var resource = _permissionStore.GetAllResource().FirstOrDefault(a => a.GetKey() == resourceKey);
+            
+            //未纳入到资源表里的资源，不允许访问
+            if (resource==null)
+            {
+                return false;
+            }
             var resourceRoleKeys = _permissionStore.GetAllRoleResource().Where(a => a.GetResourceKey() == resource.GetKey()).Select(a => a.GetRoleKey());
             return userRoleKeys.Intersect(resourceRoleKeys).Any();
         }
@@ -71,7 +77,7 @@ namespace Snail.Core.Permission
                     UserKey = user.GetKey(),
                     UserName = user.GetName()
                 };
-                var claims = GetClaimsPrincipal(userInfo);
+                var claims = GetClaims(userInfo);
                 var tokenStr= GenerateTokenStr(claims);
                 return new LoginResult
                 {
@@ -100,7 +106,7 @@ namespace Snail.Core.Permission
                 };
             }).ToList();
         }
-        public virtual List<Claim> GetClaimsPrincipal(IUserInfo userInfo)
+        public virtual List<Claim> GetClaims(IUserInfo userInfo)
         {
             return new List<Claim>
             {
