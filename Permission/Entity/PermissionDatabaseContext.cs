@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Snail.Core.Entity;
-using Snail.Core.Enum;
-using System;
 
 namespace Snail.Permission.Entity
 {
