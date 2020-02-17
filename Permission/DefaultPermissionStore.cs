@@ -19,106 +19,21 @@ using System.Reflection;
 
 namespace Snail.Permission
 {
-    public class DefaultPermissionStore : IPermissionStore
+    public class DefaultPermissionStore :BasePermissionStore<PermissionDatabaseContext,User,Role,UserRole,Resource,RoleResource>, IPermissionStore
     {
-        private DbContext _db;
-        private IMemoryCache _memoryCache;
-        private IApplicationContext _applicationContext;
         private string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}", roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}", userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}", resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}", roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
-        protected PermissionOptions _permissionOptions;
 
-        public DefaultPermissionStore(DbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext)
+        public DefaultPermissionStore(PermissionDatabaseContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext):base(db,memoryCache,permissionOptions,applicationContext)
         {
-            _db = db;
-            _memoryCache = memoryCache;
-            _permissionOptions = permissionOptions.CurrentValue ?? new PermissionOptions();
-            _applicationContext = applicationContext;
         }
-        public virtual List<IResource> GetAllResource()
-        {
-            return _memoryCache.GetOrCreate(resourceCacheKey, a => _db.Set<Resource>().AsNoTracking().Select(i => (IResource)i).ToList());
-        }
-
-        public List<IRole> GetAllRole()
-        {
-            return _memoryCache.GetOrCreate(roleCacheKey, a => _db.Set<Role>().AsNoTracking().Select(i => (IRole)i).ToList());
-
-        }
-
-        public List<IRoleResource> GetAllRoleResource()
-        {
-            return _memoryCache.GetOrCreate(roleResourceCacheKey, a => _db.Set<RoleResource>().AsNoTracking().Select(i => (IRoleResource)i).ToList());
-
-        }
-
-        public List<IUser> GetAllUser()
-        {
-            return _memoryCache.GetOrCreate(userCacheKey, a => _db.Set<User>().AsNoTracking().Select(i => (IUser)i).ToList());
-
-        }
-
-        public List<IUserRole> GetAllUserRole()
-        {
-            return _memoryCache.GetOrCreate(userRoleCacheKey, a => _db.Set<UserRole>().AsNoTracking().Select(i => (IUserRole)i).ToList());
-
-        }
+       
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>
-        /// 经验证，cache里的值在remove后，之前已经从cache里获取的值不会删除
-        /// </remarks>
-        public void ReloadPemissionDatas()
-        {
-            _memoryCache.Remove(userCacheKey);
-            _memoryCache.Remove(roleCacheKey);
-            _memoryCache.Remove(userRoleCacheKey);
-            _memoryCache.Remove(resourceCacheKey);
-            _memoryCache.Remove(roleResourceCacheKey);
-        }
-
-
-
-        public void RemoveRole(string roleKey)
-        {
-            //角色真删除
-            var roleEntity = _db.Set<Role>().Where(a => a.Id == roleKey);
-            _db.Remove(roleEntity);
-            _db.SaveChanges();
-            _memoryCache.Remove(roleCacheKey);
-
-        }
-
-
-        public void RemoveUser(string userKey)
-        {
-            var userEntity = _db.Set<User>().FirstOrDefault(a => a.Id == userKey);
-            if (userEntity != null)
-            {
-                userEntity.IsDeleted = true;
-                _db.SaveChanges();
-            }
-            _memoryCache.Remove(userCacheKey);
-        }
-
-
-        public void RemoveResource(string resourceKey)
-        {
-            var resourceEntity = _db.Set<Resource>().FirstOrDefault(a => a.Id == resourceKey);
-            if (resourceEntity != null)
-            {
-                _db.Remove(resourceEntity);//资源为真删
-                _db.SaveChanges();
-            }
-            _memoryCache.Remove(resourceCacheKey);
-        }
         /// <summary>
         /// 保存资源。会从资源id和资源code两字段考虑是新增还是修改
         /// </summary>
         /// <param name="resource"></param>
-        public void SaveResource(IResource resource)
+        public override void SaveResource(IResource resource)
         {
             var resoureDto = resource as Resource;
             var resourceKey = resource.GetKey();
@@ -152,99 +67,65 @@ namespace Snail.Permission
             _db.SaveChanges();
             _memoryCache.Remove(resourceCacheKey);
         }
-        public void SaveRole(IRole role)
-        {
-            var roleKey = role.GetKey();
-            var userId = _applicationContext.GetCurrentUserId();
-            if (string.IsNullOrEmpty(roleKey))
-            {
-                //add
-                _db.Add(new Role
-                {
-                    Creater = userId,
-                    CreateTime = DateTime.Now,
-                    Id = IdGenerator.Generate<string>(),
-                    IsDeleted = false,
-                    Name = role.GetName(),
-                    Updater = userId,
-                    UpdateTime = DateTime.Now                    
-                });
-            }
-            else
-            {
-                var roleEntity = _db.Set<Role>().FirstOrDefault(a => a.Id == roleKey);
-                if (roleEntity != null)
-                {
-                    roleEntity.Name = role.GetName();
-                    roleEntity.Updater = userId;
-                    roleEntity.UpdateTime = DateTime.Now;
-                }
-            }
-            _db.SaveChanges();
-            _memoryCache.Remove(roleCacheKey);
 
+        public override void UpdateRoleEntityByDto(IRole entity, IRole dto, bool isAdd)
+        {
+            var roleEntity = entity as Role;
+            var roleDto = dto as Role;
+            var userId= _applicationContext.GetCurrentUserId();
+            var now = DateTime.Now;
+            if (isAdd)
+            {
+                roleEntity.Id = IdGenerator.Generate<string>();
+                roleEntity.IsDeleted = false;
+            }
+            roleEntity.CreateTime = now;
+            roleEntity.Updater = userId;
+            roleEntity.Updater = userId;
+            roleEntity.Creater = userId;
+            roleEntity.Name = roleDto.Name;
         }
 
-        public void SaveUser(IUser user)
+        public override void UpdateUserEntityByDto(IUser entity, IUser dto, bool isAdd)
         {
-            var userDto = user as User;
-            var userKey = user.GetKey();
+            var userEntity = entity as User;
+            var userDto = dto as User;
             var userId = _applicationContext.GetCurrentUserId();
-            if (string.IsNullOrEmpty(userKey))
+            var now = DateTime.Now;
+            if (isAdd)
             {
-                //add
-                _db.Add(new User
-                {
-                    Creater = userId,
-                    CreateTime = DateTime.Now,
-                    Id = IdGenerator.Generate<string>(),
-                    IsDeleted = false,
-                    Name = user.GetName(),
-                    Updater = userId,
-                    UpdateTime = DateTime.Now,
-                    Account= userDto?.Account,
-                    Email=userDto?.Email,
-                    Gender=userDto?.Gender??EGender.Male,
-                    Phone=userDto?.Phone,
-                    Pwd=userDto?.Pwd
-                });
+                userEntity.Id = IdGenerator.Generate<string>();
+                userEntity.IsDeleted = false;
+                userEntity.Pwd = userDto.Pwd;
             }
-            else
+
+            if (!string.IsNullOrEmpty(userDto.GetName()))
             {
-                var roleEntity = _db.Set<User>().FirstOrDefault(a => a.Id == userKey);
-                if (roleEntity != null)
-                {
-                    if (!string.IsNullOrEmpty(user.GetName()))
-                    {
-                        roleEntity.Name = user.GetName();
-                    }
-                    if (!string.IsNullOrEmpty(user.GetAccount()))
-                    {
-                        roleEntity.Account = user.GetAccount();
-                    }
-                    if (!string.IsNullOrEmpty(userDto.Email))
-                    {
-                        roleEntity.Email = userDto.Email;
-                    }
-                    if (!string.IsNullOrEmpty(userDto.Phone))
-                    {
-                        roleEntity.Phone = userDto.Phone;
-                    }
-                    if (!string.IsNullOrEmpty(userDto.Pwd))
-                    {
-                        roleEntity.Pwd = userDto.Pwd;
-                    }
-                    roleEntity.Gender = userDto.Gender;
-                    roleEntity.Updater = userId;
-                    roleEntity.UpdateTime = DateTime.Now;
-                    
-                }
+                userEntity.Name = userDto.GetName();
             }
-            _db.SaveChanges();
-            _memoryCache.Remove(userCacheKey);
+            if (!string.IsNullOrEmpty(userDto.GetAccount()))
+            {
+                userEntity.Account = userDto.GetAccount();
+            }
+            if (!string.IsNullOrEmpty(userDto.Email))
+            {
+                userEntity.Email = userDto.Email;
+            }
+            if (!string.IsNullOrEmpty(userDto.Phone))
+            {
+                userEntity.Phone = userDto.Phone;
+            }
+            if (!string.IsNullOrEmpty(userDto.Pwd))
+            {
+                userEntity.Pwd = userDto.Pwd;
+            }
+            userEntity.CreateTime = now;
+            userEntity.Updater = userId;
+            userEntity.Updater = userId;
+            userEntity.Creater = userId;
         }
 
-        public void SetRoleResources(string roleKey, List<string> resourceKeys)
+        public override void SetRoleResources(string roleKey, List<string> resourceKeys)
         {
             var userId = _applicationContext.GetCurrentUserId();
             var allRoleResources = _db.Set<RoleResource>().AsNoTracking().Where(a => a.RoleId == roleKey).ToList();
@@ -274,7 +155,7 @@ namespace Snail.Permission
             _memoryCache.Remove(roleResourceCacheKey);
         }
 
-        public void SetUserRoles(string userKey, List<string> roleKeys)
+        public override void SetUserRoles(string userKey, List<string> roleKeys)
         {
             var userId = _applicationContext.GetCurrentUserId();
             var allUserRoles = _db.Set<UserRole>().AsNoTracking().Where(a => a.UserId == userKey).ToList();

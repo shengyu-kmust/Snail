@@ -105,9 +105,9 @@ namespace Snail.DAL
         {
             var query = GetQueryableSource();
             // 查询条件
-            if (queryDto is IPredicateConvert<TSource> predicateConvert)
+            if (queryDto is IPredicateBuilder<TSource> predicateConvert)
             {
-                var predicate = predicateConvert.GetExpression();
+                var predicate = predicateConvert.BuildPredicate();
                 query = query.Where(predicate);
             }
             else
@@ -119,7 +119,7 @@ namespace Snail.DAL
             // 结果映射
             if (queryDto is ISelectorBuilder<TSource, TResult> selectorBuilder)
             {
-                result = query.Select(selectorBuilder.GetSelector());
+                result = query.Select(selectorBuilder.BuildSelector());
             }
             else
             {
