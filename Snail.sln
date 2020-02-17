@@ -25,6 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Common.Test", "Snail.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Core.Default", "Snail.Core.Default\Snail.Core.Default.csproj", "{57E2967D-9E19-42D8-A4AE-B9FC3C1C7C35}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C4F9C34E-5913-4A67-9011-34630BDE3978}"
+	ProjectSection(SolutionItems) = preProject
+		updatePackage.bat = updatePackage.bat
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
