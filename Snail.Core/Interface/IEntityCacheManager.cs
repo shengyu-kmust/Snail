@@ -8,5 +8,7 @@ namespace Snail.Core.Interface
     public interface IEntityCacheManager
     {
         List<TEntity> Get<TEntity>() where TEntity : class;
+        void RefreashAllEntityCache();
+        void RefreshEntityCache(Type entity);
     }
 }

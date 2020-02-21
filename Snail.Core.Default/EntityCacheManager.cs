@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace Snail.Core.Default
 {
@@ -15,10 +16,12 @@ namespace Snail.Core.Default
         public const string EntityCacheEventName = "EntityCacheEventName";
         private DbContext _db;
         private IMemoryCache _memoryCache;
+        private ConcurrentDictionary<string, string> _entityKeyMaps;//为entity.name和cacheKey的map
         public EntityCacheManager(DbContext db, IMemoryCache memoryCache)
         {
             _db = db;
             _memoryCache = memoryCache;
+            _entityKeyMaps = new ConcurrentDictionary<string, string>();
         }
 
         public List<TEntity> Get<TEntity>() where TEntity : class
@@ -27,11 +30,28 @@ namespace Snail.Core.Default
             return _memoryCache.GetOrCreate<List<TEntity>>(key, a => LoadEntities<TEntity>());
         }
 
+        public void RefreashAllEntityCache()
+        {
+            _entityKeyMaps.ToList().ForEach(item =>
+            {
+                _memoryCache.Remove(item.Value);
+            });
+        }
+
+        public void RefreshEntityCache(Type entity)
+        {
+            if (_entityKeyMaps.TryGetValue(entity.Name, out string cacheKey))
+            {
+                _memoryCache.Remove(cacheKey);
+            }
+        }
+
         private List<TEntity> LoadEntities<TEntity>() where TEntity : class
         {
             EnsureEnableCache<TEntity>();
+            var key = GenerateEntityCacheKey<TEntity>();
+            _entityKeyMaps.TryAdd(typeof(TEntity).Name, key);
             return _db.Set<TEntity>().AsNoTracking().ToList();
-
         }
 
         private void EnsureEnableCache<TEntity>()
@@ -58,11 +78,12 @@ namespace Snail.Core.Default
         }
 
 
+
         public class EntityChangeEvent
         {
             public string EntityName { get; set; }
         }
 
-       
+
     }
 }
