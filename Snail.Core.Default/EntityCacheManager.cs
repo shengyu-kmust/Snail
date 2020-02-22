@@ -16,12 +16,11 @@ namespace Snail.Core.Default
         public const string EntityCacheEventName = "EntityCacheEventName";
         private DbContext _db;
         private IMemoryCache _memoryCache;
-        private ConcurrentDictionary<string, string> _entityKeyMaps;//为entity.name和cacheKey的map
+        private static ConcurrentDictionary<string, string> _entityKeyMaps= new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);//key为entity.name，value为cache的key
         public EntityCacheManager(DbContext db, IMemoryCache memoryCache)
         {
             _db = db;
             _memoryCache = memoryCache;
-            _entityKeyMaps = new ConcurrentDictionary<string, string>();
         }
 
         public List<TEntity> Get<TEntity>() where TEntity : class
@@ -76,14 +75,12 @@ namespace Snail.Core.Default
         {
             _memoryCache.Remove(GenerateEntityCacheKey(entityChangeEvent.EntityName));
         }
-
-
-
-        public class EntityChangeEvent
-        {
-            public string EntityName { get; set; }
-        }
-
-
     }
+
+
+    public class EntityChangeEvent
+    {
+        public string EntityName { get; set; }
+    }
+
 }
