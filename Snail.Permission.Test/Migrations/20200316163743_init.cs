@@ -26,24 +26,6 @@ namespace Snail.Permission.Test.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Permissions",
-                columns: table => new
-                {
-                    Id = table.Column<string>(nullable: false),
-                    Creater = table.Column<string>(nullable: true),
-                    CreateTime = table.Column<DateTime>(nullable: false),
-                    Updater = table.Column<string>(nullable: true),
-                    UpdateTime = table.Column<DateTime>(nullable: false),
-                    IsDeleted = table.Column<bool>(nullable: false),
-                    RoleId = table.Column<string>(nullable: true),
-                    ResourceId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Permissions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Resources",
                 columns: table => new
                 {
@@ -77,6 +59,24 @@ namespace Snail.Permission.Test.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Role", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoleResources",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    Creater = table.Column<string>(nullable: true),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    Updater = table.Column<string>(nullable: true),
+                    UpdateTime = table.Column<DateTime>(nullable: false),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    RoleId = table.Column<string>(nullable: true),
+                    ResourceId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoleResources", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,12 +130,28 @@ namespace Snail.Permission.Test.Migrations
                     Email = table.Column<string>(nullable: true),
                     Phone = table.Column<string>(nullable: true),
                     Pwd = table.Column<string>(nullable: true),
-                    Gender = table.Column<int>(nullable: false)
+                    Gender = table.Column<string>(nullable: false),
+                    ExtroInfo = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Role",
+                columns: new[] { "Id", "CreateTime", "Creater", "IsDeleted", "Name", "UpdateTime", "Updater" },
+                values: new object[] { "27430171878727681", new DateTime(2020, 3, 17, 0, 37, 42, 609, DateTimeKind.Local).AddTicks(6894), null, false, "SuperAdmin", new DateTime(2020, 3, 17, 0, 37, 42, 613, DateTimeKind.Local).AddTicks(6535), null });
+
+            migrationBuilder.InsertData(
+                table: "UserRole",
+                columns: new[] { "Id", "CreateTime", "Creater", "IsDeleted", "RoleId", "UpdateTime", "Updater", "UserId" },
+                values: new object[] { "27430171920670720", new DateTime(2020, 3, 17, 0, 37, 42, 609, DateTimeKind.Local).AddTicks(6894), null, false, "27430171878727681", new DateTime(2020, 3, 17, 0, 37, 42, 613, DateTimeKind.Local).AddTicks(8576), null, "27430171878727680" });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Account", "CreateTime", "Creater", "Email", "ExtroInfo", "Gender", "IsDeleted", "Name", "Phone", "Pwd", "UpdateTime", "Updater" },
+                values: new object[] { "27430171878727680", "SuperAdmin", new DateTime(2020, 3, 17, 0, 37, 42, 609, DateTimeKind.Local).AddTicks(6894), null, null, null, "Male", false, "超级管理员", null, "E10ADC3949BA59ABBE56E057F20F883E", new DateTime(2020, 3, 17, 0, 37, 42, 611, DateTimeKind.Local).AddTicks(8072), null });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -144,13 +160,13 @@ namespace Snail.Permission.Test.Migrations
                 name: "Orgs");
 
             migrationBuilder.DropTable(
-                name: "Permissions");
-
-            migrationBuilder.DropTable(
                 name: "Resources");
 
             migrationBuilder.DropTable(
                 name: "Role");
+
+            migrationBuilder.DropTable(
+                name: "RoleResources");
 
             migrationBuilder.DropTable(
                 name: "UserOrgs");

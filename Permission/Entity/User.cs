@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Permission.Entity
 {
-    public class User:BaseEntity,IUser
+    public partial class User:BaseEntity,IUser
     {
         public string Account { get; set; }
         public string Name { get; set; }
