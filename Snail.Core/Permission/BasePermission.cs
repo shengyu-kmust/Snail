@@ -60,8 +60,8 @@ namespace Snail.Core.Permission
         #region 登录、前端界面权限控制必要方法
         public virtual LoginResult Login(LoginDto loginDto)
         {
-            var user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount() == loginDto.Account);
-            if (user != null && HashPwd(loginDto.Pwd).Equals(user.GetPassword()))
+            var user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account,StringComparison.OrdinalIgnoreCase));
+            if (user != null && HashPwd(loginDto.Pwd).Equals(user.GetPassword(),StringComparison.OrdinalIgnoreCase))
             {
                 var roleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == user.GetKey()).Select(a => a.GetRoleKey()) ?? new List<string>();
                 var roleNames = _permissionStore.GetAllRole().Where(a => roleKeys.Contains(a.GetKey())).Select(a => a.GetName()) ?? new List<string>();

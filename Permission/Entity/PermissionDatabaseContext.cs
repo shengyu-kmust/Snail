@@ -1,4 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Snail.Common;
+using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Snail.Permission.Entity
 {
@@ -30,6 +34,18 @@ namespace Snail.Permission.Entity
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<User>().Property(a => a.Gender).HasConversion<string>();
+            SeedData(modelBuilder);
+        }
+
+        private void SeedData(ModelBuilder modelBuilder)
+        {
+            var userId = IdGenerator.Generate<string>();
+            var roleId = IdGenerator.Generate<string>();
+            var pwdHash=BitConverter.ToString(HashAlgorithm.Create(HashAlgorithmName.MD5.Name).ComputeHash(Encoding.UTF8.GetBytes("123456"))).Replace("-", "");
+            var now = DateTime.Now;
+            modelBuilder.Entity<User>().HasData(new User { Id = userId, Account = "SuperAdmin", CreateTime = now, IsDeleted = false, Name = "超级管理员", Pwd = pwdHash });
+            modelBuilder.Entity<Role>().HasData(new Role { Id = roleId ,Name=DefaultPermission.superAdminRoleName,CreateTime= now ,IsDeleted=false});
+            modelBuilder.Entity<UserRole>().HasData(new UserRole { Id= IdGenerator.Generate<string>() ,IsDeleted=false,RoleId=roleId,UserId=userId,CreateTime=now});
         }
     }
 }

@@ -169,7 +169,7 @@ namespace Snail.Permission
                 UpdateUserEntityByDto(editRole, user, false);
             }
             _db.SaveChanges();
-            _memoryCache.Remove(roleCacheKey);
+            _memoryCache.Remove(userCacheKey);
         }
 
         public abstract void SetRoleResources(string roleKey, List<string> resourceKeys);

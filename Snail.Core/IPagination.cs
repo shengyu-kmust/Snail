@@ -9,4 +9,10 @@ namespace Snail.Core
         int PageSize { get; set; }
         int PageIndex { get; set; }
     }
+
+    public class BasePagination : IPagination
+    {
+        public int PageSize { get; set; } = 10;
+        public int PageIndex { get; set; } = 1;
+    }
 }

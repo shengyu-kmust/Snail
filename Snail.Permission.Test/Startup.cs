@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSwag;
+using Snail.Core.Permission;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -21,16 +25,29 @@ namespace Snail.Permission.Test
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TestDbContext>();
-            services.AddDefaultPermission<TestDbContext>(options =>
+            services.AddDbContext<TestDbContext>(options =>
+            {
+                options.UseMySql("Server=localhost;Port=3306;Database=permissionTest;User Id=root;Password = root;");
+            });
+            #region 默认权限数据结构
+            //services.AddDefaultPermission<TestDbContext>(options =>
+            //{
+            //    Configuration.GetSection("PermissionOptions").Bind(options);
+            //    options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
+            //});
+            #endregion
+
+            #region 自定义权限数据结构
+            services.AddPermission<TestDbContext, User>(options =>
             {
                 Configuration.GetSection("PermissionOptions").Bind(options);
                 options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
             });
-            //services.AddDbContext<TestDbContext>(options =>
-            //{
-            //    options.UseMySql("Server=localhost;Port=3306;Database=permissionTest;User Id=root;Password = root;");
-            //});
+            services.TryAddScoped<IPermissionStore, CustomPermissionStore>();
+            #endregion
+
+
+            
             services.AddControllers();
             #region swagger
             services.AddOpenApiDocument(conf => {
@@ -60,7 +77,7 @@ namespace Snail.Permission.Test
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -91,7 +108,7 @@ namespace Snail.Permission.Test
             app.UseSwaggerUi3();
             //app.UseReDoc();
             #endregion
-
+            serviceProvider.GetService<TestDbContext>().Database.Migrate();//自动migrate，前提是程序集里有add-migrate后的类
         }
     }
 }

@@ -19,11 +19,11 @@ using System.Reflection;
 
 namespace Snail.Permission
 {
-    public class DefaultPermissionStore :BasePermissionStore<PermissionDatabaseContext,User,Role,UserRole,Resource,RoleResource>, IPermissionStore
+    public class DefaultPermissionStore :BasePermissionStore<DbContext, User,Role,UserRole,Resource,RoleResource>, IPermissionStore
     {
         private string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}", roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}", userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}", resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}", roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
 
-        public DefaultPermissionStore(PermissionDatabaseContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext):base(db,memoryCache,permissionOptions,applicationContext)
+        public DefaultPermissionStore(DbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext):base(db,memoryCache,permissionOptions,applicationContext)
         {
         }
        

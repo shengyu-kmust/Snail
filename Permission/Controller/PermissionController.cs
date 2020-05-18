@@ -28,57 +28,30 @@ namespace Snail.Permission.Controller
 
         #region 查询权限数据
         [HttpGet, Resource(Description = "查询所有用户")]
-        public List<UserDto> GetAllUser()
+        public List<PermissionUserInfo> GetAllUser()
         {
-            var allUser = _permissionStore.GetAllUser().Select(a => (User)a).Select(a => new UserDto
+            return _permissionStore.GetAllUser().Select(a => new PermissionUserInfo
             {
-                Account = a.Account,
-                Creater = a.Creater,
-                CreateTime = a.CreateTime,
-                Email = a.Email,
-                Gender = a.Gender,
-                Id = a.Id,
-                IsDeleted = a.IsDeleted,
-                Name = a.Name,
-                Phone = a.Phone,
-                Pwd = "******",
-                Updater = a.Updater,
-                UpdateTime = a.UpdateTime
+                Id=a.GetKey(),
+                Account = a.GetAccount(),              
+                Name = a.GetName(),
             }).ToList();
-            allUser.ForEach(item =>
-            {
-                item.CreaterName = allUser.FirstOrDefault(a => a.Id == item.Creater)?.Name;
-                item.UpdaterName = allUser.FirstOrDefault(a => a.Id == item.Updater)?.Name;
-            });
-            return allUser.Where(a => !a.IsDeleted).ToList();
         }
         [HttpGet, Resource(Description = "查询所有角色")]
-        public List<RoleDto> GetAllRole()
+        public List<PermissionRoleInfo> GetAllRole()
         {
-            var allUser = _permissionStore.GetAllUser().Select(a => new { Id = a.GetKey(), Name = a.GetName() });
-            var allRole = _permissionStore.GetAllRole().Select(a => (Role)a).Select(a => new RoleDto
+            return _permissionStore.GetAllRole().Select(a => new PermissionRoleInfo
             {
-                Creater = a.Creater,
-                CreateTime = a.CreateTime,
-                Id = a.Id,
-                IsDeleted = a.IsDeleted,
-                Name = a.Name,
-                Updater = a.Updater,
-                UpdateTime = a.UpdateTime
+                Id = a.GetKey(),
+                Name = a.GetName(),
             }).ToList();
-            allRole.ForEach(item =>
-            {
-                item.CreaterName = allUser.FirstOrDefault(a => a.Id == item.Creater)?.Name;
-                item.UpdaterName = allUser.FirstOrDefault(a => a.Id == item.Updater)?.Name;
-            });
-            return allRole.Where(a => !a.IsDeleted).ToList();
         }
 
         [HttpGet, Resource(Description = "查询用户的所有角色")]
-        public UserRoleDto GetUserRoles(string userKey)
+        public PermissionUserRoleInfo GetUserRoles(string userKey)
         {
             var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a => a.GetRoleKey()).Distinct().ToList();
-            return new UserRoleDto
+            return new PermissionUserRoleInfo
             {
                 UserKey = userKey,
                 RoleKeys = userRoleKeys
@@ -86,10 +59,10 @@ namespace Snail.Permission.Controller
         }
 
         [HttpGet, Resource(Description = "查询角色的所有资源")]
-        public RoleResourceDto GetRoleResources(string roleKey)
+        public PermissionRoleResourceInfo GetRoleResources(string roleKey)
         {
             var roleResourceKeys = _permissionStore.GetAllRoleResource().Where(a => a.GetRoleKey() == roleKey).Select(a => a.GetResourceKey()).Distinct().ToList();
-            return new RoleResourceDto
+            return new PermissionRoleResourceInfo
             {
                 RoleKey = roleKey,
                 ResourceKeys = roleResourceKeys
@@ -166,7 +139,7 @@ namespace Snail.Permission.Controller
         }
 
         [HttpPost, Resource(Description = "保存角色")]
-        public void SaveRole(RoleSaveDto role)
+        public void SaveRole(PermissionRoleSaveInfo role)
         {
             _permissionStore.SaveRole(new Role
             {
@@ -182,12 +155,12 @@ namespace Snail.Permission.Controller
         }
 
         [HttpPost, Resource(Description = "用户授予角色")]
-        public void SetUserRoles(UserRoleDto dto)
+        public void SetUserRoles(PermissionUserRoleInfo dto)
         {
             _permissionStore.SetUserRoles(dto.UserKey, dto.RoleKeys);
         }
         [HttpPost, Resource(Description = "角色授予资源")]
-        public void SetRoleResources(RoleResourceDto dto)
+        public void SetRoleResources(PermissionRoleResourceInfo dto)
         {
             _permissionStore.SetRoleResources(dto.RoleKey, dto.ResourceKeys);
         }

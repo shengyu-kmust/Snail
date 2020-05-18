@@ -12,8 +12,8 @@ namespace Snail.Permission.Test
         public TestDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<TestDbContext>();
-            //optionsBuilder.UseMySql(@"Server =localhost; Port =3306; Database =sample; User Id = root; Password = root;");
-            optionsBuilder.UseSqlServer(@"Server =localhost\sqlexpress; Database =sample; User Id = sa; Password = test;");
+            optionsBuilder.UseMySql(@"Server =localhost; Port =3306; Database =sample; User Id = root; Password = root;");
+            //optionsBuilder.UseSqlServer(@"Server =localhost\sqlexpress; Database =sample; User Id = sa; Password = test;");
             return new TestDbContext(optionsBuilder.Options);
         }
     }

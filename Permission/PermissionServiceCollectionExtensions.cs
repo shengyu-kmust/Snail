@@ -40,6 +40,18 @@ namespace Snail.Permission
             AddPermissionCore(services, action);
         }
 
+
+        /// <summary>
+        /// 自定义TUser,TRole,TUserRole,TResource,TRoleResource，需自己实现和注册IPermissionStore
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TRole"></typeparam>
+        /// <typeparam name="TUserRole"></typeparam>
+        /// <typeparam name="TResource"></typeparam>
+        /// <typeparam name="TRoleResource"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
         public static void AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services, Action<PermissionOptions> action)
           where TDbContext : DbContext
           where TUser : class, IUser, new()
@@ -50,16 +62,33 @@ namespace Snail.Permission
         {
             services.TryAddScoped<DbContext, TDbContext>();
             services.TryAddScoped<IPermission, DefaultPermission>();
-            services.TryAddScoped<IPermissionStore, BasePermissionStore<DbContext, TUser, TRole, TUserRole, TResource, TRoleResource>>();
             AddPermissionCore(services, action);
         }
+
+
+        /// <summary>
+        /// 除User表用TUser外,其它的表都和AddDefaultPermission一样，需自己实现和注册IPermissionStore
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void AddPermission<TDbContext, TUser>(this IServiceCollection services, Action<PermissionOptions> action)
+          where TDbContext : DbContext
+          where TUser : class, IUser, new()
+        {
+            services.TryAddScoped<DbContext, TDbContext>();
+            services.TryAddScoped<IPermission, DefaultPermission>();
+            AddPermissionCore(services, action);
+        }
+
 
         /// <summary>
         /// 权限控制核心，即必须的配置
         /// </summary>
         /// <param name="services"></param>
         /// <param name="action"></param>
-        public static void AddPermissionCore(IServiceCollection services, Action<PermissionOptions> action)
+        public static void AddPermissionCore(this IServiceCollection services, Action<PermissionOptions> action)
         {
             #region MyRegion
             var permissionOption = new PermissionOptions();

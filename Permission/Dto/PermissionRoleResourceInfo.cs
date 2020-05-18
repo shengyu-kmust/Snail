@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Snail.Permission.Dto
 {
-    public class RoleResourceDto
+    public class PermissionRoleResourceInfo
     {
         public string RoleKey { get; set; }
         public List<string> ResourceKeys { get; set; }
