@@ -44,7 +44,8 @@ namespace Snail.Core.Default
                 Url = url,
                 ClientName = clientName,
                 RequestMethod = HttpMethod.Post,
-                DataType = DataType.Json
+                DataType = DataType.Json,
+                Data=data
             });
         }
 
