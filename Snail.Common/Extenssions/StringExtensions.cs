@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Snail.Common.Extenssions
 {
@@ -11,6 +14,11 @@ namespace Snail.Common.Extenssions
         public static bool HasValue(this string str)
         {
             return !string.IsNullOrEmpty(str);
+        }
+
+        public static string ToMd5(this string str)
+        {
+            return BitConverter.ToString(HashAlgorithm.Create(HashAlgorithmName.MD5.Name).ComputeHash(Encoding.UTF8.GetBytes(str))).Replace("-", "");
         }
 
         /// <summary>

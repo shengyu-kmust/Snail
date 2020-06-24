@@ -11,7 +11,6 @@ using System.Reflection;
 
 namespace Snail.Core.Default
 {
-    // todo 抽到sail
     /// <summary>
     /// 注册成单例
     /// </summary>

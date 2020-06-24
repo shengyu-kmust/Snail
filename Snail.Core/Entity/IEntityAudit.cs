@@ -11,8 +11,8 @@ namespace Snail.Core.Entity
     public interface IEntityAudit<T>
     {
         T Creater { get; set; }
-        DateTime CreateTime { get; set; }
+        DateTime? CreateTime { get; set; }
         T Updater { get; set; }
-        DateTime UpdateTime { get; set; }
+        DateTime? UpdateTime { get; set; }
     }
 }
