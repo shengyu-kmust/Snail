@@ -84,7 +84,7 @@ namespace Snail.Core.Permission
 
         #region 其它
         /// <summary>
-        /// password的hash，可能加salt或是不加，hash的算法也可以由用户自己配置。
+        /// 获取password的hash，可能加salt或是不加，hash的算法也可以由用户自己配置。
         /// 如果用户密码在存储时不做hash处理，则此方法返回pwd的明文即可
         /// 此方法用于两处
         /// 1、登录验证
@@ -94,6 +94,9 @@ namespace Snail.Core.Permission
         /// <returns>密码明文的hash</returns>
         string HashPwd(string pwd);
 
+        /// <summary>
+        /// 初始化权限资源
+        /// </summary>
         void InitResource();
         #endregion
 
