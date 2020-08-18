@@ -25,7 +25,7 @@ namespace Snail.FileStore
         /// </summary>
         public long Length { get; set; }
         /// <summary>
-        /// 文件数据，只有当文件是存在在数据里时，才会有值
+        /// 文件数据，只有当文件是存在在数据库里时，才会有值
         /// </summary>
         public byte[] FileData { get; set; }
         /// <summary>
