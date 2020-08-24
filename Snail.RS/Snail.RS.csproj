@@ -5,10 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="AutoMapper" Version="10.0.0" />
+	  <PackageReference Include="AutoMapper" Version="9.0.0" />
 	  <PackageReference Include="Snail.Core" Version="1.0.12" />
 	  <PackageReference Include="Snail.Common" Version="1.0.12" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.7" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 

@@ -62,9 +62,9 @@ namespace Snail.RS
             return db.Set<RSScheduleRule>().AsNoTracking();
         }
 
-        public void DeleteRule(IdsDto dto)
+        public void DeleteRule(List<string> ids)
         {
-            dto.Ids.ForEach(id =>
+            ids.ForEach(id =>
             {
                 var entity = db.Set<RSScheduleRule>().FirstOrDefault(a => a.Id == id);
                 if (entity == null)
