@@ -1,9 +1,8 @@
-﻿using Snail.Core.Entity;
-using System;
+﻿using System;
 
-namespace Snail.RS
+namespace Snail.Core.Entity
 {
-    public class BaseEntity : IEntityId<string>, IEntitySoftDelete, IEntityAudit<string>
+    public class DefaultBaseEntity : IEntityId<string>, IEntitySoftDelete, IEntityAudit<string>
     {
         public string Id { get; set; }
         public DateTime? CreateTime { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Snail.Common.Extenssions;
+using Snail.Core.Dto;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -6,8 +7,9 @@ using System.Linq;
 
 namespace Snail.RS.Dto
 {
-    public class RSScheduleRuleDto : RSScheduleRule, IValidatableObject
+    public class RSScheduleRuleDto :IDto, IValidatableObject
     {
+        public string Id { get; set; }
         /// <summary>
         /// 排班对象id
         /// </summary>

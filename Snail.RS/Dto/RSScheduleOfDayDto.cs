@@ -1,9 +1,12 @@
-﻿using System;
+﻿using Snail.Core.Dto;
+using System;
+using System.Collections.Generic;
 
 namespace Snail.RS.Dto
 {
-    public class RSScheduleOfDayDto:RSScheduleOfDay
+    public class RSScheduleOfDayDto:IDto
     {
+        public string Id { get; set; }
         #region rule相关字段
         /// <summary>
         /// 排班对象id
@@ -17,6 +20,16 @@ namespace Snail.RS.Dto
         /// 排班对象的名称，如人名，业务名，科室名等
         /// </summary>
         public string TargetName { get; set; }
+
+        /// <summary>
+        /// 排班开始时间
+        /// </summary>
+        public TimeSpan RuleBeginTime { set; get; }
+        /// <summary>
+        /// 排班结束时间
+        /// </summary>
+        public TimeSpan RuleEndTime { set; get; }
+        public int MaxNum { get; set; }
 
         #endregion
         /// <summary>
@@ -46,5 +59,12 @@ namespace Snail.RS.Dto
         /// 扩展信息，建议存dic
         /// </summary>
         public string ExtraInfo { get; set; }
+        public List<RemainNumDto> RemainNumsDto { get; set; }
+    }
+    public class RemainNumDto
+    {
+        public int Num { get; set; }
+        public TimeSpan TimeBegin { get; set; }
+        public TimeSpan TimeEnd { get; set; }
     }
 }

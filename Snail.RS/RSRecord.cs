@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Snail.Core.Entity;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,7 +8,7 @@ namespace Snail.RS
     /// <summary>
     /// 预约记录-由用户和schedule两个维度的数据组成
     /// </summary>
-    public class RSRecord:BaseEntity
+    public class RSRecord: DefaultBaseEntity
     {
         /// <summary>
         /// 预约人id

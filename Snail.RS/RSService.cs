@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Snail.Common;
 using Snail.Common.Extenssions;
 using Snail.Core;
-using Snail.Core.Dto;
 using Snail.RS.Dto;
 using System;
 using System.Collections.Generic;
@@ -151,6 +150,9 @@ namespace Snail.RS
                             TargetId = rule.TargetId,
                             TargetName = rule.TargetName,
                             TargetType = rule.TargetType,
+                            MaxNum=rule.MaxNum,
+                            RuleBeginTime=rule.BeginTime,
+                            RuleEndTime=rule.EndTime
                         };
             return query.AsNoTracking();
         }
@@ -177,7 +179,7 @@ namespace Snail.RS
             var occupy = Occupy(scheduleOfDay.RemainNums, makeAppointDto.OrderNum);
             scheduleOfDay.RemainNum = occupy.remainNum;
             scheduleOfDay.RemainNums = occupy.remainNums;
-            var numBeginEndTime = GetRecordCalcBeginEndTime(rule.BeginTime, rule.EndTime, rule.MaxNum, occupy.orderNum);
+            var numBeginEndTime = GetNumBeginEndTime(rule.BeginTime, rule.EndTime, rule.MaxNum, occupy.orderNum);
             var record = new RSRecord
             {
                 Id = IdGenerator.Generate<string>(),
@@ -191,7 +193,8 @@ namespace Snail.RS
                 SubscriberName = makeAppointDto.SubscriberName,
                 SubscriberPhone = makeAppointDto.SubscriberPhone,
                 NumBeginTime = numBeginEndTime.begin,
-                NumEndTime = numBeginEndTime.end
+                NumEndTime = numBeginEndTime.end,
+                ScheduleDate= scheduleOfDay.ScheduleDate
             };
             db.Set<RSRecord>().Add(record);
             db.SaveChanges();
@@ -221,8 +224,10 @@ namespace Snail.RS
         public IQueryable<RSRecordDto> GetRecordQuery()
         {
             var query = from a in db.Set<RSRecord>()
-                        join b in db.Set< RSScheduleOfDay>() on a.ScheduleOfDayId equals b.Id
-                        join c in db.Set<RSScheduleRule>() on b.RuleId equals c.Id
+                        join b in db.Set< RSScheduleOfDay>() on a.ScheduleOfDayId equals b.Id into b_group
+                        from b in b_group.DefaultIfEmpty()
+                        join c in db.Set<RSScheduleRule>() on b.RuleId equals c.Id into c_group
+                        from c in c_group.DefaultIfEmpty()
                         select new RSRecordDto
                         {
                             OrderNum = a.OrderNum,
@@ -236,7 +241,8 @@ namespace Snail.RS
                             SubscriberId=a.SubscriberId,
                             SubscriberName=a.SubscriberName,
                             SubscriberPhone=a.SubscriberPhone,
-                            TargetName=c.TargetName
+                            TargetName=c.TargetName,
+                            ScheduleDate=a.ScheduleDate
                         };
             return query;
         }
@@ -368,7 +374,7 @@ namespace Snail.RS
         /// <param name="totalNum"></param>
         /// <param name="orderNum"></param>
         /// <returns></returns>
-        public static (TimeSpan begin, TimeSpan end) GetRecordCalcBeginEndTime(TimeSpan begin, TimeSpan end, int totalNum, int orderNum)
+        public static (TimeSpan begin, TimeSpan end) GetNumBeginEndTime(TimeSpan begin, TimeSpan end, int totalNum, int orderNum)
         {
             try
             {
@@ -382,6 +388,15 @@ namespace Snail.RS
             {
                 return (TimeSpan.Zero, TimeSpan.Zero);
             }
+        }
+        public static void DealWithRSScheduleOfDayDto(RSScheduleOfDayDto dto)
+        {
+            dto.RemainNumsDto = new List<RemainNumDto>();
+            (dto.RemainNums ?? "").Split(",").Select(a=>int.Parse(a)).OrderBy(a=>a).ToList().ForEach(num =>
+            {
+                var beginEnd = RSService.GetNumBeginEndTime(dto.RuleBeginTime, dto.RuleEndTime, dto.MaxNum, num);
+                dto.RemainNumsDto.Add(new RemainNumDto { Num = num, TimeBegin = beginEnd.begin, TimeEnd = beginEnd.end });
+            });
         }
         #endregion
 

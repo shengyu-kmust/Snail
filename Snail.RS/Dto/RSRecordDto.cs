@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Snail.Core.Dto;
+using System;
 namespace Snail.RS.Dto
 {
     public class RSRecordDto : IDto
     {
+        public DateTime ScheduleDate { get; set; }
 
         /// <summary>
         /// 预约人id

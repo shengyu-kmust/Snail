@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Snail.Core.Entity;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,7 +8,7 @@ namespace Snail.RS
     /// <summary>
     /// 排班规则，按天为单位排班，每天定时任务自动排班
     /// </summary>
-    public class RSScheduleRule: BaseEntity
+    public class RSScheduleRule: DefaultBaseEntity
     {
         /// <summary>
         /// 排班对象id

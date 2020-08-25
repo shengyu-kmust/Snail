@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Snail.Core.Entity;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.RS
@@ -7,7 +8,7 @@ namespace Snail.RS
     /// 排班表
     /// </summary>
     [Table("RSScheduleOfDay")]
-    public class RSScheduleOfDay : BaseEntity
+    public class RSScheduleOfDay : DefaultBaseEntity
     {
         /// <summary>
         /// 对应排班规则id
