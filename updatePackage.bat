@@ -6,6 +6,7 @@ dotnet pack .\Snail.Common\Snail.Common.csproj -o .\NugetPackage -p:PackageVersi
 dotnet pack .\Snail.DAL\Snail.DAL.csproj -o .\NugetPackage -p:PackageVersion=1.0.12
 dotnet pack .\Snail.FileStore\Snail.FileStore.csproj -o .\NugetPackage -p:PackageVersion=1.0.12
 dotnet pack .\Snail.Office\Snail.Office.csproj -o .\NugetPackage -p:PackageVersion=1.0.12
+dotnet pack .\Snail.Cache\Snail.Cache.csproj -o .\NugetPackage -p:PackageVersion=1.0.1
 dotnet pack .\Permission\Snail.Permission.csproj -o .\NugetPackage -p:PackageVersion=1.0.12
 dotnet nuget push .\NugetPackage\*.nupkg -k oy2mxefoefovn---xxgy2lqgwzuqfgn---vluevl3--pfkgicp54km -s https://api.nuget.org/v3/index.json --skip-duplicate
 pause
