@@ -82,6 +82,7 @@ namespace Snail.Office
 
         public List<T> ImportFromExcel<T>(Stream fileStream, int firstRowIndex = 0, int firstColumnIndex = 0) where T : new()
         {
+            // 清空空的行
             var workbook = WorkbookFactory.Create(fileStream);
             var sheet = workbook.GetSheetAt(0);
             var headerRow = sheet.GetRow(firstRowIndex);
@@ -98,6 +99,8 @@ namespace Snail.Office
             }
             for (int i = firstRowIndex + 1; i < sheet.LastRowNum + 1; i++)
             {
+                // todo 有可能每有一行的cells数不一样，cell未激活。。。。
+                // todo StringCellValue会出错
                 var rowObject = new T();
                 var rowExcel = sheet.GetRow(i);
                 foreach (var columnMap in columnPropertyMap)
