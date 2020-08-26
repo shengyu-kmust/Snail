@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace Snail.Common.Extenssions
 {
     public static class StringExtensions
     {
+        private static readonly ConcurrentDictionary<Type, TypeConverter> typeConverters = new ConcurrentDictionary<Type, TypeConverter>();
         public static bool HasNotValue(this string str){
             return string.IsNullOrEmpty(str);
         }
@@ -29,11 +33,7 @@ namespace Snail.Common.Extenssions
         /// <returns></returns>
         public static T ConvertTo<T>(this string str)
         {
-            if (str == null)
-            {
-                return default(T);
-            }
-            return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFromInvariantString(str);
+            return (T)typeConverters.GetOrAdd(typeof(T), TypeDescriptor.GetConverter(typeof(T))).ConvertFromString(str);
         }
     }
 }

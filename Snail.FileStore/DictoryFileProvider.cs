@@ -29,13 +29,19 @@ namespace Snail.FileStore
                 FileName = fileInfo.FileName,
                 FileSuffix = fileInfo.FileSuffix,
                 FileStoreProvider=EFileStoreProvider.Dictory,
-                Length=fileInfo.Length
+                Length=fileInfo.Length,
+                RelateDataId=fileInfo.RelateDataId,
+                RelateDataType=fileInfo.RelateDataType
             });
         }
 
         public FileInfo Get(string id)
         {
             var fileInfo=_fileStore.Get(id);
+            if (fileInfo==null)
+            {
+                throw new ArgumentNullException("未找到此文件");
+            }
             fileInfo.FileData=File.ReadAllBytes(GetPath(fileInfo));
             return fileInfo;
         }

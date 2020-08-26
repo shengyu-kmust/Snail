@@ -20,7 +20,7 @@ namespace Snail.Common
         {
             var data = list.FirstOrDefault(a => IdFunc(a).Equals(nodeId));
             var parent = data == null ? null : list.FirstOrDefault(a => IdFunc(a).Equals(parentIdFunc(data)));
-            var childs = list.Where(a => parentIdFunc(a).Equals(nodeId)).Select(a => GetTree(list, IdFunc, parentIdFunc, IdFunc(a))).ToList();
+            var childs = list.Where(a => parentIdFunc(a)!=null && parentIdFunc(a).Equals(nodeId)).Select(a => GetTree(list, IdFunc, parentIdFunc, IdFunc(a))).ToList();
             return new TreeNode<T>
             {
                 Data = data,

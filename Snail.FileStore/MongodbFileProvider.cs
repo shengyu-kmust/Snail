@@ -43,13 +43,19 @@ namespace Snail.FileStore
                 FileName = fileInfo.FileName,
                 FileSuffix = fileInfo.FileSuffix,
                 FileStoreProvider = EFileStoreProvider.Mongdb,
-                Length = fileInfo.Length
+                Length = fileInfo.Length,
+                RelateDataId = fileInfo.RelateDataId,
+                RelateDataType = fileInfo.RelateDataType
             });
         }
 
         public FileInfo Get(string id)
         {
             var fileInfo = _fileStore.Get(id);
+            if (fileInfo == null)
+            {
+                throw new ArgumentNullException("未找到此文件");
+            }
             var mongdbFileInfo = _gridFSBucket.Find(Builders<GridFSFileInfo<ObjectId>>.Filter.Eq(f => f.Metadata["fileInfoId"], id))
                .FirstOrDefault();
             if (mongdbFileInfo != null)

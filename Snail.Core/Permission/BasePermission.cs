@@ -10,6 +10,9 @@ namespace Snail.Core.Permission
     /// <summary>
     /// 权限控制抽象基类，外部在实现权限控制时，如果继承此类，会简化实现的过程，也可以继承IPermission接口，自己实现 
     /// </summary>
+    /// <remarks>
+    /// todo 由于鉴权是频繁的操作，后期计划将鉴权方法里linq相关的操作用hash和缓存技术实现，进一步提高性能
+    /// </remarks>
     public abstract class BasePermission : IPermission
     {
         protected IPermissionStore _permissionStore;
@@ -31,12 +34,13 @@ namespace Snail.Core.Permission
             return resourceKey;
         }
         public abstract string GetRequestResourceCode(object obj);
+
         public virtual bool HasPermission(string resourceKey, string userKey)
         {
             var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a => a.GetRoleKey());
             var resource = _permissionStore.GetAllResource().FirstOrDefault(a => a.GetKey() == resourceKey);
             
-            //未纳入到资源表里的资源，不允许访问
+            //未纳入到资源表里的资源，如果进入到鉴权过程时，不允许访问。请将不需要做权限控制的资源设置成允许匿名访问，避免进入到鉴权流程
             if (resource==null)
             {
                 return false;
@@ -58,6 +62,11 @@ namespace Snail.Core.Permission
         #endregion
 
         #region 登录、前端界面权限控制必要方法
+        /// <summary>
+        /// 登录，返回用户的基本信息和token
+        /// </summary>
+        /// <param name="loginDto">登录dto</param>
+        /// <returns>用户的基本信息和token对象</returns>
         public virtual LoginResult Login(LoginDto loginDto)
         {
             var user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account,StringComparison.OrdinalIgnoreCase));
@@ -124,7 +133,7 @@ namespace Snail.Core.Permission
         /// <summary>
         /// 默认的密码hash算法
         /// </summary>
-        /// <param name="pwd"></param>
+        /// <param name="pwd">密码明文</param>
         /// <returns></returns>
         public virtual string HashPwd(string pwd)
         {
