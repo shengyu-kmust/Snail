@@ -1,0 +1,3 @@
+﻿## 人脸训练数据去https://github.com/ageitgey/face_recognition_models下载，即models目录下的文件
+将下载好的目录models里的dlib_face_recognition_resnet_model_v1.dat，mmod_human_face_detector.dat,shape_predictor_5_face_landmarks.dat,shape_predictor_68_face_landmarks.dat四个文件放到本目录下。
+这些数据是作者用100多万条的人脸数据生成的人脸数据，大根有100M左右

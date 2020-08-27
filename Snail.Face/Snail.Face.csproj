@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Platforms>x64;x86</Platforms>
+		<!--<Platform>x64</Platform>-->
+		<Description>用了FaceRecognition</Description>
+		<Copyright>snail-周晶</Copyright>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="FaceRecognitionDotNet" Version="1.3.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="3.1.2" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+		<PackageReference Include="Snail.Common" Version="1.0.12" />
+		<PackageReference Include="Snail.Core" Version="1.0.13" />
+		<PackageReference Include="coverlet.collector" Version="1.2.0" />
+	</ItemGroup>
+</Project>

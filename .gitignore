@@ -339,3 +339,11 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /Snail.Permission.Test/Properties/launchSettings.json
+/Snail.Face.Test/models/shape_predictor_68_face_landmarks.dat
+/Snail.Face.Test/models/shape_predictor_5_face_landmarks.dat
+/Snail.Face.Test/models/mmod_human_face_detector.dat
+/Snail.Face.Test/models/dlib_face_recognition_resnet_model_v1.dat
+/Snail.Face/models/shape_predictor_68_face_landmarks.dat
+/Snail.Face/models/shape_predictor_5_face_landmarks.dat
+/Snail.Face/models/mmod_human_face_detector.dat
+/Snail.Face/models/dlib_face_recognition_resnet_model_v1.dat
