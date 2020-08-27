@@ -22,11 +22,17 @@ namespace Snail.Core.Interface
 
     public class RequestData
     {
+        /// <summary>
+        /// 请求地址
+        /// </summary>
         public string Url { get; set; }
         public string ClientName { get; set; }
         public HttpMethod RequestMethod { get; set; }
         public Dictionary<string, string> Params { get; set; }
         public Dictionary<string, string> Headers { get; set; }
+        /// <summary>
+        /// DataType为formUrlencoded时必须为IEnumerable<KeyValuePair<string,string>>
+        /// </summary>
         public object Data { get; set; }
         public DataType DataType { get; set; } = DataType.Json;
 
