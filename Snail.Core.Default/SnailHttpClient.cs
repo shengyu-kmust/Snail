@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Snail.Core.Interface;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -57,6 +58,7 @@ namespace Snail.Core.Default
         /// <returns></returns>
         public async Task<TResult> SendAsync<TResult>(RequestData requestData)
         {
+            #region 配置httpRequestMessage
             var paramsString = string.Empty;
             var httpRequestMessage = new HttpRequestMessage
             {
@@ -90,23 +92,38 @@ namespace Snail.Core.Default
                 httpRequestMessage.Content = new StringContent(JsonConvert.SerializeObject(requestData.Data), Encoding.UTF8, "application/json");
             }
             httpRequestMessage.RequestUri = CreateUri($"{requestData.Url.TrimEnd('/')}?{paramsString.TrimStart('/')}");
+            #endregion
+
+
             using (var client = _httpClientFactory.CreateClient(requestData.ClientName ?? string.Empty))
             {
                 var response = await client.SendAsync(httpRequestMessage);
                 if (response.IsSuccessStatusCode)
                 {
                     var responseString = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<TResult>(responseString);
+                    if (typeof(TResult)!=typeof(string))
+                    {
+                        return JsonConvert.DeserializeObject<TResult>(responseString);
+                    }
+                    else
+                    {
+                        return (TResult)Convert.ChangeType(responseString, typeof(string));
+                    }
                 }
                 else
                 {
-                    throw new Exception("请求出错" + response.ToString());
+                    throw new Exception("请求出错返回结果为：" + response.ToString());
                 }
 
             }
 
         }
 
+        /// <summary>
+        /// 创建uri
+        /// </summary>
+        /// <param name="uri">相对或是绝对地址</param>
+        /// <returns></returns>
         private Uri CreateUri(string uri) =>
            string.IsNullOrEmpty(uri) ? null : new Uri(uri, UriKind.RelativeOrAbsolute);
     }
@@ -115,7 +132,7 @@ namespace Snail.Core.Default
     {
         public static void AddSnailHttpClient(this IServiceCollection services)
         {
-            services.TryAddScoped<ISnailHttpClient, SnailHttpClient>();
+            services.TryAddSingleton<ISnailHttpClient, SnailHttpClient>();
             services.AddHttpClient();
         }
     }

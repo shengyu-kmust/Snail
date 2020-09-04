@@ -42,6 +42,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Face.Test", "Snail.Fa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestProject1", "XUnitTestProject1\XUnitTestProject1.csproj", "{B14A6FF5-D252-400B-A970-96597BBB16A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.WeiXin", "Snail.WeiXin\Snail.WeiXin.csproj", "{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -238,6 +240,18 @@ Global
 		{B14A6FF5-D252-400B-A970-96597BBB16A9}.Release|x64.ActiveCfg = Release|x64
 		{B14A6FF5-D252-400B-A970-96597BBB16A9}.Release|x64.Build.0 = Release|x64
 		{B14A6FF5-D252-400B-A970-96597BBB16A9}.Release|x86.ActiveCfg = Release|x64
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Debug|x64.Build.0 = Debug|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Debug|x86.Build.0 = Debug|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Release|x64.ActiveCfg = Release|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Release|x64.Build.0 = Release|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Release|x86.ActiveCfg = Release|Any CPU
+		{1DD2A8AE-AB62-4308-B8AC-D7958147F3FB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
