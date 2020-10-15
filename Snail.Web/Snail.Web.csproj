@@ -50,7 +50,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Permission\Snail.Permission.csproj" />
 		<ProjectReference Include="..\Snail.Cache\Snail.Cache.csproj" />
 		<ProjectReference Include="..\Snail.Core\Snail.Core.csproj" />
 		<ProjectReference Include="..\Snail.FileStore\Snail.FileStore.csproj" />
