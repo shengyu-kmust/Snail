@@ -38,7 +38,7 @@ namespace Snail.Permission.Test
             #endregion
 
             #region 自定义权限数据结构
-            services.AddPermission<TestDbContext, User>(options =>
+            services.AddPermission(options =>
             {
                 Configuration.GetSection("PermissionOptions").Bind(options);
                 options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };

@@ -10,10 +10,10 @@ namespace Snail.Permission
     /// </summary>
     public class UserInfo : IUserInfo
     {
-        public string UserKey { get;set; }
-        public string UserName { get;set; }
-        public string Account { get;set; }
-        public List<string> RoleKeys { get;set; }
-        public List<string> RoleNames { get;set; }
+        public string UserKey { get; set; }
+        public string UserName { get; set; }
+        public string Account { get; set; }
+        public List<string> RoleKeys { get; set; }
+        public List<string> RoleNames { get; set; }
     }
 }

@@ -12,20 +12,20 @@ using System.Text;
 
 namespace Snail.Permission
 {
-    public class Token: IToken
+    public class Token : IToken
     {
         private IMemoryCache _cache;
         private PermissionOptions _options;
-        public Token(IMemoryCache cache,IOptionsMonitor<PermissionOptions> optionsMonitor)
+        public Token(IMemoryCache cache, IOptionsMonitor<PermissionOptions> optionsMonitor)
         {
             _cache = cache;
-            _options = optionsMonitor?.CurrentValue ?? new PermissionOptions() ;
+            _options = optionsMonitor?.CurrentValue ?? new PermissionOptions();
         }
-  
+
         public List<Claim> ResolveFromToken(string tokenStr)
         {
             _cache.TryGetValue(tokenStr, out List<Claim> claims);
-            if (claims==null)
+            if (claims == null)
             {
                 var handler = new JwtSecurityTokenHandler();
                 var key = new RsaSecurityKey(RSAHelper.GetRSAParametersFromFromPublicPem(_options.RsaPublicKey));
@@ -58,7 +58,7 @@ namespace Snail.Permission
             var jwtSecurityToken = new JwtSecurityToken(null, null, claims, null, expireTime, new SigningCredentials(key, SecurityAlgorithms.RsaSha256));
             var tokenStr = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             _cache.Set(tokenStr, claims, expireTime);
-            return tokenStr;    
+            return tokenStr;
         }
     }
 }

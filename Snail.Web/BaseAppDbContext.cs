@@ -59,5 +59,7 @@ namespace Snail.Web
 
             return base.SaveChanges();
         }
+
+        // 不用要SeedData会数据初始化，此方法会在每次migration时删除和创建数据
     }
 }

@@ -14,19 +14,20 @@ namespace Snail.Permission
     public abstract class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource> : IPermissionStore
         where TDbContext : DbContext
         where TUser : class, IUser, new()
-        where TRole : class, IRole,new()
+        where TRole : class, IRole, new()
         where TUserRole : class, IUserRole, new()
-        where TResource : class,IResource, new()
+        where TResource : class, IResource, new()
         where TRoleResource : class, IRoleResource, new()
     {
         protected TDbContext _db;
         protected IMemoryCache _memoryCache;
         protected IApplicationContext _applicationContext;
-        private string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}";
-        private string roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}";
-        private string userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}";
-        private string resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}";
-        private string roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
+        protected readonly string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}";
+        protected readonly string roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}";
+        protected readonly string userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}";
+        protected readonly string resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}";
+        protected readonly string roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
+
         protected IOptionsMonitor<PermissionOptions> _permissionOptions;
 
         public BasePermissionStore(TDbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext)
@@ -90,7 +91,7 @@ namespace Snail.Permission
         public virtual void RemoveRole(string roleKey)
         {
             var roleEntity = GetAllRole().FirstOrDefault(a => a.GetKey() == roleKey) as TRole;
-            if (roleEntity!=null)
+            if (roleEntity != null)
             {
                 _db.Set<TRole>().Remove(roleEntity);
             }
