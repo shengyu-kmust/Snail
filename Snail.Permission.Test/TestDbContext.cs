@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Snail.Common;
 using Snail.Core.Interface;
 using Snail.Core.Permission;
-using Snail.Permission.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

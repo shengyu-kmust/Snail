@@ -24,4 +24,8 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Snail.Core\Snail.Core.csproj" />
+  </ItemGroup>
+
 </Project>
