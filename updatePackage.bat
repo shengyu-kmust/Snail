@@ -13,5 +13,5 @@ dotnet pack .\Snail.RS\Snail.RS.csproj -o .\NugetPackage -p:PackageVersion=1.0.1
 dotnet pack .\Snail.Speech\Snail.Speech.csproj -o .\NugetPackage -p:PackageVersion=1.0.16
 dotnet pack .\Snail.Web\Snail.Web.csproj -o .\NugetPackage -p:PackageVersion=1.0.16
 dotnet pack .\Snail.WeiXin\Snail.WeiXin.csproj -o .\NugetPackage -p:PackageVersion=1.0.16
-dotnet nuget push .\NugetPackage\*.nupkg -k oy2mxefoefovnxxgy2lqgwzuqfgnvluevl3pfkgicp54km -s https://api.nuget.org/v3/index.json --skip-duplicate
+dotnet nuget push .\NugetPackage\*.nupkg -k oy2mxefoe--fovnxxgy--2lqgwzuqf--gnvluevl3p--fkgicp54km -s https://api.nuget.org/v3/index.json --skip-duplicate
 pause
