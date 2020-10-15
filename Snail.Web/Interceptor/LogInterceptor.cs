@@ -95,6 +95,9 @@ namespace Snail.Web.Interceptor
 
     public class LogInterceptorOption
     {
+        /// <summary>
+        /// 响应速度大于多少毫秒时，记入到warn日志
+        /// </summary>
         public int WarnMilliseconds { get; set; } = 2000;
     }
 }
