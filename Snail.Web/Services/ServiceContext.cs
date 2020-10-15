@@ -7,6 +7,9 @@ using System;
 
 namespace Snail.Web.Services
 {
+    /// <summary>
+    /// service的上下文对象，封装所有service层用到的公共或是常用的属性，方法
+    /// </summary>
     public class ServiceContext
     {
         public BaseAppDbContext db;

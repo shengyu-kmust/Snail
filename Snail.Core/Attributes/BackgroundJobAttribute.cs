@@ -14,7 +14,7 @@ namespace Snail.Core.Attributes
         /// </summary>
         public string DelayTimeSpan { get; set; }
         /// <summary>
-        /// 定时任务类型为Recurring时，循环执行的时间配置
+        /// 定时任务类型为Recurring时，循环执行的时间配置，如"10 * * * *"，即每小时的第10分钟
         /// </summary>
         public string Cron { get; set; }
     }

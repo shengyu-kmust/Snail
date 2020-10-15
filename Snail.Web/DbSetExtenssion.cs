@@ -8,9 +8,22 @@ using System.Linq;
 
 namespace Snail.Web
 {
+    /// <summary>
+    /// DbSet的扩展帮助类方法
+    /// </summary>
     public static class DbSetExtenssion
     {
         #region addList
+        /// <summary>
+        /// 增加多个实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dtos"></param>
+        /// <param name="addFunc"></param>
+        /// <param name="userId"></param>
         public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, Func<TDto, TEntity> addFunc, TKey userId)
            where TEntity : class, IIdField<TKey>
          where TDto : class, IIdField<TKey>
@@ -21,6 +34,16 @@ namespace Snail.Web
             });
         }
 
+        /// <summary>
+        /// 增加多个实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dtos"></param>
+        /// <param name="mapper"></param>
+        /// <param name="userId"></param>
         public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, IMapper mapper, TKey userId)
            where TEntity : class, IIdField<TKey>
          where TDto : class, IIdField<TKey>
@@ -34,6 +57,16 @@ namespace Snail.Web
 
         #endregion
         #region add
+        /// <summary>
+        /// 增加单个实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dto"></param>
+        /// <param name="addFunc"></param>
+        /// <param name="userId"></param>
         public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId)
           where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
@@ -57,6 +90,16 @@ namespace Snail.Web
             entities.Add(entity);
         }
 
+        /// <summary>
+        /// 增加单个实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dto"></param>
+        /// <param name="mapper"></param>
+        /// <param name="userId"></param>
         public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId)
            where TEntity : class, IIdField<TKey>
          where TDto : class, IIdField<TKey>
@@ -66,12 +109,24 @@ namespace Snail.Web
         #endregion
 
         #region addOrUpdate
-        public static void AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId)
+        /// <summary>
+        /// 增加或更新
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dto">要增加或更新的对象</param>
+        /// <param name="addFunc"></param>
+        /// <param name="updateFunc"></param>
+        /// <param name="userId"></param>
+        /// <param name="existEntities"></param>
+        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, List<TEntity> existEntities = null)
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
             var now = DateTime.Now;
-            var entity = entities.Find(dto.Id);
+            var entity = existEntities == null ? entities.Find(dto.Id) : existEntities.FirstOrDefault(a => a.Id.Equals(dto.Id));
             if (entity == null)
             {
                 //add
@@ -98,27 +153,59 @@ namespace Snail.Web
                 auditEntity.CreateTime = now;
                 auditEntity.UpdateTime = now;
             }
+            return entity;
         }
-        public static void AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId)
+
+        /// <summary>
+        /// 增加或更新
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dto"></param>
+        /// <param name="mapper"></param>
+        /// <param name="userId"></param>
+        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId, List<TEntity> existEntities = null)
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
-            AddOrUpdate(entities, dto, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId);
+            return AddOrUpdate(entities, dto, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId, existEntities);
         }
 
         #endregion
 
         #region addOrUpdateList
-        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existsEntities, List<TDto> dtos, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId)
+
+        /// <summary>
+        /// 增加或更新多个
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="existEntities">已经存在的实体</param>
+        /// <param name="dtos">要</param>
+        /// <param name="addFunc"></param>
+        /// <param name="updateFunc"></param>
+        /// <param name="userId"></param>
+        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existEntities, List<TDto> dtos, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId)
            where TEntity : class, IIdField<TKey>
            where TDto : class, IIdField<TKey>
         {
-            var dtoIds = dtos.Select(a => a.Id).ToList();
-            // 删除 
-            var removeIds = existsEntities.Select(a => a.Id).Except(dtoIds).ToList();
-            RemoveByIds<TEntity, TKey>(entities, removeIds);
+            if (dtos == null || dtos.Count == 0)
+            {
+                return;
+            }
 
-            // 增加或 更新
+            var dtoIds = dtos.Select(a => a.Id).ToList();
+            // 要删除的ids
+            var removeIds = existEntities?.Select(a => a.Id).Except(dtoIds).ToList() ?? new List<TKey>();
+            // 更新ids删除对象
+            RemoveByIds<TEntity, TKey>(entities, removeIds, existEntities);
+
+
+            // 增加或更新
             foreach (var dto in dtos.Where(a => !removeIds.Contains(a.Id)))
             {
                 AddOrUpdate(entities, dto, addFunc, updateFunc, userId);
@@ -126,6 +213,17 @@ namespace Snail.Web
         }
 
 
+        /// <summary>
+        /// 增加或更新多个
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="existsEntities"></param>
+        /// <param name="dtos"></param>
+        /// <param name="mapper"></param>
+        /// <param name="userId"></param>
         public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existsEntities, List<TDto> dtos, IMapper mapper, TKey userId)
            where TEntity : class, IIdField<TKey>
            where TDto : class, IIdField<TKey>
@@ -135,18 +233,30 @@ namespace Snail.Web
 
         #endregion
 
-
-        public static void RemoveByIds<TEntity, TKey>(this DbSet<TEntity> entities, List<TKey> ids)
+        /// <summary>
+        /// 删除实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="ids"></param>
+        /// <param name="existEntities"></param>
+        public static void RemoveByIds<TEntity, TKey>(this DbSet<TEntity> entities, List<TKey> ids, List<TEntity> existEntities = null)
            where TEntity : class, IIdField<TKey>
         {
             foreach (var id in ids)
             {
-                var entity = entities.Find(id);
+                var entity = existEntities == null ? entities.Find(id) : existEntities.FirstOrDefault(a => a.Id.Equals(id));
                 if (entity != null)
                 {
                     if (entity is IEntitySoftDelete entitySoftDeleteEntity)
                     {
                         entitySoftDeleteEntity.IsDeleted = true;
+                        if (entity is IEntityAudit<TKey> auditEntity)
+                        {
+                            auditEntity.CreateTime = DateTime.Now;
+                            auditEntity.UpdateTime = DateTime.Now;
+                        }
                     }
                     else
                     {

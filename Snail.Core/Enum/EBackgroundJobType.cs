@@ -7,17 +7,17 @@ namespace Snail.Core.Enum
         /// <summary>
         /// 立即执行，并只执行一次
         /// </summary>
-        [Description("不能进行所有的操作")]
-        Enqueue, 
+        [Description("立即执行")]
+        Enqueue,
         /// <summary>
         /// 多久后执行，并执行一次
         /// </summary>
-        [Description("不能进行所有的操作")]
+        [Description("多久后执行")]
         Schedule,
         /// <summary>
         /// 循环执行
         /// </summary>
-        [Description("不能进行所有的操作")]
+        [Description("循环执行")]
         Recurring
     }
 }
