@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
+		<PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+		<PackageReference Include="DotNetCore.CAP" Version="3.0.2" />
+		<PackageReference Include="Autofac.Extras.DynamicProxy" Version="5.0.0" />
+		<PackageReference Include="Hangfire.Core" Version="1.7.9" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.7.9" />
+		<PackageReference Include="HangFire.Autofac" Version="2.3.1" />
+		<PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
+		<PackageReference Include="Hangfire.MySqlStorage" Version="2.0.2" />
+		<PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
+		<PackageReference Include="Hangfire.SqlServer" Version="1.7.9" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="3.1.5" />
+		<PackageReference Include="AutoMapper" Version="9.0.0" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+		<PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="EasyCaching.InMemory" Version="0.8.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+		<PackageReference Include="System.Management" Version="4.7.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.2" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.2" />
+
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.2" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
+		<PackageReference Include="NSwag.AspNetCore" Version="13.2.5" />
+		<PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.1.0" />
+		<PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.1.0" />
+		<PackageReference Include="DotNetCore.CAP.Dashboard" Version="3.0.2" />
+		<PackageReference Include="DotNetCore.CAP.InMemoryStorage" Version="3.0.2" />
+		<PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="3.0.0" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="4.9.0" />
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Permission\Snail.Permission.csproj" />
+		<ProjectReference Include="..\Snail.Cache\Snail.Cache.csproj" />
+		<ProjectReference Include="..\Snail.Core\Snail.Core.csproj" />
+		<ProjectReference Include="..\Snail.FileStore\Snail.FileStore.csproj" />
+		<ProjectReference Include="..\Snail.Office\Snail.Office.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Attributes\" />
+		<Folder Include="EntityTypeConfiguration\" />
+		<Folder Include="Services\" />
+		<Folder Include="Controllers\" />
+	</ItemGroup>
+
+</Project>

@@ -1,14 +1,15 @@
-﻿using Snail.Core.Enum;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Snail.Core.Entity;
+using Snail.Core.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace Snail.Permission.Dto
 {
-    public class UserSaveDto
+    public class UserSaveDto:IIdField<string>
     {
         public string Id { get; set; }
+        [Required(ErrorMessage = "账号必填")]
         public string Account { get; set; }
+        [Required(ErrorMessage = "姓名必填")]
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }

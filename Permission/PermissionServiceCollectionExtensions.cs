@@ -9,88 +9,26 @@ using Snail.Common;
 using Snail.Core.Default;
 using Snail.Core.Interface;
 using Snail.Core.Permission;
-using Snail.Permission.Entity;
+using SnaiWeb.Permission;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Snail.Permission
 {
-    /// <summary>
-    /// 实现权限的方式有如下两种
-    /// 1、dbContext继承PermissionDatabaseContext，并调用AddDefaultPermission
-    /// 2、实现IPermission和IPermissionStore接口并注册，调用AddPermissionCore
-    /// </summary>
     public static class PermissionServiceCollectionExtensions
     {
-        /// <summary>
-        /// 用默认的User, Role, UserRole, Resource, RoleResource表实现权限,即TDbContext已经有默认的这几张表，TDbContext可以通过继承PermissionDatabaseContext来简化实现过程
-        /// </summary>
-        /// <typeparam name="TDbContext">权限的表是在哪个dbcontext</typeparam>
-        /// <param name="services"></param>
-        /// <param name="action"></param>
-        public static void AddDefaultPermission<TDbContext>(this IServiceCollection services, Action<PermissionOptions> action) where TDbContext : DbContext
-        {
-            if (!typeof(PermissionDatabaseContext).IsAssignableFrom(typeof(TDbContext)))
-            {
-                throw new Exception($"{typeof(TDbContext).Name}未继承{typeof(PermissionDatabaseContext).Name}");
-            }
-            services.TryAddScoped<DbContext, TDbContext>();
-            services.TryAddScoped<IPermission, DefaultPermission>();
-            services.TryAddScoped<IPermissionStore, DefaultPermissionStore>();
-            AddPermissionCore(services, action);
-        }
-
-
-        /// <summary>
-        /// 自定义TUser,TRole,TUserRole,TResource,TRoleResource，需自己实现和注册IPermissionStore
-        /// </summary>
-        /// <typeparam name="TDbContext"></typeparam>
-        /// <typeparam name="TUser"></typeparam>
-        /// <typeparam name="TRole"></typeparam>
-        /// <typeparam name="TUserRole"></typeparam>
-        /// <typeparam name="TResource"></typeparam>
-        /// <typeparam name="TRoleResource"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="action"></param>
-        public static void AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services, Action<PermissionOptions> action)
-          where TDbContext : DbContext
-          where TUser : class, IUser, new()
-          where TRole : class, IRole, new()
-          where TUserRole : class, IUserRole, new()
-          where TResource : class, IResource, new()
-          where TRoleResource : class, IRoleResource, new()
-        {
-            services.TryAddScoped<DbContext, TDbContext>();
-            services.TryAddScoped<IPermission, DefaultPermission>();
-            AddPermissionCore(services, action);
-        }
-
-
-        /// <summary>
-        /// 除User表用TUser外,其它的表都和AddDefaultPermission一样，需自己实现和注册IPermissionStore
-        /// </summary>
-        /// <typeparam name="TDbContext"></typeparam>
-        /// <typeparam name="TUser"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="action"></param>
-        public static void AddPermission<TDbContext, TUser>(this IServiceCollection services, Action<PermissionOptions> action)
-          where TDbContext : DbContext
-          where TUser : class, IUser, new()
-        {
-            services.TryAddScoped<DbContext, TDbContext>();
-            services.TryAddScoped<IPermission, DefaultPermission>();
-            AddPermissionCore(services, action);
-        }
-
 
         /// <summary>
         /// 权限控制核心，即必须的配置
         /// </summary>
         /// <param name="services"></param>
         /// <param name="action"></param>
-        public static void AddPermissionCore(this IServiceCollection services, Action<PermissionOptions> action)
+        public static void AddPermission(this IServiceCollection services, Action<PermissionOptions> action)
         {
-            #region MyRegion
+            services.TryAddScoped<IPermission, DefaultPermission>();
+            services.TryAddScoped<IPermissionStore, DefaultPermissionStore>();
+            #region 身份验证
             var permissionOption = new PermissionOptions();
             action(permissionOption);
             //addAuthentication不放到AddPermissionCore方法里，是为了外部可自己配置
@@ -99,16 +37,16 @@ namespace Snail.Permission
                .AddCookie(
                    CookieAuthenticationDefaults.AuthenticationScheme, options =>
                    {
-                   //下面的委托方法只会在第一次cookie验证时调用，调用时会用到上面的permissionOption变量，但其实permissionOption变量是在以前已经初始化的，所以在此方法调用之前，permissionOption变量不会被释放
-                   options.Cookie.Name = "auth";
-                       options.AccessDeniedPath = permissionOption.AccessDeniedPath;
-                       options.LoginPath = permissionOption.LoginPath;
+                       //下面的委托方法只会在第一次cookie验证时调用，调用时会用到上面的permissionOption变量，但其实permissionOption变量是在以前已经初始化的，所以在此方法调用之前，permissionOption变量不会被释放
+                       options.Cookie.Name = "auth";
+                       options.AccessDeniedPath = permissionOption.AccessDeniedPath;// 当403时，返回到无授权界面
+                       options.LoginPath = permissionOption.LoginPath;// 当401时，返回到登录界面
                        options.ExpireTimeSpan = permissionOption.ExpireTimeSpan != default ? permissionOption.ExpireTimeSpan : new TimeSpan(12, 0, 0);
                        options.ForwardDefaultSelector = context =>
                        {
                            string authorization = context.Request.Headers["Authorization"];
-                       //身份验证的顺序为jwt、cookie
-                       if (authorization != null && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                           //身份验证的顺序为jwt、cookie
+                           if (authorization != null && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                            {
                                return JwtBearerDefaults.AuthenticationScheme;
                            }
@@ -117,9 +55,22 @@ namespace Snail.Permission
                                return CookieAuthenticationDefaults.AuthenticationScheme;
                            }
                        };
+                       var cookieAuthenticationEvents = new CookieAuthenticationEvents
+                       {
+                           OnSignedIn = context =>
+                           {
+                               return Task.CompletedTask;
+                           },
+                           OnSigningOut = context =>
+                           {
+                               return Task.CompletedTask;
+                           }
+                       };
+                       options.Events = cookieAuthenticationEvents;
                    })
                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                {
+                   // jwt可用对称和非对称算法进行验签
                    SecurityKey key;
                    if (permissionOption.IsAsymmetric)
                    {
@@ -140,6 +91,23 @@ namespace Snail.Permission
                        ValidateIssuer = false,
                        ValidateAudience = false
                    };
+                   var jwtBearerEvents = new JwtBearerEvents
+                   {
+                       OnMessageReceived = context =>
+                       {
+                           return Task.CompletedTask;
+                       },
+                       OnTokenValidated = context =>
+                       {
+                           return Task.CompletedTask;
+                       },
+                       OnAuthenticationFailed = context =>
+                       {
+                           return Task.CompletedTask;
+                       }
+
+                   };
+                   options.Events = jwtBearerEvents;
                });
             #endregion
             #region 授权
@@ -150,6 +118,7 @@ namespace Snail.Permission
             //所有的handler都要注入到services，用services.AddSingleton<IAuthorizationHandler, xxxHandler>()，而哪个requirement用哪个handler，低层会自动匹配。最后将requirement对到policy里即可
             services.AddAuthorization(options =>
             {
+                // 增加鉴权策略，并告知这个策略要判断用户是否获得了PermissionRequirement这个Requirement
                 options.AddPolicy(PermissionConstant.PermissionAuthorizePolicy, policyBuilder =>
                 {
                     policyBuilder.AddRequirements(new PermissionRequirement());

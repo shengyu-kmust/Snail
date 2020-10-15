@@ -9,6 +9,7 @@ namespace Snail.Core.Permission
         public const string PermissionAuthorizePolicy = nameof(PermissionAuthorizePolicy);
         public const string PermissionScheme = nameof(PermissionScheme);
         public const string userIdClaim = "userId";
+        public const string tenantIdClaim = "tenantId";
         public const string userNameClaim = "userName";
         public const string accountClaim = "account";
         public const string roleIdsClaim = "roleIds";

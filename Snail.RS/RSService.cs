@@ -294,23 +294,23 @@ namespace Snail.RS
             for (int i = 0; i < days; i++)
             {
                 var thisDate = beginDate.AddDays(i);
-                if (rule.ExceptDate?.Split(",").Any(a => a == thisDate.ToString("yyyyMMdd")) ?? false)
+                if (rule.ExceptDate?.Split(',').Any(a => a == thisDate.ToString("yyyyMMdd")) ?? false)
                 {
                     continue;
                 }
-                if (rule.InDate?.Split(",").Any(a => a == thisDate.ToString("yyyyMMdd")) ?? false)
+                if (rule.InDate?.Split(',').Any(a => a == thisDate.ToString("yyyyMMdd")) ?? false)
                 {
                     result.Add(thisDate);
                     continue;
                 }
                 if (rule.DayType == EScheduleDayType.Month
-                    && (rule.DayList?.Split(",").Any(a => a == thisDate.Day.ToString()) ?? false))
+                    && (rule.DayList?.Split(',').Any(a => a == thisDate.Day.ToString()) ?? false))
                 {
                     result.Add(thisDate);
                     continue;
                 }
                 if (rule.DayType == EScheduleDayType.Week
-                    && (rule.DayList?.Split(",").Any(a => a == GetDayOfWeekInt(thisDate.DayOfWeek).ToString()) ?? false))
+                    && (rule.DayList?.Split(',').Any(a => a == GetDayOfWeekInt(thisDate.DayOfWeek).ToString()) ?? false))
                 {
                     result.Add(thisDate);
                     continue;
@@ -332,7 +332,7 @@ namespace Snail.RS
         /// <returns>remainNum：剩余多少号，remainNums：剩余号，orderNum：预约到哪个号</returns>
         public static (int remainNum, string remainNums, int orderNum) Occupy(string remainNums, int occupyNum)
         {
-            var remainList = remainNums.Split(",", StringSplitOptions.RemoveEmptyEntries).OrderBy(a => int.Parse(a)).ToList();
+            var remainList = remainNums.Split(new char[] { ','}, StringSplitOptions.RemoveEmptyEntries).OrderBy(a => int.Parse(a)).ToList();
             if (!remainList.Any())
             {
                 throw new BusinessException("余号不足");
@@ -359,7 +359,7 @@ namespace Snail.RS
         }
         public static (int RemainNum, string RemainNums) Release(string remainNums, int orderNum)
         {
-            var remainList = remainNums.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+            var remainList = remainNums.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             remainList.Add(orderNum.ToString());
             remainList = remainList.OrderBy(a => int.Parse(a)).ToList();
             var remainNumsTemp = string.Join(",", remainList);
@@ -392,7 +392,7 @@ namespace Snail.RS
         public static void DealWithRSScheduleOfDayDto(RSScheduleOfDayDto dto)
         {
             dto.RemainNumsDto = new List<RemainNumDto>();
-            (dto.RemainNums ?? "").Split(",").Select(a=>int.Parse(a)).OrderBy(a=>a).ToList().ForEach(num =>
+            (dto.RemainNums ?? "").Split(',').Select(a=>int.Parse(a)).OrderBy(a=>a).ToList().ForEach(num =>
             {
                 var beginEnd = RSService.GetNumBeginEndTime(dto.RuleBeginTime, dto.RuleEndTime, dto.MaxNum, num);
                 dto.RemainNumsDto.Add(new RemainNumDto { Num = num, TimeBegin = beginEnd.begin, TimeEnd = beginEnd.end });

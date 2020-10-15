@@ -1,32 +1,24 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Snail.Common;
-using Snail.Core.Attributes;
-using Snail.Core.Entity;
-using Snail.Core.Enum;
+using Snail.Common.Extenssions;
 using Snail.Core.Interface;
 using Snail.Core.Permission;
 using Snail.Permission.Entity;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using Snail.Common.Extenssions;
-using System.Reflection;
 
 namespace Snail.Permission
 {
-    public class DefaultPermissionStore :BasePermissionStore<DbContext, User,Role,UserRole,Resource,RoleResource>, IPermissionStore
+    public class DefaultPermissionStore : BasePermissionStore<DbContext, User, Role, UserRole, Resource, RoleResource>, IPermissionStore
     {
-        private string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}", roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}", userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}", resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}", roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
 
-        public DefaultPermissionStore(DbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext):base(db,memoryCache,permissionOptions,applicationContext)
+        public DefaultPermissionStore(DbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext) : base(db, memoryCache, permissionOptions, applicationContext)
         {
         }
-       
+
 
 
         /// <summary>
@@ -72,7 +64,7 @@ namespace Snail.Permission
         {
             var roleEntity = entity as Role;
             var roleDto = dto as Role;
-            var userId= _applicationContext.GetCurrentUserId();
+            var userId = _applicationContext.GetCurrentUserId();
             var now = DateTime.Now;
             if (isAdd)
             {
@@ -136,7 +128,7 @@ namespace Snail.Permission
             });
             resourceKeys.Where(a => !allRoleResources.Select(i => i.GetResourceKey()).Contains(a)).ToList().ForEach(resourceKey =>
             {
-                if (allResource.Any(a=>a.Id==resourceKey))
+                if (allResource.Any(a => a.Id == resourceKey))
                 {
                     _db.Add(new RoleResource
                     {
@@ -166,7 +158,7 @@ namespace Snail.Permission
             });
             roleKeys.Where(a => !allUserRoles.Select(i => i.RoleId).Contains(a) && a.HasValue()).ToList().ForEach(roleKey =>
             {
-                if (allRole.Any(a=>a.Id==roleKey))
+                if (allRole.Any(a => a.Id == roleKey))
                 {
                     _db.Add(new UserRole
                     {
@@ -180,7 +172,7 @@ namespace Snail.Permission
                         UpdateTime = DateTime.Now
                     });
                 }
-               
+
             });
             _db.SaveChanges();
             _memoryCache.Remove(userRoleCacheKey);

@@ -17,5 +17,10 @@ namespace Snail.Core.Default
         {
             return _httpContextAccessor?.HttpContext?.User?.FindFirst(a => a.Type.Equals(PermissionConstant.userIdClaim, StringComparison.OrdinalIgnoreCase))?.Value;
         }
+
+        public string GetCurrnetTenantId()
+        {
+            return _httpContextAccessor?.HttpContext?.User?.FindFirst(a => a.Type.Equals(PermissionConstant.tenantIdClaim, StringComparison.OrdinalIgnoreCase))?.Value;
+        }
     }
 }

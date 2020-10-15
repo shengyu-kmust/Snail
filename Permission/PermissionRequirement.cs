@@ -8,6 +8,6 @@ namespace Snail.Permission
 {
     public class PermissionRequirement : IAuthorizationRequirement
     {
-       
+
     }
 }

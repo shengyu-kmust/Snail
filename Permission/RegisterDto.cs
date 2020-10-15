@@ -7,7 +7,7 @@ namespace Snail.Permission
 {
     public class RegisterDto
     {
-        public string Account { get;set;}
-        public string Pwd { get;set;}
+        public string Account { get; set; }
+        public string Pwd { get; set; }
     }
 }

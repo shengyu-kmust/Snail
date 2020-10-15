@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
-using Snail.Common.Extenssions;
-using Snail.Core;
 using Snail.Core.Attributes;
 using Snail.Core.Permission;
 using Snail.Permission.Entity;
@@ -19,8 +16,11 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
-namespace Snail.Permission
+namespace SnaiWeb.Permission
 {
+    /// <summary>
+    /// 权限的默认实现类
+    /// </summary>
     public class DefaultPermission : BasePermission
     {
         public static readonly string superAdminRoleName = "SuperAdmin";
@@ -135,10 +135,10 @@ namespace Snail.Permission
                                 resources.Add(new Resource
                                 {
                                     Id = parentId,
-                                    Code = parentResource?.ResourceCode??controller.Name,
+                                    Code = parentResource?.ResourceCode ?? controller.Name,
                                     CreateTime = DateTime.Now,
                                     IsDeleted = false,
-                                    Name = parentResource?.Description??controller.Name
+                                    Name = parentResource?.Description ?? controller.Name
                                 });
                                 controllerIsAdded = true;
                             }
@@ -150,7 +150,7 @@ namespace Snail.Permission
                                 CreateTime = DateTime.Now,
                                 IsDeleted = false,
                                 ParentId = parentId,
-                                Name = methodResource?.Description??method.Name
+                                Name = methodResource?.Description ?? method.Name
                             });
                         }
                     });
@@ -158,19 +158,29 @@ namespace Snail.Permission
             });
             resources.ForEach(item =>
             {
-                // 计算resource的id，如果已经存在，id为已经存在的resource的id
-                var matchRs = existResources.FirstOrDefault(i => i.GetResourceCode() == item.Code);
-                if (matchRs!=null)
+                var temp = new Resource
                 {
-                    item.Id = matchRs.GetKey();
+                    Id = item.Id,
+                    Code = item.Code,
+                    CreateTime = DateTime.Now,
+                    IsDeleted = false,
+                    Name = item.Name,
+                    ParentId = item.ParentId,
+                    UpdateTime = DateTime.Now
+                };
+                // 设置资源的id
+                var matchRs = existResources.FirstOrDefault(i => i.GetResourceCode() == temp.Code);
+                if (matchRs != null)
+                {
+                    temp.Id = matchRs.GetKey();
                 }
 
-                // 计算资源的父id，如果父存在，则子资源的父id为已经存在的父数据的id，否则为新的id
-                if (!string.IsNullOrEmpty(item.ParentId))
+                // 设置资源的父id
+                if (!string.IsNullOrEmpty(temp.ParentId))
                 {
-                    var pa = resources.FirstOrDefault(a => a.Id == item.ParentId);
+                    var pa = resources.FirstOrDefault(a => a.Id == temp.ParentId);
                     var matchPa = existResources.FirstOrDefault(i => i.GetResourceCode() == pa?.Code);
-                    if (matchPa!=null)
+                    if (matchPa != null)
                     {
                         item.ParentId = matchPa.GetKey();
                     }
@@ -181,7 +191,7 @@ namespace Snail.Permission
 
         private bool IsSuperAdmin(string userKey)
         {
-            var superRole = _permissionStore.GetAllRole().FirstOrDefault(a => a.GetName().Equals(DefaultPermission.superAdminRoleName,StringComparison.OrdinalIgnoreCase));
+            var superRole = _permissionStore.GetAllRole().FirstOrDefault(a => a.GetName().Equals(DefaultPermission.superAdminRoleName, StringComparison.OrdinalIgnoreCase));
             return _permissionStore.GetAllUserRole().Any(a => a.GetUserKey() == userKey && a.GetRoleKey() == superRole.GetKey());
         }
 
