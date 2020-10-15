@@ -1,9 +1,10 @@
-﻿using Snail.Core.Enum;
+﻿using Snail.Core.Entity;
+using Snail.Core.Enum;
 using System.ComponentModel.DataAnnotations;
 
 namespace Snail.Permission.Dto
 {
-    public class UserSaveDto
+    public class UserSaveDto:IIdField<string>
     {
         public string Id { get; set; }
         [Required(ErrorMessage = "账号必填")]
