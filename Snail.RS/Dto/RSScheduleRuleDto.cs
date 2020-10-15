@@ -77,11 +77,11 @@ namespace Snail.RS.Dto
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var error = new List<ValidationResult>();
-            if (DayType==EScheduleDayType.Week && (DayList??"").Split(",").ToList().Any(a=>int.Parse(a)>7))
+            if (DayType==EScheduleDayType.Week && (DayList??"").Split(',').ToList().Any(a=>int.Parse(a)>7))
             {
                 error.Add(new ValidationResult("当以星期的形式排班时，日期只能是1到7之间的数字"));
             }
-            if (DayType == EScheduleDayType.Week && (DayList ?? "").Split(",").ToList().Any(a =>int.Parse(a) > 31))
+            if (DayType == EScheduleDayType.Week && (DayList ?? "").Split(',').ToList().Any(a =>int.Parse(a) > 31))
             {
                 error.Add(new ValidationResult("当以月的形式排班时，日期只能是1到31之间的数字"));
             }
@@ -89,11 +89,11 @@ namespace Snail.RS.Dto
             {
                 error.Add(new ValidationResult("结束时间必须小于开始时间"));
             }
-            if (ExceptDate.HasValue() && ExceptDate.Split(",").Any(a=>DateTime.TryParse(a,out DateTime exceptDateTemp)))
+            if (ExceptDate.HasValue() && ExceptDate.Split(',').Any(a=>DateTime.TryParse(a,out DateTime exceptDateTemp)))
             {
                 error.Add(new ValidationResult($"不包含日期参数里有不合法的日期"));
             }
-            if (ExceptDate.HasValue() && InDate.Split(",").Any(a => DateTime.TryParse(a, out DateTime exceptDateTemp)))
+            if (ExceptDate.HasValue() && InDate.Split(',').Any(a => DateTime.TryParse(a, out DateTime exceptDateTemp)))
             {
                 error.Add(new ValidationResult($"包含日期参数里有不合法的日期"));
             }

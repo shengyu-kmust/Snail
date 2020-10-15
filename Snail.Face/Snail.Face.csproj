@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<Platforms>x64;x86</Platforms>
 		<!--<Platform>x64</Platform>-->
 		<Description>用了FaceRecognition</Description>
@@ -13,8 +13,10 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="3.1.2" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-		<PackageReference Include="Snail.Common" Version="1.0.12" />
-		<PackageReference Include="Snail.Core" Version="1.0.13" />
 		<PackageReference Include="coverlet.collector" Version="1.2.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Snail.Common\Snail.Common.csproj" />
+	  <ProjectReference Include="..\Snail.Core\Snail.Core.csproj" />
 	</ItemGroup>
 </Project>

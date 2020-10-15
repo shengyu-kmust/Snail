@@ -10,5 +10,6 @@ namespace Snail.Core.Interface
     public interface IApplicationContext
     {
         string GetCurrentUserId();
+        string GetCurrnetTenantId();
     }
 }

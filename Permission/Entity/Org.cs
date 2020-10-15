@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Snail.Core.Permission;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,9 +9,19 @@ using System.Threading.Tasks;
 /// </summary>
 namespace Snail.Permission.Entity
 {
-    public class Org : BaseEntity
+    public class Org : BaseEntity,IOrg
     {
         public string ParentId { get; set; }
         public string Name { get; set; }
+
+        public string GetKey()
+        {
+            return this.Id;
+        }
+
+        public string GetName()
+        {
+            return this.Name;
+        }
     }
 }
