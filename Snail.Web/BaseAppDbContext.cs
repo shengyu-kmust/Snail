@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Snail.Web
 {
-    public partial class BaseAppDbContext : DbContext
+    public abstract class BaseAppDbContext : DbContext
     {
         #region 通用权限表
         public DbSet<User> Users { get; set; }
@@ -25,7 +25,7 @@ namespace Snail.Web
         public DbSet<Snail.FileStore.FileInfo> FileInfos { get; set; }
         #endregion
 
-        private ICapPublisher _publisher;
+        protected ICapPublisher _publisher;
         public BaseAppDbContext(DbContextOptions options, ICapPublisher publisher)
             : base(options)
         {

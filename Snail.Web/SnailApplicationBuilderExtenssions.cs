@@ -85,18 +85,18 @@ namespace Snail.Web
 
 
             //静态文件
-            app.UseStaticFiles();
-            //spa前端静态文件
-            app.UseSpaStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                RequestPath = "/" + serviceProvider.GetService<IOptions<StaticFileUploadOption>>().Value.StaticFilePath,
-                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, serviceProvider.GetService<IOptions<StaticFileUploadOption>>().Value.StaticFilePath))
-            });
+            //app.UseStaticFiles();
+            ////spa前端静态文件
+            //app.UseSpaStaticFiles();
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    RequestPath = "/" + serviceProvider.GetService<IOptions<StaticFileUploadOption>>().Value.StaticFilePath,
+            //    FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, serviceProvider.GetService<IOptions<StaticFileUploadOption>>().Value.StaticFilePath))
+            //});
 
             app.UseCors(builder => { builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin(); });
 
-            app.UseApplicationLicensing();
+            //app.UseApplicationLicensing();
             app.UseAuthentication();
 
             // hangfire前端界面的访问控制
@@ -149,7 +149,7 @@ namespace Snail.Web
                 //    spa.UseReactDevelopmentServer(npmScript: "start");
                 //}
             });
-           
+
 
         }
     }

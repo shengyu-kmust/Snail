@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
@@ -28,6 +27,7 @@ namespace Snail.Permission
         {
             services.TryAddScoped<IPermission, DefaultPermission>();
             services.TryAddScoped<IPermissionStore, DefaultPermissionStore>();
+            services.AddSingleton<IToken, Token>();
             #region 身份验证
             var permissionOption = new PermissionOptions();
             action(permissionOption);
