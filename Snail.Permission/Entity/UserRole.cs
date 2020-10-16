@@ -1,15 +1,12 @@
-﻿using Snail.Core.Permission;
-using System;
-using System.Collections.Generic;
+﻿using Snail.Core.Entity;
+using Snail.Core.Permission;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Snail.Permission.Entity
 {
 
     [Table("UserRole")]
-    public class UserRole:BaseEntity,IUserRole
+    public class UserRole: DefaultBaseEntity, IUserRole
     {
         public string UserId { get; set; }
         public string RoleId { get; set; }

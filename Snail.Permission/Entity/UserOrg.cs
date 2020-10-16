@@ -1,9 +1,10 @@
-﻿using Snail.Core.Permission;
+﻿using Snail.Core.Entity;
+using Snail.Core.Permission;
 using System;
 
 namespace Snail.Permission.Entity
 {
-    public class UserOrg:BaseEntity,IUserOrg
+    public class UserOrg: DefaultBaseEntity, IUserOrg
     {
         public string UserId { get; set; }
         public string OrgId { get; set; }

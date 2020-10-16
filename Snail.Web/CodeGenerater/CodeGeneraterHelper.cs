@@ -17,6 +17,8 @@ namespace Snail.Web.CodeGenerater
             result.BasePath = configDto.BasePath.Trim('\\');
             result.Entities = CodeGeneraterHelper.GenerateEntitiesModelFromTableModels(configDto,ref errors);
             result.Enums = GenerateEnumModelFromConfig(configDto, ref errors);
+            result.ExceptApis = configDto.ExceptApis;
+            result.ExceptServices = configDto.ExceptServices;
             return result;
 
         }

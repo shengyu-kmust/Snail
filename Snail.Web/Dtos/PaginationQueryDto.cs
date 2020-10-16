@@ -1,8 +1,9 @@
-﻿using Snail.Core.Dto;
+﻿using Snail.Core;
+using Snail.Core.Dto;
 
 namespace Snail.Web.Dtos
 {
-    public class PaginationQueryDto:Pagination,IDto
+    public class PaginationQueryDto:BasePagination,IDto
     {
     }
 }

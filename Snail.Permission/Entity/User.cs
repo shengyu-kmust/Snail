@@ -1,4 +1,5 @@
-﻿using Snail.Core.Enum;
+﻿using Snail.Core.Entity;
+using Snail.Core.Enum;
 using Snail.Core.Permission;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Permission.Entity
 {
-    public partial class User:BaseEntity,IUser
+    public partial class User: DefaultBaseEntity, IUser
     {
         public string Account { get; set; }
         public string Name { get; set; }

@@ -5,10 +5,11 @@
 <#@ import namespace="System.Collections.Generic" #>
 using ApplicationCore.Entity;
 using Microsoft.EntityFrameworkCore;
+using Snail.Web;
 
 namespace Infrastructure
 {
-    public partial class AppDbContext : DbContext
+    public partial class AppDbContext : BaseAppDbContext
     {
 <# foreach(var entityName in EntityNames??new List<string>()){ #>
         public DbSet<<#= entityName #>> <#= entityName #> { get; set; }

@@ -5,7 +5,7 @@ using Snail.Web;
 namespace Snail.Web.Controllers
 {
     /// <summary>
-    /// controller公共上下文，用于定义controller类的公共方法，属性等
+    /// controller公共上下文，用于定义controller类的公共方法，属性等 // todo 命名和Microsoft的有冲突
     /// </summary>
     public class ControllerContext
     {

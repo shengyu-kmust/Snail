@@ -50,7 +50,7 @@ namespace Snail.Web.Controllers
                 new List<string> { "Result", "Save", "Source", "Query" }.ForEach(preFix =>
                 {
                     var dtoTemplate = new DtoTemplate();
-                    dtoTemplate.Dto = new DtoModel { Name = entity.Name, Fields = preFix == "Query" ? new List<EntityFieldModel>() : entity.Fields, Prefix = preFix, BaseClass = preFix == "Query" ? "BaseQueryPaginationDto" : "BaseIdDto" };
+                    dtoTemplate.Dto = new DtoModel { Name = entity.Name, Fields = preFix == "Query" ? new List<EntityFieldModel>() : entity.Fields, Prefix = preFix, BaseClass = preFix == "Query" ? "BaseQueryPaginationDto" : "DefaultBaseDto" };
                     Directory.CreateDirectory($@"{dto.BasePath}\ApplicationCore\Dtos\{entity.Name}");
                     System.IO.File.WriteAllText($@"{dto.BasePath}\ApplicationCore\Dtos\{entity.Name}\{entity.Name}{preFix}Dto.cs", dtoTemplate.TransformText());
                 });
