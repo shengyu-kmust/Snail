@@ -30,6 +30,14 @@ namespace Snail.Web.CodeGenerater
         public string BasePath { get; set; }
         public List<EntityModel> Entities { get; set; }
         public List<EnumModel> Enums { get; set; }
+        /// <summary>
+        /// 哪些表不生成service
+        /// </summary>
+        public List<string> ExceptServices { get; set; }
+        /// <summary>
+        /// 哪些表不生成api
+        /// </summary>
+        public List<string> ExceptApis { get; set; }
     }
     #endregion
 

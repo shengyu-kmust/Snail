@@ -1,12 +1,19 @@
 {
+  "BasePath": "G:\\mywork\\SnailAspNetCoreFramework",
   "Entities": [
     {
       "name": "实体名",
       "tableName": "表名",
+      "comment": "注释",
       "columns": [
         "字段名,字段类型,字段描述,长度"
       ]
     }
-  ]
+  ],
+  "Enums": [
+    "EGenderTest,性别,Female,女,Male,男"
+  ],
+  "ExceptServices": [],
+  "ExceptApis": []
 }
 

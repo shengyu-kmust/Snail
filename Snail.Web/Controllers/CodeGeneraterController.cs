@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Snail.Common.Extenssions;
+using Snail.Core;
 using Snail.Core.Permission;
 using Snail.Web.CodeGenerater;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,9 +20,13 @@ namespace Snail.Web.Controllers
     public class CodeGeneraterController : ControllerBase
     {
         [HttpGet]
-        public void Generater()
+        public void Generater(string codeGeneraterConfigFile)
         {
-            var configValue = System.IO.File.ReadAllText("./CodeGenerater/codeGeneratorTestModel.json");
+            if (codeGeneraterConfigFile.HasNotValue())
+            {
+                throw new BusinessException( "请转入代码生成的配置文件路径（绝对或是相对路径）");
+            }
+            var configValue = System.IO.File.ReadAllText($"{codeGeneraterConfigFile}");
             var configDto=CodeGeneraterHelper.GenerateDtoFromConfig(configValue, out List<string> errors);
             GenerateEntity(configDto);
             GenerateService(configDto);
@@ -81,6 +88,10 @@ namespace Snail.Web.Controllers
         {
             foreach (var entity in dto.Entities)
             {
+                if (dto.ExceptServices.Contains(entity.Name,StringComparer.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
                 var serviceTemplate = new ServiceTemplate();
                 serviceTemplate.Name = entity.Name;
                 Directory.CreateDirectory($@"{dto.BasePath}\Service");
@@ -94,6 +105,10 @@ namespace Snail.Web.Controllers
         {
             foreach (var entity in dto.Entities)
             {
+                if (dto.ExceptApis.Contains(entity.Name, StringComparer.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
                 var controllerTemplate = new ControllerTemplate();
                 controllerTemplate.Name = entity.Name;
                 controllerTemplate.Comment = entity.Comment;
@@ -136,6 +151,10 @@ namespace Snail.Web.Controllers
             var vueModels = CodeGeneraterHelper.GenerateVueModelFromEntityModels(dto.Entities);
             foreach (var vue in vueModels)
             {
+                if (dto.ExceptApis.Contains(vue.Name, StringComparer.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
                 var vueTemplate = new VueTemplate();
                 vueTemplate.Vue = vue;
                 Directory.CreateDirectory($@"{dto.BasePath}\Web\ClientApp\src\views\basic");
@@ -147,7 +166,7 @@ namespace Snail.Web.Controllers
         private void GenerateVueApi(CodeGenerateDto dto)
         {
             var vueApiTemplate = new VueApiTemplate();
-            vueApiTemplate.EntityNames = dto.Entities.Select(a => CodeGeneraterHelper.ToCamel(a.Name)).ToList();
+            vueApiTemplate.EntityNames = dto.Entities.Select(a => CodeGeneraterHelper.ToCamel(a.Name)).Where(a=>!dto.ExceptApis.Contains(a,StringComparer.OrdinalIgnoreCase)).ToList();
             Directory.CreateDirectory($@"{dto.BasePath}\Web\ClientApp\src\api");
             System.IO.File.WriteAllText($@"{dto.BasePath}\Web\ClientApp\src\api\basic.js", vueApiTemplate.TransformText());
 
@@ -156,7 +175,7 @@ namespace Snail.Web.Controllers
         private void GenerateVueRouter(CodeGenerateDto dto)
         {
             var vueRouterTemplate = new VueRouterTemplate();
-            vueRouterTemplate.VueRouteModels = dto.Entities.Select(a => new VueRouteModel { Name= CodeGeneraterHelper.ToCamel(a.Name),Comment=a.Comment}).ToList();
+            vueRouterTemplate.VueRouteModels = dto.Entities.Select(a => new VueRouteModel { Name= CodeGeneraterHelper.ToCamel(a.Name),Comment=a.Comment}).Where(a => !dto.ExceptApis.Contains(a.Name, StringComparer.OrdinalIgnoreCase)).ToList();
             Directory.CreateDirectory($@"{dto.BasePath}\Web\ClientApp\src\router");
             System.IO.File.WriteAllText($@"{dto.BasePath}\Web\ClientApp\src\router\basicRouters.js", vueRouterTemplate.TransformText());
         }
