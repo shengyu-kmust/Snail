@@ -5,6 +5,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 using ApplicationCore.Enums;
 using Snail.Core.Dto;
+using Snail.Core;
 using System;
 using System.ComponentModel.DataAnnotations;
 namespace ApplicationCore.Dtos
