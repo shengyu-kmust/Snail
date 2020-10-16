@@ -18,9 +18,9 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class AppDbContextTemplate : AppDbContextTemplateBase
+    public partial class EntityTemplate : EntityTemplateBase
     {
 #line hidden
         /// <summary>
@@ -28,33 +28,72 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using ApplicationCore.Entity;\r\nusing Microsoft.EntityFrameworkCore;\r\nusing Snail." +
-                    "Web;\r\n\r\nnamespace Infrastructure\r\n{\r\n    public partial class AppDbContext : Bas" +
-                    "eAppDbContext\r\n    {\r\n");
+            this.Write("\r\nusing ApplicationCore.Enums;\r\nusing Snail.Core.Entity;\r\nusing System;\r\nusing Sy" +
+                    "stem.ComponentModel.DataAnnotations;\r\nnamespace ApplicationCore.Entity\r\n{\r\n    p" +
+                    "ublic class ");
             
-            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
- foreach(var entityName in EntityNames??new List<string>()){ 
-            
-            #line default
-            #line hidden
-            this.Write("        public DbSet<");
-            
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
             #line hidden
-            this.Write("> ");
+            this.Write(":DefaultBaseEntity\r\n    {\r\n");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+
+    foreach(var item in Entity.Fields){
+
             
             #line default
             #line hidden
-            this.Write(" { get; set; }\r\n");
+            this.Write("        /// <summary>\r\n        /// ");
             
-            #line 16 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+            #line 19 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Comment));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n        /// </summary>\r\n");
+            
+            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+ foreach(var attr in item.Attributes??new List<string>()){ 
+            
+            #line default
+            #line hidden
+            this.Write("        ");
+            
+            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attr));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
 }
+            
+            #line default
+            #line hidden
+            this.Write("        public ");
+            
+            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Type));
+            
+            #line default
+            #line hidden
+            this.Write(" ");
+            
+            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
+            
+            #line default
+            #line hidden
+            this.Write("  {get;set;}\r\n");
+            
+            #line 25 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+
+    }
+
             
             #line default
             #line hidden
@@ -70,7 +109,7 @@ namespace Snail.Web.CodeGenerater
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class AppDbContextTemplateBase
+    public class EntityTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

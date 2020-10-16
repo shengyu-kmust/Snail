@@ -9,18 +9,15 @@
 // ------------------------------------------------------------------------------
 namespace Snail.Web.CodeGenerater
 {
-    using System.Linq;
-    using System.Text;
-    using System.Collections.Generic;
     using System;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class AppDbContextTemplate : AppDbContextTemplateBase
+    public partial class ControllerTemplate : ControllerTemplateBase
     {
 #line hidden
         /// <summary>
@@ -28,37 +25,228 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using ApplicationCore.Entity;\r\nusing Microsoft.EntityFrameworkCore;\r\nusing Snail." +
-                    "Web;\r\n\r\nnamespace Infrastructure\r\n{\r\n    public partial class AppDbContext : Bas" +
-                    "eAppDbContext\r\n    {\r\n");
+            this.Write(@"using ApplicationCore.Dtos;
+using ApplicationCore.Entity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Service;
+using Snail.Common;
+using Snail.Core;
+using Snail.Core.Attributes;
+using Snail.Core.Permission;
+using Snail.Web.Controllers;
+using System.Collections.Generic;
+using System.Linq;
+using ControllerContext = Snail.Web.Controllers.ControllerContext;
+
+namespace Web.Controllers
+{
+    /// <summary>
+    /// ");
             
-            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
- foreach(var entityName in EntityNames??new List<string>()){ 
-            
-            #line default
-            #line hidden
-            this.Write("        public DbSet<");
-            
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
-            
-            #line default
-            #line hidden
-            this.Write("> ");
-            
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
-            
-            #line default
-            #line hidden
-            this.Write(" { get; set; }\r\n");
-            
-            #line 16 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-}
+            #line 18 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Comment));
             
             #line default
             #line hidden
-            this.Write("    }\r\n}\r\n");
+            this.Write("接口\r\n    /// </summary>\r\n    [Authorize(Policy = PermissionConstant.PermissionAuth" +
+                    "orizePolicy)]\r\n    [Resource(Description =\"");
+            
+            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Comment));
+            
+            #line default
+            #line hidden
+            this.Write("管理\")]\r\n    public class ");
+            
+            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("Controller : DefaultBaseController, ICrudController<");
+            
+            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("SaveDto, ");
+            
+            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("ResultDto, ");
+            
+            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("QueryDto>\r\n    {\r\n        private ");
+            
+            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("Service _service;\r\n        public ");
+            
+            #line 25 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("Controller(");
+            
+            #line 25 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write(@"Service service,ControllerContext controllerContext):base(controllerContext) {
+            this.controllerContext = controllerContext;
+            this._service = service;
+        } 
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <param name=""queryDto""></param>
+        /// <returns></returns>
+        [Resource(Description =""查询列表"")]
+        [HttpGet]
+        public List<");
+            
+            #line 37 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("ResultDto> QueryList([FromQuery]");
+            
+            #line 37 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("QueryDto queryDto)\r\n        {\r\n            var pred = ExpressionExtensions.True<");
+            
+            #line 39 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write(">().And(a=>!a.IsDeleted);\r\n            return controllerContext.mapper.ProjectTo<" +
+                    "");
+            
+            #line 40 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write(@"ResultDto>(_service.QueryList(pred)).ToList();
+        }
+
+        /// <summary>
+        /// 查询分页
+        /// </summary>
+        /// <param name=""queryDto""></param>
+        /// <returns></returns>
+        [Resource(Description =""查询分页"")]
+        [HttpGet]
+        public IPageResult<");
+            
+            #line 50 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("ResultDto> QueryPage([FromQuery]");
+            
+            #line 50 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("QueryDto queryDto)\r\n        {\r\n            var pred = ExpressionExtensions.True<");
+            
+            #line 52 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write(">().And(a=>!a.IsDeleted);\r\n            return controllerContext.mapper.ProjectTo<" +
+                    "");
+            
+            #line 53 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write(@"ResultDto>(_service.QueryList(pred)).ToPageList(queryDto);
+        }
+
+        /// <summary>
+        /// 查找单个
+        /// </summary>
+        /// <param name=""id""></param>
+        /// <returns></returns>
+        [Resource(Description =""查找单个"")]
+        [HttpGet]
+        public ");
+            
+            #line 63 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("ResultDto Find(string id)\r\n        {\r\n            return controllerContext.mapper" +
+                    ".Map<");
+            
+            #line 65 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write(@"ResultDto>(_service.QueryList(a => a.Id == id).FirstOrDefault());
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name=""ids""></param>
+        [Resource(Description =""删除"")]
+        [HttpPost]
+        public void Remove(List<string> ids)
+        {
+            _service.Remove(ids);
+        }
+
+        /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name=""saveDto""></param>
+        [Resource(Description =""保存"")]
+        [HttpPost]
+        public void Save(");
+            
+            #line 85 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ControllerTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            
+            #line default
+            #line hidden
+            this.Write("SaveDto saveDto)\r\n        {\r\n            _service.Save(saveDto);\r\n        }\r\n    " +
+                    "}\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -70,7 +258,7 @@ namespace Snail.Web.CodeGenerater
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class AppDbContextTemplateBase
+    public class ControllerTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

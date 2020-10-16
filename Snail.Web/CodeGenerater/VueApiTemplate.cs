@@ -18,9 +18,9 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class AppDbContextTemplate : AppDbContextTemplateBase
+    public partial class VueApiTemplate : VueApiTemplateBase
     {
 #line hidden
         /// <summary>
@@ -28,37 +28,84 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using ApplicationCore.Entity;\r\nusing Microsoft.EntityFrameworkCore;\r\nusing Snail." +
-                    "Web;\r\n\r\nnamespace Infrastructure\r\n{\r\n    public partial class AppDbContext : Bas" +
-                    "eAppDbContext\r\n    {\r\n");
+            this.Write("\r\nimport request from \'@/utils/request\'\r\n\r\n");
             
-            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
- foreach(var entityName in EntityNames??new List<string>()){ 
+            #line 9 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+    foreach(var entityName in EntityNames??new List<string>()){ 
             
             #line default
             #line hidden
-            this.Write("        public DbSet<");
+            this.Write("// ");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+            #line 10 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
             
             #line default
             #line hidden
-            this.Write("> ");
+            this.Write("管理\r\nexport const ");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+            #line 11 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
             
             #line default
             #line hidden
-            this.Write(" { get; set; }\r\n");
+            this.Write("QueryPage = params => request.get(\'/api/");
             
-            #line 16 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-}
+            #line 11 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
             
             #line default
             #line hidden
-            this.Write("    }\r\n}\r\n");
+            this.Write("/queryPage\', { params })\r\nexport const ");
+            
+            #line 12 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            
+            #line default
+            #line hidden
+            this.Write("Find = data => request.post(\'/api/");
+            
+            #line 12 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            
+            #line default
+            #line hidden
+            this.Write("/find\', data)\r\nexport const ");
+            
+            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            
+            #line default
+            #line hidden
+            this.Write("Remove = data => request.post(\'/api/");
+            
+            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            
+            #line default
+            #line hidden
+            this.Write("/remove\', data)\r\nexport const ");
+            
+            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            
+            #line default
+            #line hidden
+            this.Write("Save = data => request.post(\'/api/");
+            
+            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            
+            #line default
+            #line hidden
+            this.Write("/save\', data)\r\n");
+            
+            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueApiTemplate.tt"
+    }
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -70,7 +117,7 @@ namespace Snail.Web.CodeGenerater
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class AppDbContextTemplateBase
+    public class VueApiTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

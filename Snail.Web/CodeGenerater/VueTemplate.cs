@@ -18,9 +18,9 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class AppDbContextTemplate : AppDbContextTemplateBase
+    public partial class VueTemplate : VueTemplateBase
     {
 #line hidden
         /// <summary>
@@ -28,37 +28,121 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using ApplicationCore.Entity;\r\nusing Microsoft.EntityFrameworkCore;\r\nusing Snail." +
-                    "Web;\r\n\r\nnamespace Infrastructure\r\n{\r\n    public partial class AppDbContext : Bas" +
-                    "eAppDbContext\r\n    {\r\n");
+            this.Write("\r\n<template>\r\n  <div style=\"display:flex;flex:1\">\r\n    <snail-simple-crud\r\n      " +
+                    "search-api=\"");
             
-            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
- foreach(var entityName in EntityNames??new List<string>()){ 
-            
-            #line default
-            #line hidden
-            this.Write("        public DbSet<");
-            
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            #line 10 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vue.Name));
             
             #line default
             #line hidden
-            this.Write("> ");
+            this.Write("QueryPage\"\r\n      add-api=\"");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
-            
-            #line default
-            #line hidden
-            this.Write(" { get; set; }\r\n");
-            
-            #line 16 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-}
+            #line 11 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vue.Name));
             
             #line default
             #line hidden
-            this.Write("    }\r\n}\r\n");
+            this.Write("Save\"\r\n      edit-api=\"");
+            
+            #line 12 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vue.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Save\"\r\n      remove-api=\"");
+            
+            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(Vue.Name));
+            
+            #line default
+            #line hidden
+            this.Write(@"Remove""
+      :search-fields=""searchFields""
+      :fields=""fields""
+      :search-rules=""rules""
+      :form-rules=""rules""
+      :form-fields=""fields""
+    >
+    </snail-simple-crud>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      keyValues: {
+      },
+      rules: {
+        //name: [
+        //{ required: true, message: '必填项', trigger: 'blur' }
+        //]
+      }
+    }
+  },
+  computed: {
+    fields() {
+      return [
+");
+            
+            #line 40 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+    foreach(var field in Vue.Fields){ 
+            
+            #line default
+            #line hidden
+            this.Write("        {\r\n          name: \'");
+            
+            #line 42 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\',\r\n          label: \'");
+            
+            #line 43 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Comment));
+            
+            #line default
+            #line hidden
+            this.Write("\',\r\n          type: \'");
+            
+            #line 44 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Type));
+            
+            #line default
+            #line hidden
+            this.Write("\',\r\n");
+            
+            #line 45 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+ if(field.Type=="select"){ 
+            
+            #line default
+            #line hidden
+            this.Write("          keyValues: ");
+            
+            #line 46 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.KeyValues));
+            
+            #line default
+            #line hidden
+            this.Write(",\r\n");
+            
+            #line 47 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+ }
+            
+            #line default
+            #line hidden
+            this.Write("          span: 12\r\n        },\r\n");
+            
+            #line 50 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueTemplate.tt"
+    }
+            
+            #line default
+            #line hidden
+            this.Write("      ]\r\n    },\r\n    searchFields() {\r\n      return [\r\n        {\r\n          name:" +
+                    " \'keyWord\',\r\n          label: \'关键字\',\r\n          type: \'string\'\r\n        }\r\n     " +
+                    " ]\r\n    }\r\n  },\r\n  created() {\r\n  },\r\n  methods: {\r\n  }\r\n}\r\n</script>\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -70,7 +154,7 @@ namespace Snail.Web.CodeGenerater
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class AppDbContextTemplateBase
+    public class VueTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

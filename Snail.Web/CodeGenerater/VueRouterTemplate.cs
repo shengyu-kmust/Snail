@@ -18,9 +18,9 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
+    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class AppDbContextTemplate : AppDbContextTemplateBase
+    public partial class VueRouterTemplate : VueRouterTemplateBase
     {
 #line hidden
         /// <summary>
@@ -28,37 +28,51 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using ApplicationCore.Entity;\r\nusing Microsoft.EntityFrameworkCore;\r\nusing Snail." +
-                    "Web;\r\n\r\nnamespace Infrastructure\r\n{\r\n    public partial class AppDbContext : Bas" +
-                    "eAppDbContext\r\n    {\r\n");
+            this.Write("\r\nimport Layout from \'@/layout\'\r\nconst basicRouters = {\r\n  path: \'/basic\',\r\n  com" +
+                    "ponent: Layout,\r\n  redirect: \'noRedirect\',\r\n  name: \'basic\',\r\n  meta: {\r\n    tit" +
+                    "le: \'基础信息管理\',\r\n    iconClass: \'el-icon-setting\'\r\n  },\r\n  children: [\r\n");
             
-            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
- foreach(var entityName in EntityNames??new List<string>()){ 
-            
-            #line default
-            #line hidden
-            this.Write("        public DbSet<");
-            
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
+            #line 18 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+    foreach(var router in VueRouteModels){ 
             
             #line default
             #line hidden
-            this.Write("> ");
+            this.Write("                {\r\n                  path: \'");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityName));
-            
-            #line default
-            #line hidden
-            this.Write(" { get; set; }\r\n");
-            
-            #line 16 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\AppDbContextTemplate.tt"
-}
+            #line 20 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(router.Name));
             
             #line default
             #line hidden
-            this.Write("    }\r\n}\r\n");
+            this.Write("\',\r\n                  component: () => import(\'@/views/basic/");
+            
+            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(router.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\'),\r\n                  name: \'user\',\r\n                  meta: { title: \'");
+            
+            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(router.Comment));
+            
+            #line default
+            #line hidden
+            this.Write("管理\',resourceCode: \'");
+            
+            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(router.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Controller\' }\r\n                },\r\n");
+            
+            #line 25 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+    }
+            
+            #line default
+            #line hidden
+            this.Write("    \r\n  ]\r\n}\r\n\r\nexport default basicRouters\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
@@ -70,7 +84,7 @@ namespace Snail.Web.CodeGenerater
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class AppDbContextTemplateBase
+    public class VueRouterTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
