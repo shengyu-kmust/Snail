@@ -8,6 +8,9 @@ using Snail.Core.Dto;
 using Snail.Core;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using Snail.Core.Enum;
+
 namespace ApplicationCore.Dtos
 {
     public class <#= Dto.Name #><#= Dto.Prefix#>Dto:<#= Dto.BaseClass#>

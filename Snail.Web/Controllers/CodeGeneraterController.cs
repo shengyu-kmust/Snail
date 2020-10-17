@@ -133,9 +133,9 @@ namespace Snail.Web.Controllers
         #region enum
         private void GenerateEnum(CodeGenerateDto dto)
         {
-            var enumTemplate = new EnumTemplate();
             foreach (var enumModel in dto.Enums)
             {
+                var enumTemplate = new EnumTemplate();
                 enumTemplate.Model = enumModel;
                 Directory.CreateDirectory($@"{dto.BasePath}\ApplicationCore\Enums");
                 System.IO.File.WriteAllText($@"{dto.BasePath}\ApplicationCore\Enums\{enumModel.Name}.cs", enumTemplate.TransformText());

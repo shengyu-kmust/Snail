@@ -18,7 +18,7 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+    #line 1 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class DtoTemplate : DtoTemplateBase
     {
@@ -29,30 +29,31 @@ namespace Snail.Web.CodeGenerater
         public virtual string TransformText()
         {
             this.Write("using ApplicationCore.Enums;\r\nusing Snail.Core.Dto;\r\nusing Snail.Core;\r\nusing Sys" +
-                    "tem;\r\nusing System.ComponentModel.DataAnnotations;\r\nnamespace ApplicationCore.Dt" +
-                    "os\r\n{\r\n    public class ");
+                    "tem;\r\nusing System.ComponentModel.DataAnnotations;\r\nusing System.Collections.Gen" +
+                    "eric;\r\nusing Snail.Core.Enum;\r\n\r\nnamespace ApplicationCore.Dtos\r\n{\r\n    public c" +
+                    "lass ");
             
-            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 16 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Dto.Name));
             
             #line default
             #line hidden
             
-            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 16 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Dto.Prefix));
             
             #line default
             #line hidden
             this.Write("Dto:");
             
-            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 16 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Dto.BaseClass));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 18 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
 
     foreach(var item in Dto.Fields){
 
@@ -61,49 +62,49 @@ namespace Snail.Web.CodeGenerater
             #line hidden
             this.Write("        /// <summary>\r\n        /// ");
             
-            #line 19 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 22 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n        /// </summary>\r\n");
             
-            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 24 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
  foreach(var attr in item.Attributes??new List<string>()){ 
             
             #line default
             #line hidden
             this.Write("        ");
             
-            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 25 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attr));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 26 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("        public ");
             
-            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 27 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Type));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 27 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write("  {get;set;}\r\n");
             
-            #line 25 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
+            #line 28 "D:\我的框架\Snail\Snail.Web\CodeGenerater\DtoTemplate.tt"
 
     }
 
