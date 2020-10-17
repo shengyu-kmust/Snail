@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Snail.Core.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +10,7 @@ namespace Snail.Web.Enums
     /// <summary>
     /// 字典配置的操作类型
     /// </summary>
+    [EnumKeyValue]
     public enum EConfigOperType
     {
         /// <summary>
