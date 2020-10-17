@@ -12,7 +12,6 @@ using Snail.Permission.Entity;
 using Snail.Web.Dtos;
 using System.Collections.Generic;
 using System.Linq;
-using Snail.EntityFrameworkCore;
 namespace Snail.Web.Controllers
 {
 

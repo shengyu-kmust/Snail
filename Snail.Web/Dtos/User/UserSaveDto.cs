@@ -2,7 +2,7 @@
 using Snail.Core.Enum;
 using System.ComponentModel.DataAnnotations;
 
-namespace Snail.Permission.Dto
+namespace Snail.Web.Dtos
 {
     public class UserSaveDto:IIdField<string>
     {

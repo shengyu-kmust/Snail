@@ -1,7 +1,7 @@
 ﻿using Snail.Core.Dto;
 using Snail.Core.Enum;
 
-namespace Snail.Permission.Dto
+namespace Snail.Web.Dtos
 {
     public class UserResultDto: DefaultBaseDto
     {

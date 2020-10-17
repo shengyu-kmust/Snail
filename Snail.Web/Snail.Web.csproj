@@ -57,6 +57,7 @@
 
 	<ItemGroup>
 		<Folder Include="Attributes\" />
+		<Folder Include="Dtos\User\" />
 		<Folder Include="EntityTypeConfiguration\" />
 		<Folder Include="Services\" />
 	</ItemGroup>

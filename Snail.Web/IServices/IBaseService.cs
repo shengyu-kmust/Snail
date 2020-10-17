@@ -6,7 +6,8 @@ using System.Linq.Expressions;
 
 namespace ApplicationCore.IServices
 {
-    public interface IBaseService<TEntity> where TEntity : class
+    public interface IBaseService<TEntity> 
+        where TEntity : class
     {
         void Save<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<string>;
         void Remove(List<string> ids);
