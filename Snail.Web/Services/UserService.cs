@@ -4,7 +4,7 @@ using Snail.Permission.Entity;
 
 namespace Snail.Web.Services
 {
-    public class UserService : BaseService<User>, IUserService
+    public class UserService : BaseService<PermissionDefaultUser >, IUserService
     {
         private IPermissionStore _permissionStore;
         public UserService(ServiceContext serviceContext,IPermissionStore permissionStore) : base(serviceContext)

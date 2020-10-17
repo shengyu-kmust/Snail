@@ -46,7 +46,7 @@ namespace Snail.DAL
                 saveDto.Id = IdGenerator.Generate<TKey>();
             }
             var entity = mapper.Map<TEntity>(saveDto);
-            if (entity is IEntityAudit<TKey> entityAudit)
+            if (entity is IAudit<TKey> entityAudit)
             {
                 entityAudit.UpdateTime = DateTime.Now;
                 entityAudit.CreateTime = DateTime.Now;
@@ -69,7 +69,7 @@ namespace Snail.DAL
             {
                 throw new BusinessException($"您要删除的对象不存在，id为{id}");
             }
-            if (entity is IEntityAudit<TKey> entityAudit)
+            if (entity is IAudit<TKey> entityAudit)
             {
                 var userId = applicationContext.GetCurrentUserId().ConvertTo<TKey>();
                 entityAudit.UpdateTime = DateTime.Now;
@@ -78,7 +78,7 @@ namespace Snail.DAL
                     entityAudit.Updater = userId;
                 }
             }
-            if (entity is IEntitySoftDelete entitySoftDelete)
+            if (entity is ISoftDelete entitySoftDelete)
             {
                 entitySoftDelete.IsDeleted = true;
             }
@@ -141,7 +141,7 @@ namespace Snail.DAL
                 throw new Exception("要修改的实体不存在");
             }
             mapper.Map(saveDto, entity, typeof(TSaveDto), typeof(TEntity));
-            if (entity is IEntityAudit<TKey> entityAudit)
+            if (entity is IAudit<TKey> entityAudit)
             {
                 entityAudit.UpdateTime = DateTime.Now;
                 entityAudit.CreateTime = DateTime.Now;

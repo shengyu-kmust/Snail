@@ -1,12 +1,10 @@
-﻿using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace Snail.Web.EFValueConverter
+namespace Snail.EntityFrameworkCore.EFValueConverter
 {
     public class StringSplitConverter : ValueConverter<List<string>, string>
     {

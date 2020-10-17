@@ -100,7 +100,7 @@ namespace Snail.Web
             #endregion
 
             #region 增加通用权限
-            services.AddPermission(options =>
+            services.AddDefaultPermission(options =>
             {
                 configuration.GetSection("PermissionOptions").Bind(options);
                 options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };// 从哪些程序集里，将Controller的action设置成权限资源

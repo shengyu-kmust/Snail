@@ -12,13 +12,13 @@ namespace Snail.Web
     public abstract class BaseAppDbContext : DbContext
     {
         #region 通用权限表
-        public DbSet<User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<Resource> Resources { get; set; }
-        public DbSet<RoleResource> RoleResources { get; set; }
-        public DbSet<Snail.Permission.Entity.Org> Orgs { get; set; }
-        public DbSet<UserOrg> UserOrgs { get; set; }
+        public DbSet<PermissionDefaultUser > Users { get; set; }
+        public DbSet<PermissionDefaultRole> Roles { get; set; }
+        public DbSet<PermissionDefaultUserRole > UserRoles { get; set; }
+        public DbSet<PermissionDefaultResource > Resources { get; set; }
+        public DbSet<PermissionDefaultRoleResource > RoleResources { get; set; }
+        public DbSet<Snail.Permission.Entity.PermissionDefaultOrg> Orgs { get; set; }
+        public DbSet<PermissionDefaultUserOrg > UserOrgs { get; set; }
         #endregion
         #region 公共表
         public DbSet<Snail.Web.Entities.Config> Configs { get; set; }

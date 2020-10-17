@@ -6,7 +6,7 @@ using Snail.Core.Permission;
 /// </summary>
 namespace Snail.Permission.Entity
 {
-    public class Org : DefaultBaseEntity, IOrg
+    public class PermissionDefaultOrg : DefaultBaseEntity, IOrg
     {
         public string ParentId { get; set; }
         public string Name { get; set; }
@@ -19,6 +19,11 @@ namespace Snail.Permission.Entity
         public string GetName()
         {
             return this.Name;
+        }
+
+        public void SetName(string name)
+        {
+            this.Name = name;
         }
     }
 }

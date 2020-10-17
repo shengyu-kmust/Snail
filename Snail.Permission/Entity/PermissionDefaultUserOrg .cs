@@ -4,19 +4,19 @@ using System;
 
 namespace Snail.Permission.Entity
 {
-    public class UserOrg: DefaultBaseEntity, IUserOrg
+    public class PermissionDefaultUserOrg : DefaultBaseEntity, IUserOrg
     {
         public string UserId { get; set; }
         public string OrgId { get; set; }
 
         public string GetOrgKey()
         {
-            throw new NotImplementedException();
+            return OrgId;
         }
 
         public string GetUserKey()
         {
-            throw new NotImplementedException();
+            return UserId;
         }
     }
 }

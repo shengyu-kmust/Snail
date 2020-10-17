@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Snail.Common;
-using Snail.Core.Entity;
+using Snail.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Snail.Web
+namespace Snail.EntityFrameworkCore
 {
     /// <summary>
     /// DbSet的扩展帮助类方法
@@ -77,7 +77,7 @@ namespace Snail.Web
             {
                 entity.Id = IdGenerator.Generate<TKey>();
             }
-            if (entity is IEntityAudit<TKey> auditEntity)
+            if (entity is IAudit<TKey> auditEntity)
             {
                 if (!string.IsNullOrEmpty(userId?.ToString()))
                 {
@@ -104,7 +104,7 @@ namespace Snail.Web
            where TEntity : class, IIdField<TKey>
          where TDto : class, IIdField<TKey>
         {
-            Add(entities, dto, (dto) => mapper.Map<TEntity>(dto), userId);
+            Add(entities, dto, (dtoPara) => mapper.Map<TEntity>(dtoPara), userId);
         }
         #endregion
 
@@ -143,7 +143,7 @@ namespace Snail.Web
                 updateFunc(dto, entity);
             }
 
-            if (entity is IEntityAudit<TKey> auditEntity)
+            if (entity is IAudit<TKey> auditEntity)
             {
                 if (!string.IsNullOrEmpty(userId?.ToString()))
                 {
@@ -170,7 +170,12 @@ namespace Snail.Web
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
-            return AddOrUpdate(entities, dto, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId, existEntities);
+            return AddOrUpdate(entities, 
+                dto, 
+                dtoPara => mapper.Map<TEntity>(dtoPara), 
+                (dtoPara, entity) => mapper.Map<TDto, TEntity>(dtoPara, entity),
+                userId,
+                existEntities);
         }
 
         #endregion
@@ -249,10 +254,10 @@ namespace Snail.Web
                 var entity = existEntities == null ? entities.Find(id) : existEntities.FirstOrDefault(a => a.Id.Equals(id));
                 if (entity != null)
                 {
-                    if (entity is IEntitySoftDelete entitySoftDeleteEntity)
+                    if (entity is ISoftDelete entitySoftDeleteEntity)
                     {
                         entitySoftDeleteEntity.IsDeleted = true;
-                        if (entity is IEntityAudit<TKey> auditEntity)
+                        if (entity is IAudit<TKey> auditEntity)
                         {
                             auditEntity.CreateTime = DateTime.Now;
                             auditEntity.UpdateTime = DateTime.Now;

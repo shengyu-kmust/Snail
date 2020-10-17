@@ -21,7 +21,7 @@ namespace Snail.Web.Controllers
         private IPermission _permission;
         private IPermissionStore _permissionStore;
         private IToken _token;
-        public PermissionController(IPermission permission, IPermissionStore permissionStore, ControllerContext controllerContext, IToken token):base(controllerContext)
+        public PermissionController(IPermission permission, IPermissionStore permissionStore, SnailControllerContext controllerContext, IToken token):base(controllerContext)
         {
             _permission = permission;
             _permissionStore = permissionStore;
@@ -141,7 +141,7 @@ namespace Snail.Web.Controllers
                     user.Pwd = _permission.HashPwd(user.Pwd);
                 }
             }
-            _permissionStore.SaveUser(new User
+            _permissionStore.SaveUser(new PermissionDefaultUser 
             {
                 Account = user.Account,
                 Email = user.Email,
@@ -161,7 +161,7 @@ namespace Snail.Web.Controllers
         [HttpPost, Resource(Description = "保存角色")]
         public void SaveRole(PermissionRoleSaveInfo role)
         {
-            _permissionStore.SaveRole(new Role
+            _permissionStore.SaveRole(new PermissionDefaultRole
             {
                 Id = role.Id,
                 Name = role.Name

@@ -6,7 +6,7 @@ namespace Snail.Permission.Entity
 {
 
     [Table("UserRole")]
-    public class UserRole: DefaultBaseEntity, IUserRole
+    public class PermissionDefaultUserRole : DefaultBaseEntity, IUserRole
     {
         public string UserId { get; set; }
         public string RoleId { get; set; }
@@ -19,6 +19,16 @@ namespace Snail.Permission.Entity
         public string GetUserKey()
         {
             return this.UserId;
+        }
+
+        public void SetRoleKey(string roleKey)
+        {
+            this.RoleId = roleKey;
+        }
+
+        public void SetUserKey(string userKey)
+        {
+            this.UserId = userKey;
         }
     }
 }

@@ -1,17 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Snail.Common;
 using Snail.Core.Entity;
 using Snail.Core.Interface;
-using Snail.Core.Permission;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Snail.Permission
+namespace Snail.Core.Permission
 {
-    public abstract class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource> : IPermissionStore
+    /// <summary>
+    /// 权限系统的存储基类，todo GetUserKey会全表查询，需优化
+    /// </summary>
+    /// <typeparam name="TDbContext"></typeparam>
+    /// <typeparam name="TUser"></typeparam>
+    /// <typeparam name="TRole"></typeparam>
+    /// <typeparam name="TUserRole"></typeparam>
+    /// <typeparam name="TResource"></typeparam>
+    /// <typeparam name="TRoleResource"></typeparam>
+    /// 
+    public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource> : IPermissionStore
         where TDbContext : DbContext
         where TUser : class, IUser, new()
         where TRole : class, IRole, new()
@@ -104,7 +113,7 @@ namespace Snail.Permission
         public virtual void RemoveUser(string userKey)
         {
             var userEntity = _db.Set<TUser>().Find(userKey);
-            if (userEntity is IEntitySoftDelete entitySoftDeleteEntity)
+            if (userEntity is ISoftDelete entitySoftDeleteEntity)
             {
                 entitySoftDeleteEntity.IsDeleted = true;
             }
@@ -131,10 +140,36 @@ namespace Snail.Permission
         /// 保存资源。会从资源id和资源code两字段考虑是新增还是修改
         /// </summary>
         /// <param name="resource"></param>
-        public abstract void SaveResource(IResource resource);
+        public virtual void SaveResource(IResource resource)
+        {
+            var resourceKey = resource.GetKey();
+            var resourceEntity = _db.Set<TResource>().FirstOrDefault(a => a.GetKey() == resourceKey || a.GetResourceCode() == resource.GetResourceCode());
+            if (resourceEntity == null)
+            {
+                //add
+                var addDto = new TResource();
+                EasyMap.Map(resource.GetType(), typeof(TResource), resource, addDto,null);
+                _db.Add(addDto);
+            }
+            else
+            {
+                EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
+            }
+            SetAuditSoftDelete(resourceEntity);
+            _db.SaveChanges();
+            _memoryCache.Remove(resourceCacheKey);
+        }
 
-        public abstract void UpdateRoleEntityByDto(IRole entity, IRole dto, bool isAdd);
-        public abstract void UpdateUserEntityByDto(IUser entity, IUser dto, bool isAdd);
+        public virtual void UpdateRoleEntityByDto(IRole entity, IRole dto, bool isAdd)
+        {
+            EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
+            SetAuditSoftDelete(entity);
+        }
+        public virtual void UpdateUserEntityByDto(IUser entity, IUser dto, bool isAdd)
+        {
+            EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
+            SetAuditSoftDelete(entity);
+        }
 
         public virtual void SaveRole(IRole role)
         {
@@ -173,7 +208,74 @@ namespace Snail.Permission
             _memoryCache.Remove(userCacheKey);
         }
 
-        public abstract void SetRoleResources(string roleKey, List<string> resourceKeys);
-        public abstract void SetUserRoles(string userKey, List<string> roleKeys);
+        public virtual void SetRoleResources(string roleKey, List<string> resourceKeys)
+        {
+            var userId = _applicationContext.GetCurrentUserId();
+            var allRoleResources = _db.Set<TRoleResource>().AsNoTracking().Where(a => a.GetRoleKey() == roleKey).ToList(); // 这个是否为全表查询
+            var allResources = _db.Set<TResource>().AsNoTracking().ToList();
+
+            // 删除角色权限
+            allRoleResources.Where(a => !resourceKeys.Contains(a.GetResourceKey())).ToList().ForEach(a =>
+            {
+                _db.Remove(a);
+            });
+
+            // 增加角色权限
+            resourceKeys.Where(a => !allRoleResources.Select(i => i.GetResourceKey()).Contains(a)).ToList().ForEach(resourceKey =>
+            {
+                if (allResources.Any(a => a.GetKey() == resourceKey))
+                {
+                    var addRoleResource = new TRoleResource();
+                    SetAuditSoftDelete(addRoleResource);
+                    addRoleResource.SetRoleKey(roleKey);
+                    addRoleResource.SetResourceKey(resourceKey);
+                }
+            });
+            _db.SaveChanges();
+            _memoryCache.Remove(roleResourceCacheKey);
+        }
+
+        public virtual void SetUserRoles(string userKey, List<string> roleKeys)
+        {
+            var userId = _applicationContext.GetCurrentUserId();
+            var allUserRoles = _db.Set<TUserRole>().AsNoTracking().Where(a => a.GetUserKey() == userKey).ToList();
+            var allRole = _db.Set<TRole>().AsNoTracking().ToList();
+            allUserRoles.Where(a => !roleKeys.Contains(a.GetRoleKey())).ToList().ForEach(a =>
+            {
+                _db.Remove(a);
+            });
+            roleKeys.Where(a => !allUserRoles.Select(i => i.GetRoleKey()).Contains(a) && !string.IsNullOrEmpty(a)).ToList().ForEach(roleKey =>
+            {
+                if (allRole.Any(a => a.GetKey() == roleKey))
+                {
+                    var addItem = new TUserRole();
+                    SetAuditSoftDelete(addItem);
+                    addItem.SetRoleKey(roleKey);
+                    addItem.SetUserKey(userKey);
+                }
+
+            });
+            _db.SaveChanges();
+            _memoryCache.Remove(userRoleCacheKey);
+        }
+
+        private void SetAuditSoftDelete(object obj)
+        {
+            var userId = _applicationContext.GetCurrentUserId();
+            if (obj is IIdField<string> entityOfIdField)
+            {
+                if (!string.IsNullOrEmpty(entityOfIdField.Id))
+                {
+                    entityOfIdField.Id = IdGenerator.Generate<string>();
+                }
+            }
+            if (obj is IAudit<string> entityOfAudit)
+            {
+                entityOfAudit.CreateTime = DateTime.Now;
+                entityOfAudit.Updater = userId;
+                entityOfAudit.Updater = userId;
+                entityOfAudit.Creater = userId;
+            }
+        }
     }
 }

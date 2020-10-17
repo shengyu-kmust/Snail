@@ -1,4 +1,4 @@
-﻿using Snail.Core.Entity;
+﻿using Snail.Core;
 using Snail.Core.Enum;
 using System.ComponentModel.DataAnnotations;
 

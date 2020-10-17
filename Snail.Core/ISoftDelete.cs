@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Core.Entity
+namespace Snail.Core
 {
     /// <summary>
     /// 软删除
     /// </summary>
-    public interface IEntitySoftDelete
+    public interface ISoftDelete
     {
         bool IsDeleted { get; set; }
     }

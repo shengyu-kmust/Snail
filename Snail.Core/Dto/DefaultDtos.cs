@@ -4,6 +4,25 @@ using System.Text;
 
 namespace Snail.Core.Dto
 {
+    public class DefaultBaseDto : BaseAuditSoftDeleteDto<string>
+    {
+    }
+
+    public class DefaultBaseDtoWithTenant : BaseAuditSoftDeleteTenantDto<string>
+    {
+    }
+    /// <summary>
+    /// 用于只传id对象的dto
+    /// </summary>
+    public class IdsDto
+    {
+        public List<string> Ids { get; set; }
+    }
+
+
+    /// <summary>
+    /// key-value值对dto
+    /// </summary>
     public class KeyValueDto
     {
         /// <summary>

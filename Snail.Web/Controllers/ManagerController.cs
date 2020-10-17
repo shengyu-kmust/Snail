@@ -13,7 +13,7 @@ namespace Snail.Web.Controllers
     public class ManagerController : DefaultBaseController
     {
         private IPermissionStore _permissionStore;
-        public ManagerController(ControllerContext controllerContext, IPermissionStore permissionStore) : base(controllerContext)
+        public ManagerController(SnailControllerContext controllerContext, IPermissionStore permissionStore) : base(controllerContext)
         {
             _permissionStore = permissionStore;
         }

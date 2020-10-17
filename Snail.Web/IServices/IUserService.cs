@@ -2,7 +2,7 @@
 
 namespace ApplicationCore.IServices
 {
-    public interface IUserService : IBaseService<User>
+    public interface IUserService : IBaseService<PermissionDefaultUser >
     {
     }
 }

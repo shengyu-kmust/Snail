@@ -11,7 +11,7 @@ namespace Snail.Web.Controllers
     public class TestController : DefaultBaseController
     {
         private IInterceptorService interceptorService;
-        public TestController(ControllerContext controllerContext, IInterceptorService service) : base(controllerContext)
+        public TestController(SnailControllerContext controllerContext, IInterceptorService service) : base(controllerContext)
         {
             this.interceptorService = service;
 

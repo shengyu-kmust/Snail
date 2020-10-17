@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Snail.Core.Entity
+namespace Snail.Core
 {
     public interface ITenant<T>
     {

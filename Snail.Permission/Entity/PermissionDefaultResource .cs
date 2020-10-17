@@ -3,7 +3,7 @@ using Snail.Core.Permission;
 
 namespace Snail.Permission.Entity
 {
-    public class Resource: DefaultBaseEntity, IResource
+    public class PermissionDefaultResource : DefaultBaseEntity, IResource
     {
         /// <summary>
         /// 资源键，如接口名，菜单名，唯一键
@@ -31,6 +31,11 @@ namespace Snail.Permission.Entity
         public string GetResourceCode()
         {
             return this.Code;
+        }
+
+        public void SetName(string name)
+        {
+            this.Name = name;
         }
     }
 }
