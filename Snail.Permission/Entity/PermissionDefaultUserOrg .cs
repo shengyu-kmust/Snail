@@ -1,9 +1,10 @@
 ﻿using Snail.Core.Entity;
 using Snail.Core.Permission;
-using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Permission.Entity
 {
+    [Table("UserOrg")]
     public class PermissionDefaultUserOrg : DefaultBaseEntity, IUserOrg
     {
         public string UserId { get; set; }

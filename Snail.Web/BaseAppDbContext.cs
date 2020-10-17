@@ -29,8 +29,8 @@ namespace Snail.Web
         public DbSet<TUserOrg> UserOrgs { get; set; }
         #endregion
         #region 公共表
-        public DbSet<Snail.Web.Entities.Config> Configs { get; set; }
-        public DbSet<Snail.FileStore.FileInfo> FileInfos { get; set; }
+        public DbSet<Snail.Web.Entities.Config> Config { get; set; }
+        public DbSet<Snail.FileStore.FileInfo> FileInfo { get; set; }
         #endregion
 
         protected ICapPublisher _publisher;

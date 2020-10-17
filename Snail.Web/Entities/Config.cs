@@ -1,10 +1,12 @@
 ﻿using Snail.Core.Attributes;
 using Snail.Core.Entity;
 using Snail.Web.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Web.Entities
 {
     [EnableEntityCache]
+    [Table("Config")]
     public class Config : DefaultBaseEntity
     {
         public string Key { get; set; }

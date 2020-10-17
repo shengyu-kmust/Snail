@@ -1,8 +1,10 @@
 ﻿using Snail.Core.Entity;
 using Snail.Core.Permission;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Permission.Entity
 {
+    [Table("Resource")]
     public class PermissionDefaultResource : DefaultBaseEntity, IResource
     {
         /// <summary>
