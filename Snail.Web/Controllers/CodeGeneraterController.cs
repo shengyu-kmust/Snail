@@ -77,8 +77,8 @@ namespace Snail.Web.Controllers
                 var entityConfigTemplate = new EntityConfigTemplate();
                 entityConfigTemplate.Name = entity.Name;
                 entityConfigTemplate.TableName = entity.TableName;
-                Directory.CreateDirectory($@"{dto.BasePath}\Infrastructure\Data\Config");
-                System.IO.File.WriteAllText($@"{dto.BasePath}\Infrastructure\Data\Config\{entity.Name}Configuration.cs", entityConfigTemplate.TransformText());
+                Directory.CreateDirectory($@"{dto.BasePath}\Infrastructure\EntityTypeConfigurations");
+                System.IO.File.WriteAllText($@"{dto.BasePath}\Infrastructure\EntityTypeConfigurations\{entity.Name}Configuration.cs", entityConfigTemplate.TransformText());
             }
         }
         #endregion

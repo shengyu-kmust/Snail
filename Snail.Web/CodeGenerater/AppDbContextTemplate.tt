@@ -5,11 +5,12 @@
 <#@ import namespace="System.Collections.Generic" #>
 using ApplicationCore.Entity;
 using Microsoft.EntityFrameworkCore;
+using Snail.Permission.Entity;
 using Snail.Web;
 
 namespace Infrastructure
 {
-    public partial class AppDbContext : BaseAppDbContext
+    public partial class AppDbContext : BaseAppDbContext<PermissionDefaultUser, PermissionDefaultRole, PermissionDefaultResource, PermissionDefaultUserRole, PermissionDefaultRoleResource, PermissionDefaultOrg, PermissionDefaultUserOrg>
     {
 <# foreach(var entityName in EntityNames??new List<string>()){ #>
         public DbSet<<#= entityName #>> <#= entityName #> { get; set; }

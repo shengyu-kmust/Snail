@@ -18,7 +18,7 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+    #line 1 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class EntityTemplate : EntityTemplateBase
     {
@@ -29,17 +29,17 @@ namespace Snail.Web.CodeGenerater
         public virtual string TransformText()
         {
             this.Write("\r\nusing ApplicationCore.Enums;\r\nusing Snail.Core.Entity;\r\nusing System;\r\nusing Sy" +
-                    "stem.ComponentModel.DataAnnotations;\r\nnamespace ApplicationCore.Entity\r\n{\r\n    p" +
-                    "ublic class ");
+                    "stem.ComponentModel.DataAnnotations;\r\nusing System.Collections.Generic;\r\nusing S" +
+                    "nail.Core.Enum;\r\nnamespace ApplicationCore.Entity\r\n{\r\n    public class ");
             
-            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 15 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
             #line hidden
             this.Write(":DefaultBaseEntity\r\n    {\r\n");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 17 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
 
     foreach(var item in Entity.Fields){
 
@@ -48,49 +48,49 @@ namespace Snail.Web.CodeGenerater
             #line hidden
             this.Write("        /// <summary>\r\n        /// ");
             
-            #line 19 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 21 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n        /// </summary>\r\n");
             
-            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 23 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
  foreach(var attr in item.Attributes??new List<string>()){ 
             
             #line default
             #line hidden
             this.Write("        ");
             
-            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 24 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attr));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 25 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("        public ");
             
-            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 26 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Type));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 26 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write("  {get;set;}\r\n");
             
-            #line 25 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
+            #line 27 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityTemplate.tt"
 
     }
 
