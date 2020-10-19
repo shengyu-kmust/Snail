@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Snail.Common
+namespace OrPMS.Utilities
 {
     /// <summary>
     /// 对象属性映射赋值类
@@ -242,10 +242,10 @@ namespace Snail.Common
             var expressions = new List<Expression>();
             var sourceProperties = sourceType.GetProperties(BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public).ToList();
             var targetProperties = targetType.GetProperties(BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public).ToList();
-            foreach (var targetProperty in targetProperties)
+            foreach (var sourceProperty in sourceProperties)
             {
-                var sourceProperty = sourceProperties.FirstOrDefault(a => a.Name.Equals(targetProperty.Name, StringComparison.OrdinalIgnoreCase));
-                if (sourceProperty != null)
+                var targetProperty = targetProperties.FirstOrDefault(a => a.Name.Equals(sourceProperty.Name, StringComparison.OrdinalIgnoreCase));
+                if (targetProperty.CanWrite && sourceProperty != null)
                 {
                     // 可空和非可空的映射
                     var targetBasicType = (targetProperty.PropertyType.IsGenericType && targetProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
