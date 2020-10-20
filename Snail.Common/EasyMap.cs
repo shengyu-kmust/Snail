@@ -5,7 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace OrPMS.Utilities
+namespace Snail.Common
 {
     /// <summary>
     /// 对象属性映射赋值类
@@ -245,39 +245,47 @@ namespace OrPMS.Utilities
             foreach (var sourceProperty in sourceProperties)
             {
                 var targetProperty = targetProperties.FirstOrDefault(a => a.Name.Equals(sourceProperty.Name, StringComparison.OrdinalIgnoreCase));
-                if (targetProperty.CanWrite && sourceProperty != null)
+
+                if (targetProperty != null && targetProperty.CanWrite && sourceProperty != null)
                 {
                     // 可空和非可空的映射
-                    var targetBasicType = (targetProperty.PropertyType.IsGenericType && targetProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    var targetPropertyIsNullable = targetProperty.PropertyType.IsGenericType && targetProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                    var sourcePropertyIsNullable = sourceProperty.PropertyType.IsGenericType && sourceProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                    var targetBasicType = targetPropertyIsNullable
                             ? targetProperty.PropertyType.GetGenericArguments()[0]
                             : targetProperty.PropertyType;
-                    var sourceBasicType = (sourceProperty.PropertyType.IsGenericType && sourceProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    var sourceBasicType = sourcePropertyIsNullable
                         ? sourceProperty.PropertyType.GetGenericArguments()[0]
                         : sourceProperty.PropertyType;
 
                     // 只有当字段名和基础类型都相等时才匹配映射关系
                     if (targetBasicType == sourceBasicType)
                     {
-                        var condition1 = Expression.Equal(fieldsPa, Expression.Constant(null));
+                        var sourcePropertyExpression = Expression.PropertyOrField(sourcePa, sourceProperty.Name);
+                        var targetPropertyExpression = Expression.PropertyOrField(targetPa, targetProperty.Name);
+                        var condition1 = Expression.Equal(fieldsPa, Expression.Constant(null)); // 包段字段是否为null的判断
                         var condition2 = Expression.Call(fieldsPa, typeof(List<string>).GetMethod("Contains"), Expression.Constant(targetProperty.Name));
-                        BinaryExpression assignExpression;
-                        if (
-                            (sourceProperty.PropertyType.IsGenericType && sourceProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                            &&
-                            !(targetProperty.PropertyType.IsGenericType && targetProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                            )
+                        BinaryExpression assignExpression; // 目标字段是否在包含字段里的判断
+                        Expression leftExpression;
+                        if (sourcePropertyIsNullable && !targetPropertyIsNullable)
                         {
-                            var sourceField = Expression.PropertyOrField(sourcePa, sourceProperty.Name);
-                            var nullAbleAssignExpression = Expression.Condition(
-                                Expression.PropertyOrField(sourceField, "HasValue"),
-                                Expression.PropertyOrField(sourceField, "Value"),
-                                Expression.Default(targetBasicType));
-                            assignExpression = Expression.Assign(Expression.PropertyOrField(targetPa, targetProperty.Name), nullAbleAssignExpression);
+                            // 可空到非可空的赋值
+                            leftExpression = Expression.Condition(
+                                Expression.PropertyOrField(sourcePropertyExpression, "HasValue"),
+                                Expression.PropertyOrField(sourcePropertyExpression, "Value"),
+                                Expression.Default(targetBasicType));// 编译成source.field.HasValue?source.field.Value:default
+                        }
+                        else if (!sourcePropertyIsNullable && targetPropertyIsNullable)
+                        {
+                            // 非可空到可空的赋值
+                            leftExpression = Expression.Convert(sourcePropertyExpression, targetPropertyExpression.Type);
                         }
                         else
                         {
-                            assignExpression = Expression.Assign(Expression.PropertyOrField(targetPa, targetProperty.Name), Expression.PropertyOrField(sourcePa, sourceProperty.Name));
+                            // 两个类型完成相同
+                            leftExpression = sourcePropertyExpression;
                         }
+                        assignExpression = Expression.Assign(targetPropertyExpression, leftExpression);
                         var thisFieldAssignExpression = Expression.IfThen(Expression.OrElse(condition1, condition2), assignExpression);//用orElse而不是or来提高性能
                         expressions.Add(thisFieldAssignExpression);
                     }
@@ -546,4 +554,5 @@ namespace OrPMS.Utilities
         }
 
     }
+
 }
