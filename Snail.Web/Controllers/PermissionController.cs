@@ -126,8 +126,12 @@ namespace Snail.Web.Controllers
             _permission.InitResource();
         }
 
+        /// <summary>
+        /// 用于权限的用户基本数据保存，请开发新接口以支持应用的用户保存逻辑
+        /// </summary>
+        /// <param name="user"></param>
         [HttpPost, Resource(Description = "保存用户")]
-        public void SaveUser(UserSaveDto user)
+        public void SaveUser(PermissionUserInfo user)
         {
             // 增加时，设置密码
             if (user.Id.HasNotValue())
@@ -142,16 +146,7 @@ namespace Snail.Web.Controllers
                     user.Pwd = _permission.HashPwd(user.Pwd);
                 }
             }
-            _permissionStore.SaveUser(new PermissionDefaultUser 
-            {
-                Account = user.Account,
-                Email = user.Email,
-                Gender = user.Gender,
-                Id = user.Id,
-                Name = user.Name,
-                Phone = user.Phone,
-                Pwd = user.Pwd,
-            });
+            _permissionStore.SaveUser(user);
         }
         [HttpPost, Resource(Description = "删除用户")]
         public void RemoveUser(string userKey)
@@ -159,14 +154,14 @@ namespace Snail.Web.Controllers
             _permissionStore.RemoveUser(userKey);
         }
 
+        /// <summary>
+        /// 用于权限的角色基本数据保存，请开发新接口以支持应用的角色保存逻辑
+        /// </summary>
+        /// <param name="role"></param>
         [HttpPost, Resource(Description = "保存角色")]
-        public void SaveRole(PermissionRoleSaveInfo role)
+        public void SaveRole(IRole role)
         {
-            _permissionStore.SaveRole(new PermissionDefaultRole
-            {
-                Id = role.Id,
-                Name = role.Name
-            });
+            _permissionStore.SaveRole(role);
         }
 
         [HttpPost, Resource(Description = "删除角色")]

@@ -52,7 +52,7 @@ namespace Snail.Web
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 自动应用所有的IEntityTypeConfiguration配置
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            //modelBuilder.ApplyConfigurationsFromAssembly(Assembly);//，在外层配置
         }
         public override int SaveChanges()
         {
