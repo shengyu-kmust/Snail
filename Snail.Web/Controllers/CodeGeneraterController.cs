@@ -77,8 +77,8 @@ namespace Snail.Web.Controllers
                 var entityConfigTemplate = new EntityConfigTemplate();
                 entityConfigTemplate.Name = entity.Name;
                 entityConfigTemplate.TableName = entity.TableName;
-                Directory.CreateDirectory($@"{dto.BasePath}\Infrastructure\Data\Config");
-                System.IO.File.WriteAllText($@"{dto.BasePath}\Infrastructure\Data\Config\{entity.Name}Configuration.cs", entityConfigTemplate.TransformText());
+                Directory.CreateDirectory($@"{dto.BasePath}\Infrastructure\EntityTypeConfigurations");
+                System.IO.File.WriteAllText($@"{dto.BasePath}\Infrastructure\EntityTypeConfigurations\{entity.Name}Configuration.cs", entityConfigTemplate.TransformText());
             }
         }
         #endregion
@@ -133,9 +133,9 @@ namespace Snail.Web.Controllers
         #region enum
         private void GenerateEnum(CodeGenerateDto dto)
         {
-            var enumTemplate = new EnumTemplate();
             foreach (var enumModel in dto.Enums)
             {
+                var enumTemplate = new EnumTemplate();
                 enumTemplate.Model = enumModel;
                 Directory.CreateDirectory($@"{dto.BasePath}\ApplicationCore\Enums");
                 System.IO.File.WriteAllText($@"{dto.BasePath}\ApplicationCore\Enums\{enumModel.Name}.cs", enumTemplate.TransformText());

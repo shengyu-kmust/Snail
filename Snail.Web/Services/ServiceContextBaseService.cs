@@ -18,7 +18,7 @@ namespace Snail.Web.Services
         protected IMapper mapper => serviceContext.mapper;
         protected IApplicationContext applicationContext => serviceContext.applicationContext;
         protected string currentUserId => serviceContext.applicationContext.GetCurrentUserId();
-        public BaseAppDbContext db => serviceContext.db;
+        public DbContext db => serviceContext.db;
         public IMemoryCache memoryCache => serviceContext.memoryCache;
         public ICapPublisher publisher => serviceContext.publisher;
         public ISnailCache cache => serviceContext.cache;
@@ -36,7 +36,7 @@ namespace Snail.Web.Services
         /// <typeparam name="TEntityCache"></typeparam>
         /// <returns></returns>
         public List<TEntityCache> GetEntityCache<TEntity, TEntityCache>()
-         where TEntity : class, IBaseEntity
+         where TEntity : class, IEntity
         {
             return cache.GetOrSet<List<TEntityCache>>(GetEntityCacheKey<TEntity, TEntityCache>(), key =>
             {

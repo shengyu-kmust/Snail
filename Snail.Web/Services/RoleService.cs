@@ -4,7 +4,7 @@ using Snail.Permission.Entity;
 
 namespace Snail.Web.Services
 {
-    public class RoleService : BaseService<Role>, IRoleService
+    public class RoleService : BaseService<PermissionDefaultRole>, IRoleService
     {
         private IPermissionStore _permissionStore;
         public RoleService(ServiceContext serviceContext,IPermissionStore permissionStore) : base(serviceContext)

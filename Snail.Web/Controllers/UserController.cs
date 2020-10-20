@@ -6,24 +6,23 @@ using Snail.Common.Extenssions;
 using Snail.Core;
 using Snail.Core.Attributes;
 using Snail.Core.Permission;
+using Snail.EntityFrameworkCore;
 using Snail.Permission.Dto;
 using Snail.Permission.Entity;
-using Snail.Web;
 using Snail.Web.Dtos;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace Snail.Web.Controllers
 {
 
     [Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)]
     [Resource(Description = "用户管理")]
-    public class UserController : DefaultBaseController, ICrudController<User, UserSaveDto, UserResultDto, KeyQueryDto>
+    public class UserController : DefaultBaseController, ICrudController<PermissionDefaultUser , UserSaveDto, UserResultDto, KeyQueryDto>
     {
         private IUserService _service;
         private IPermissionStore _permissionStore;
         private IPermission _permission;
-        public UserController(IUserService service, ControllerContext controllerContext,IPermissionStore permissionStore, IPermission permission) : base(controllerContext)
+        public UserController(IUserService service, SnailControllerContext controllerContext,IPermissionStore permissionStore, IPermission permission) : base(controllerContext)
         {
             this.controllerContext = controllerContext;
             this._service = service;
@@ -35,7 +34,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public List<UserResultDto> QueryList([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<User>().And(a=>!a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Email.Contains(queryDto.KeyWord) || a.Account.Contains(queryDto.KeyWord));
+            var pred = ExpressionExtensions.True<PermissionDefaultUser >().And(a=>!a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Email.Contains(queryDto.KeyWord) || a.Account.Contains(queryDto.KeyWord));
             return controllerContext.mapper.ProjectTo<UserResultDto>(_service.QueryList(pred)).ToList();
         }
 
@@ -43,7 +42,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public IPageResult<UserResultDto> QueryPage([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<User>().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Email.Contains(queryDto.KeyWord) || a.Account.Contains(queryDto.KeyWord));
+            var pred = ExpressionExtensions.True<PermissionDefaultUser >().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Email.Contains(queryDto.KeyWord) || a.Account.Contains(queryDto.KeyWord));
             return controllerContext.mapper.ProjectTo<UserResultDto>(_service.QueryList(pred)).ToPageList(queryDto);
         }
 
@@ -68,15 +67,15 @@ namespace Snail.Web.Controllers
         {
             var pwd = saveDto.Pwd.HasValue() ? _permission.HashPwd(saveDto.Pwd) : _permission.HashPwd("123456");
             var canUpdatePwd = saveDto.Id.HasValue() && saveDto.Pwd.HasValue();
-            db.Users.AddOrUpdate(saveDto, dto =>
+            db.Set<PermissionDefaultUser>().AddOrUpdate(saveDto, dto =>
             {
-                var entityTemp = mapper.Map<User>(dto);
+                var entityTemp = mapper.Map<PermissionDefaultUser >(dto);
                 entityTemp.Pwd = pwd;
                 return entityTemp;
             }, (dto, entity) =>
             {
                 var pwdBack = entity.Pwd;
-                mapper.Map<UserSaveDto, User>(dto, entity);
+                mapper.Map<UserSaveDto, PermissionDefaultUser >(dto, entity);
                 if (canUpdatePwd)
                 {
                     entity.Pwd = pwd;

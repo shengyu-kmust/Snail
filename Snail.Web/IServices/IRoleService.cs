@@ -2,7 +2,7 @@
 
 namespace ApplicationCore.IServices
 {
-    public interface IRoleService : IBaseService<Role>
+    public interface IRoleService : IBaseService<PermissionDefaultRole>
     {
     }
 }

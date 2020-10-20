@@ -1,22 +1,23 @@
 ﻿using Snail.Core.Entity;
 using Snail.Core.Permission;
-using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Permission.Entity
 {
-    public class UserOrg: DefaultBaseEntity, IUserOrg
+    [Table("UserOrg")]
+    public class PermissionDefaultUserOrg : DefaultBaseEntity, IUserOrg
     {
         public string UserId { get; set; }
         public string OrgId { get; set; }
 
         public string GetOrgKey()
         {
-            throw new NotImplementedException();
+            return OrgId;
         }
 
         public string GetUserKey()
         {
-            throw new NotImplementedException();
+            return UserId;
         }
     }
 }

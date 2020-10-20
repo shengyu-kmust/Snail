@@ -16,7 +16,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 
-namespace SnaiWeb.Permission
+namespace Snail.Permission
 {
     /// <summary>
     /// 权限的默认实现类
@@ -109,7 +109,7 @@ namespace SnaiWeb.Permission
         /// </summary>
         public override void InitResource()
         {
-            var resources = new List<Resource>();
+            var resources = new List<PermissionDefaultResource >();
             if (PermissionOptions.ResourceAssemblies == null)
             {
                 PermissionOptions.ResourceAssemblies = new List<Assembly>();
@@ -132,7 +132,7 @@ namespace SnaiWeb.Permission
                             if (!controllerIsAdded)
                             {
                                 // 增加父
-                                resources.Add(new Resource
+                                resources.Add(new PermissionDefaultResource 
                                 {
                                     Id = parentId,
                                     Code = parentResource?.ResourceCode ?? controller.Name,
@@ -143,7 +143,7 @@ namespace SnaiWeb.Permission
                                 controllerIsAdded = true;
                             }
                             // 增加子
-                            resources.Add(new Resource
+                            resources.Add(new PermissionDefaultResource 
                             {
                                 Id = IdGenerator.Generate<string>(),
                                 Code = GetResourceCode(method),
@@ -158,7 +158,7 @@ namespace SnaiWeb.Permission
             });
             resources.ForEach(item =>
             {
-                var temp = new Resource
+                var temp = new PermissionDefaultResource 
                 {
                     Id = item.Id,
                     Code = item.Code,

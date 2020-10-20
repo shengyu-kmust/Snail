@@ -37,7 +37,7 @@ namespace Snail.Web
        
 
         public static IServiceCollection ConfigSnailWebServices<TDbContext>(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
-          where TDbContext : BaseAppDbContext
+          where TDbContext : DbContext
         {
             #region option配置
             services.ConfigAllOption(configuration);
@@ -96,11 +96,10 @@ namespace Snail.Web
             };
             services.AddDbContext<TDbContext>(optionsAction);
             services.AddDbContext<DbContext, TDbContext>(optionsAction);
-            services.AddDbContext<BaseAppDbContext, TDbContext>(optionsAction);
             #endregion
 
             #region 增加通用权限
-            services.AddPermission(options =>
+            services.AddDefaultPermission(options =>
             {
                 configuration.GetSection("PermissionOptions").Bind(options);
                 options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };// 从哪些程序集里，将Controller的action设置成权限资源

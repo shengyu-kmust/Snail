@@ -1,9 +1,11 @@
 ﻿using Snail.Core.Entity;
 using Snail.Core.Permission;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Permission.Entity
 {
-    public class RoleResource: DefaultBaseEntity, IRoleResource
+    [Table("RoleResource")]
+    public class PermissionDefaultRoleResource : DefaultBaseEntity, IRoleResource
     {
         public string RoleId { get; set; }
         public string ResourceId { get; set; }
@@ -16,6 +18,16 @@ namespace Snail.Permission.Entity
         public string GetRoleKey()
         {
             return this.RoleId;
+        }
+
+        public void SetResourceKey(string resourceKey)
+        {
+            ResourceId = resourceKey;
+        }
+
+        public void SetRoleKey(string roleKey)
+        {
+            RoleId = roleKey;
         }
     }
 }

@@ -4,9 +4,9 @@ using Snail.Permission.Entity;
 
 namespace Snail.Web.EntityTypeConfiguration
 {
-    public class UserConfiguration : BaseConfiguration,IEntityTypeConfiguration<User>
+    public class UserConfiguration : BaseConfiguration,IEntityTypeConfiguration<PermissionDefaultUser >
     {
-        public void Configure(EntityTypeBuilder<User> builder)
+        public void Configure(EntityTypeBuilder<PermissionDefaultUser > builder)
         {
             base.Config(builder);
             builder.ToTable("User");

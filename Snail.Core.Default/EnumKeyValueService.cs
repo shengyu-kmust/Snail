@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Snail.Core.Attributes;
 using Snail.Core.Dto;
 using Snail.Core.Interface;
 using System;
@@ -70,10 +71,7 @@ namespace Snail.Core.Default
         public Dictionary<string, List<KeyValueDto>> InitKeyValues { get; set; }
     }
 
-    public class EnumKeyValueAttribute : Attribute
-    {
-
-    }
+    
 
     public static class EnumKeyValueServiceExtenssion
     {

@@ -10,7 +10,6 @@ using Snail.Core.Permission;
 using Snail.Web.Controllers;
 using System.Collections.Generic;
 using System.Linq;
-using ControllerContext = Snail.Web.Controllers.ControllerContext;
 
 namespace Web.Controllers
 {
@@ -22,7 +21,7 @@ namespace Web.Controllers
     public class <#= Name#>Controller : DefaultBaseController, ICrudController<<#= Name#>, <#= Name#>SaveDto, <#= Name#>ResultDto, <#= Name#>QueryDto>
     {
         private <#= Name#>Service _service;
-        public <#= Name#>Controller(<#= Name#>Service service,ControllerContext controllerContext):base(controllerContext) {
+        public <#= Name#>Controller(<#= Name#>Service service,SnailControllerContext controllerContext):base(controllerContext) {
             this.controllerContext = controllerContext;
             this._service = service;
         } 

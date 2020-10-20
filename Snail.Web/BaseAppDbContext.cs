@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Snail.Core.Attributes;
 using Snail.Core.Default;
+using Snail.Core.Permission;
 using Snail.Permission.Entity;
 using System;
 using System.Linq;
@@ -9,20 +10,27 @@ using System.Reflection;
 
 namespace Snail.Web
 {
-    public abstract class BaseAppDbContext : DbContext
+    public abstract class BaseAppDbContext<TUser,TRole,TResource,TUserRole,TRoleResource,TOrg,TUserOrg> : DbContext
+        where TUser : class, IUser, new()
+        where TRole : class, IRole, new()
+        where TUserRole : class, IUserRole, new()
+        where TResource : class, IResource, new()
+        where TRoleResource : class, IRoleResource, new()
+        where TOrg : class, IOrg, new()
+        where TUserOrg : class, IUserOrg, new()
     {
         #region 通用权限表
-        public DbSet<User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<Resource> Resources { get; set; }
-        public DbSet<RoleResource> RoleResources { get; set; }
-        public DbSet<Snail.Permission.Entity.Org> Orgs { get; set; }
-        public DbSet<UserOrg> UserOrgs { get; set; }
+        public DbSet<TUser> Users { get; set; }
+        public DbSet<TRole> Roles { get; set; }
+        public DbSet<TUserRole> UserRoles { get; set; }
+        public DbSet<TResource> Resources { get; set; }
+        public DbSet<TRoleResource> RoleResources { get; set; }
+        public DbSet<TOrg> Orgs { get; set; }
+        public DbSet<TUserOrg> UserOrgs { get; set; }
         #endregion
         #region 公共表
-        public DbSet<Snail.Web.Entities.Config> Configs { get; set; }
-        public DbSet<Snail.FileStore.FileInfo> FileInfos { get; set; }
+        public DbSet<Snail.Web.Entities.Config> Config { get; set; }
+        public DbSet<Snail.FileStore.FileInfo> FileInfo { get; set; }
         #endregion
 
         protected ICapPublisher _publisher;

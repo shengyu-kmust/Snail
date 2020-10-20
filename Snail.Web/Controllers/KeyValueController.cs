@@ -12,7 +12,7 @@ namespace Snail.Web.Controllers
         private IEnumKeyValueService _enumKeyValueService;
         private IEntityCacheManager _entityCacheManager;
         private IConfigService _configService;
-        public KeyValueController(ControllerContext controllerContext, IEntityCacheManager entityCacheManager, IEnumKeyValueService enumKeyValueService, IConfigService configService) : base(controllerContext)
+        public KeyValueController(SnailControllerContext controllerContext, IEntityCacheManager entityCacheManager, IEnumKeyValueService enumKeyValueService, IConfigService configService) : base(controllerContext)
         {
             _enumKeyValueService = enumKeyValueService;
             _entityCacheManager = entityCacheManager;

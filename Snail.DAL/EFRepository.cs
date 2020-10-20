@@ -100,7 +100,7 @@ namespace Snail.DAL
         #region 帮助方法
         private void DealAudit(TEntity entity)
         {
-            if (entity is IEntityAudit<TKey> entityAudit)
+            if (entity is IAudit<TKey> entityAudit)
             {
                 var userId = (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(_applicationContext.GetCurrentUserId());
                 var now = DateTime.Now;
@@ -113,11 +113,11 @@ namespace Snail.DAL
 
         private void DealSoftDelete(TEntity entity)
         {
-            if (entity is IEntitySoftDelete entitySoftDelete)
+            if (entity is ISoftDelete entitySoftDelete)
             {
                 var userId = (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(_applicationContext.GetCurrentUserId());
                 var now = DateTime.Now;
-                if (entity is IEntityAudit<TKey> entityAudit)
+                if (entity is IAudit<TKey> entityAudit)
                 {
                     entityAudit.Updater = userId;
                     entityAudit.UpdateTime = now;

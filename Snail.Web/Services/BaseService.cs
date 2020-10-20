@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Snail.Common;
 using Snail.Common.Extenssions;
 using Snail.Core;
-using Snail.Core.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,8 @@ using System.Linq.Expressions;
 
 namespace Snail.Web.Services
 {
-    public abstract class BaseService<TEntity> : ServiceContextBaseService, IBaseService<TEntity> where TEntity : class
+    public abstract class BaseService<TEntity> : ServiceContextBaseService, IBaseService<TEntity> 
+        where TEntity : class
     {
         protected BaseService(ServiceContext serviceContext) : base(serviceContext)
         {
@@ -49,7 +49,7 @@ namespace Snail.Web.Services
                 {
                     throw new BusinessException($"您要删除的对象不存在，id为{id}");
                 }
-                if (entity is IEntityAudit<string> entityAudit)
+                if (entity is IAudit<string> entityAudit)
                 {
                     entityAudit.UpdateTime = DateTime.Now;
                     if (userId != null)
@@ -57,7 +57,7 @@ namespace Snail.Web.Services
                         entityAudit.Updater = userId;
                     }
                 }
-                if (entity is IEntitySoftDelete entitySoftDelete)
+                if (entity is ISoftDelete entitySoftDelete)
                 {
                     entitySoftDelete.IsDeleted = true;
                 }
@@ -70,14 +70,15 @@ namespace Snail.Web.Services
             db.SaveChanges();
         }
 
-        public virtual void Save<TSaveDto>(TSaveDto saveDto) where TSaveDto : IIdField<string>
+        public virtual void Save<TSaveDto>(TSaveDto saveDto) 
+            where TSaveDto : IIdField<string>
         {
             var userId = applicationContext.GetCurrentUserId();
             if (saveDto.Id.HasNotValue())
             {
                 saveDto.Id = IdGenerator.Generate<string>();
                 var entity = mapper.Map<TEntity>(saveDto);
-                if (entity is IEntityAudit<string> entityAudit)
+                if (entity is IAudit<string> entityAudit)
                 {
                     entityAudit.UpdateTime = DateTime.Now;
                     entityAudit.CreateTime = DateTime.Now;
@@ -94,7 +95,7 @@ namespace Snail.Web.Services
                     throw new Exception("要修改的实体不存在");
                 }
                 mapper.Map(saveDto, entity, typeof(TSaveDto), typeof(TEntity));
-                if (entity is IEntityAudit<string> entityAudit)
+                if (entity is IAudit<string> entityAudit)
                 {
                     entityAudit.UpdateTime = DateTime.Now;
                     entityAudit.CreateTime = DateTime.Now;
@@ -104,7 +105,6 @@ namespace Snail.Web.Services
                     }
                 }
             }
-
             db.SaveChanges();
         }
     }

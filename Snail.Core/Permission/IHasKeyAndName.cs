@@ -16,5 +16,9 @@ namespace Snail.Core.Permission
         /// </summary>
         /// <returns></returns>
         string GetName();
+        /// <summary>
+        /// 设置名
+        /// </summary>
+        void SetName(string name);
     }
 }

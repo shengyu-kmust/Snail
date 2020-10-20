@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +9,7 @@ using Snail.Common;
 using Snail.Core.Default;
 using Snail.Core.Interface;
 using Snail.Core.Permission;
-using SnaiWeb.Permission;
+using Snail.Permission.Entity;
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,14 +20,24 @@ namespace Snail.Permission
     {
 
         /// <summary>
+        /// 增加权限的默认实现
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void AddDefaultPermission(this IServiceCollection services, Action<PermissionOptions> action)
+        {
+            services.TryAddScoped<IPermission, DefaultPermission>();
+            services.TryAddScoped<IPermissionStore, DefaultPermissionStore>();
+            AddCorePermission(services, action);
+        }
+
+        /// <summary>
         /// 权限控制核心，即必须的配置
         /// </summary>
         /// <param name="services"></param>
         /// <param name="action"></param>
-        public static void AddPermission(this IServiceCollection services, Action<PermissionOptions> action)
+        public static void AddCorePermission(this IServiceCollection services, Action<PermissionOptions> action)
         {
-            services.TryAddScoped<IPermission, DefaultPermission>();
-            services.TryAddScoped<IPermissionStore, DefaultPermissionStore>();
             services.AddSingleton<IToken, Token>();
             #region 身份验证
             var permissionOption = new PermissionOptions();
@@ -130,6 +141,14 @@ namespace Snail.Permission
             services.AddHttpContextAccessor();
             services.Configure(action);
             #endregion
+        }
+
+        public static void AddPermission<TUser>(this IServiceCollection services, Action<PermissionOptions> action)
+         where TUser : class, IUser, new()
+        {
+            services.TryAddScoped<IPermission, DefaultPermission>();
+            services.TryAddScoped<IPermissionStore, BasePermissionStore<DbContext,TUser,PermissionDefaultRole,PermissionDefaultUserRole ,PermissionDefaultResource ,PermissionDefaultRoleResource >>();
+            AddCorePermission(services, action);
         }
 
     }

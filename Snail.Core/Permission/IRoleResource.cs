@@ -8,5 +8,7 @@ namespace Snail.Core.Permission
     {
         string GetRoleKey();
         string GetResourceKey();
+        void SetRoleKey(string roleKey);
+        void SetResourceKey(string resourceKey);
     }
 }

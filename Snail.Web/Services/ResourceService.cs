@@ -2,10 +2,11 @@
 
 namespace Snail.Web.Services
 {
-    public class ResourceService : BaseService<Resource>
+    public class ResourceService : BaseService<PermissionDefaultResource >
     {
         public ResourceService(ServiceContext serviceContext) : base(serviceContext)
         {
+            
         }
     }
 }

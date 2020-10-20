@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Snail.Core;
 using Snail.Core.Entity;
 
 namespace Snail.Web.EntityTypeConfiguration
@@ -13,11 +14,11 @@ namespace Snail.Web.EntityTypeConfiguration
                 builder.Property("Id").HasMaxLength(50);
                 builder.HasKey("Id");
             }
-            if (typeof(IEntitySoftDelete).IsAssignableFrom(typeof(TEntity)))
+            if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
             {
                 builder.Property("IsDeleted").HasConversion<int>();
             }
-            if (typeof(IEntityAudit<string>).IsAssignableFrom(typeof(TEntity)))
+            if (typeof(IAudit<string>).IsAssignableFrom(typeof(TEntity)))
             {
                 builder.Property("Creater").HasMaxLength(50);
                 builder.Property("Updater").HasMaxLength(50);

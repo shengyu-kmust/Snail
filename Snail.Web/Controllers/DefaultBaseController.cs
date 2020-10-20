@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Snail.Core.Interface;
 using Snail.Web;
 
@@ -17,13 +18,13 @@ namespace Snail.Web.Controllers
     [Authorize]
     public class DefaultBaseController : ControllerBase
     {
-        protected ControllerContext controllerContext;
+        protected SnailControllerContext controllerContext;
         protected IMapper mapper => controllerContext.mapper;
         protected IApplicationContext applicationContext => controllerContext.applicationContext;
-        protected BaseAppDbContext db => controllerContext.db;
+        protected DbContext db => controllerContext.db;
         protected IEntityCacheManager entityCacheManager => controllerContext.entityCacheManager;
         protected string currentUserId => controllerContext.applicationContext.GetCurrentUserId();
-        public DefaultBaseController(ControllerContext controllerContext)
+        public DefaultBaseController(SnailControllerContext controllerContext)
         {
             this.controllerContext = controllerContext;
         }

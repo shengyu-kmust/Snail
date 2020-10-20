@@ -1,5 +1,5 @@
-﻿using Snail.Core.Dto;
-using Snail.Core.Entity;
+﻿using Snail.Core;
+using Snail.Core.Dto;
 
 namespace Snail.Web.Dtos
 {

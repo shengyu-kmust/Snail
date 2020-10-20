@@ -16,12 +16,12 @@ namespace Snail.Web.Controllers
 
     [Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)]
     [Resource(Description = "角色管理")]
-    public class RoleController : DefaultBaseController, ICrudController<Role, RoleSaveDto, RoleResultDto, KeyQueryDto>
+    public class RoleController : DefaultBaseController, ICrudController<PermissionDefaultRole, RoleSaveDto, RoleResultDto, KeyQueryDto>
     {
         private IRoleService _service;
         private IPermissionStore _permissionStore;
         private IPermission _permission;
-        public RoleController(IRoleService service, ControllerContext controllerContext,IPermissionStore permissionStore, IPermission permission) : base(controllerContext)
+        public RoleController(IRoleService service, SnailControllerContext controllerContext,IPermissionStore permissionStore, IPermission permission) : base(controllerContext)
         {
             this.controllerContext = controllerContext;
             this._service = service;
@@ -32,7 +32,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public List<RoleResultDto> QueryList([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Role>().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord));
+            var pred = ExpressionExtensions.True<PermissionDefaultRole>().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord));
             return controllerContext.mapper.ProjectTo<RoleResultDto>(_service.QueryList(pred)).ToList();
         }
 
@@ -40,7 +40,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public IPageResult<RoleResultDto> QueryPage([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Role>().And(a=>!a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord));
+            var pred = ExpressionExtensions.True<PermissionDefaultRole>().And(a=>!a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord));
             return controllerContext.mapper.ProjectTo<RoleResultDto>(_service.QueryList(pred)).ToPageList(queryDto);
         }
         [Resource(Description ="查找单个")]

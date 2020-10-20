@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Snail.Permission.Entity
 {
     [Table("Role")]
-    public class Role : DefaultBaseEntity, IRole
+    public class PermissionDefaultRole : DefaultBaseEntity, IRole
     {
         public string Name { get; set; }
 
@@ -17,6 +17,11 @@ namespace Snail.Permission.Entity
         public string GetName()
         {
             return this.Name;
+        }
+
+        public void SetName(string name)
+        {
+            this.Name = name;
         }
     }
 }

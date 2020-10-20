@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DotNetCore.CAP;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Snail.Cache;
 using Snail.Core.Interface;
@@ -12,7 +13,7 @@ namespace Snail.Web.Services
     /// </summary>
     public class ServiceContext
     {
-        public BaseAppDbContext db;
+        public DbContext db;
         public IEntityCacheManager entityCacheManager;
         public IMapper mapper;
         public IApplicationContext applicationContext;
@@ -20,7 +21,7 @@ namespace Snail.Web.Services
         public ICapPublisher publisher;
         public IServiceProvider serviceProvider;
         public ISnailCache cache;
-        public ServiceContext(BaseAppDbContext db, IMapper mapper, IApplicationContext applicationContext, IEntityCacheManager entityCacheManager, IMemoryCache memoryCache, ICapPublisher publisher, IServiceProvider serviceProvider,ISnailCache cache)
+        public ServiceContext(DbContext db, IMapper mapper, IApplicationContext applicationContext, IEntityCacheManager entityCacheManager, IMemoryCache memoryCache, ICapPublisher publisher, IServiceProvider serviceProvider,ISnailCache cache)
         {
             this.mapper = mapper;
             this.db = db;

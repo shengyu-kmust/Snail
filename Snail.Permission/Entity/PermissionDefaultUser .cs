@@ -1,13 +1,12 @@
 ﻿using Snail.Core.Entity;
 using Snail.Core.Enum;
 using Snail.Core.Permission;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Permission.Entity
 {
-    public partial class User: DefaultBaseEntity, IUser
+    [Table("User")]
+    public partial class PermissionDefaultUser : DefaultBaseEntity, IUser
     {
         public string Account { get; set; }
         public string Name { get; set; }
@@ -36,6 +35,11 @@ namespace Snail.Permission.Entity
         public string GetPassword()
         {
             return Pwd;
+        }
+
+        public void SetName(string name)
+        {
+            this.Name = name;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Snail.Web.Controllers
     public class ConfigController : DefaultBaseController, ICrudController<Config, ConfigSaveDto, ConfigResultDto, KeyQueryDto>
     {
         private IConfigService _service;
-        public ConfigController(IConfigService service, ControllerContext controllerContext) : base(controllerContext)
+        public ConfigController(IConfigService service, SnailControllerContext controllerContext) : base(controllerContext)
         {
             this.controllerContext = controllerContext;
             this._service = service;

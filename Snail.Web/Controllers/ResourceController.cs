@@ -15,11 +15,11 @@ namespace Snail.Web.Controllers
 
     [Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)]
     [Resource(Description = "权限资源管理")]
-    public class ResourceController : DefaultBaseController, ICrudController<Resource, ResourceSaveDto, ResourceResultDto, KeyQueryDto>
+    public class ResourceController : DefaultBaseController, ICrudController<PermissionDefaultResource , ResourceSaveDto, ResourceResultDto, KeyQueryDto>
     {
         private ResourceService _service;
         private IPermissionStore _permissionStore;
-        public ResourceController(ResourceService service, ControllerContext controllerContext,IPermissionStore permissionStore, IPermission permission) : base(controllerContext)
+        public ResourceController(ResourceService service, SnailControllerContext controllerContext,IPermissionStore permissionStore, IPermission permission) : base(controllerContext)
         {
             this.controllerContext = controllerContext;
             this._service = service;
@@ -29,7 +29,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public List<ResourceResultDto> QueryList([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Resource>().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Code.Contains(queryDto.KeyWord));
+            var pred = ExpressionExtensions.True<PermissionDefaultResource >().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Code.Contains(queryDto.KeyWord));
             return controllerContext.mapper.ProjectTo<ResourceResultDto>(_service.QueryList(pred)).ToList();
         }
 
@@ -37,7 +37,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public IPageResult<ResourceResultDto> QueryPage([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Resource>().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Code.Contains(queryDto.KeyWord));
+            var pred = ExpressionExtensions.True<PermissionDefaultResource >().And(a => !a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Code.Contains(queryDto.KeyWord));
             return controllerContext.mapper.ProjectTo<ResourceResultDto>(_service.QueryList(pred)).ToPageList(queryDto);
         }
 
@@ -45,7 +45,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public List<ResourceTreeResultDto> QueryListTree([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Resource>().And(a=>!a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord));
+            var pred = ExpressionExtensions.True<PermissionDefaultResource >().And(a=>!a.IsDeleted).AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord));
             var list = controllerContext.mapper.ProjectTo<ResourceResultDto>(_service.QueryList(pred)).ToList();
             return list.Where(a=>!a.ParentId.HasValue()).Select(a => GetChildren(a, list)).ToList();
         }
