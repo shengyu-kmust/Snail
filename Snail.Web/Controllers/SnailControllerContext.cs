@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Snail.Core.Interface;
 using Snail.Web;
+using Snail.Web.Services;
 
 namespace Snail.Web.Controllers
 {
@@ -13,13 +14,15 @@ namespace Snail.Web.Controllers
         public IMapper mapper;
         public IApplicationContext applicationContext;
         public DbContext db;
+        public ServiceContext serviceContext;
         public IEntityCacheManager entityCacheManager;
-        public SnailControllerContext(IMapper mapper,IApplicationContext applicationContext, DbContext db, IEntityCacheManager entityCacheManager)
+        public SnailControllerContext(IMapper mapper,IApplicationContext applicationContext, DbContext db, IEntityCacheManager entityCacheManager, ServiceContext serviceContext)
         {
             this.mapper = mapper;
             this.applicationContext = applicationContext;
             this.db = db;
             this.entityCacheManager = entityCacheManager;
+            this.serviceContext = serviceContext;
         }
     }
 }

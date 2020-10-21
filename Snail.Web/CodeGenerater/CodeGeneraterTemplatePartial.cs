@@ -16,8 +16,7 @@ namespace Snail.Web.CodeGenerater
     }
     public partial class EntityConfigTemplate
     {
-        public string Name { get; set; }
-        public string TableName { get; set; }
+        public EntityModel Entity { get; set; }
     }
     public partial class EntityTemplate
     {

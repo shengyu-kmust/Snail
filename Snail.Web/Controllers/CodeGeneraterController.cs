@@ -51,6 +51,13 @@ namespace Snail.Web.Controllers
                 {
                     var dtoTemplate = new DtoTemplate();
                     dtoTemplate.Dto = new DtoModel { Name = entity.Name, Fields = preFix == "Query" ? new List<EntityFieldModel>() : entity.Fields, Prefix = preFix, BaseClass = preFix == "Query" ? "BasePagination,IDto" : "DefaultBaseDto" };
+                    dtoTemplate.Dto.Fields.ForEach(field =>
+                    {
+                        if (field.Type.StartsWith("E"))
+                        {
+                            field.Attributes = field.Attributes.Where(a => !a.Contains("MaxLength")).ToList();// dto的枚举过滤MaxLength特性
+                        }
+                    });
                     Directory.CreateDirectory($@"{dto.BasePath}\ApplicationCore\Dtos\{entity.Name}");
                     System.IO.File.WriteAllText($@"{dto.BasePath}\ApplicationCore\Dtos\{entity.Name}\{entity.Name}{preFix}Dto.cs", dtoTemplate.TransformText());
                 });
@@ -75,8 +82,7 @@ namespace Snail.Web.Controllers
             foreach (var entity in dto.Entities)
             {
                 var entityConfigTemplate = new EntityConfigTemplate();
-                entityConfigTemplate.Name = entity.Name;
-                entityConfigTemplate.TableName = entity.TableName;
+                entityConfigTemplate.Entity = entity;
                 Directory.CreateDirectory($@"{dto.BasePath}\Infrastructure\EntityTypeConfigurations");
                 System.IO.File.WriteAllText($@"{dto.BasePath}\Infrastructure\EntityTypeConfigurations\{entity.Name}Configuration.cs", entityConfigTemplate.TransformText());
             }

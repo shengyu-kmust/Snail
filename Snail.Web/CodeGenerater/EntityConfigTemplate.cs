@@ -30,21 +30,21 @@ namespace Snail.Web.CodeGenerater
                     "ion;\r\n\r\nnamespace Infrastructure.Data.Config\r\n{\r\n    public class ");
             
             #line 8 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
             #line hidden
             this.Write("Configuration : BaseConfiguration,IEntityTypeConfiguration<");
             
             #line 8 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
             #line hidden
             this.Write(">\r\n    {\r\n        public void Configure(EntityTypeBuilder<");
             
             #line 10 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
             #line hidden
@@ -52,11 +52,71 @@ namespace Snail.Web.CodeGenerater
                     "able(\"");
             
             #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(TableName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(Entity.TableName));
             
             #line default
             #line hidden
-            this.Write("\");\r\n        }\r\n    }\r\n}\r\n");
+            this.Write("\");\r\n");
+            
+            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+
+    foreach(var item in Entity.Fields){
+
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 18 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+ if(item.Type=="List<string>"){ 
+            
+            #line default
+            #line hidden
+            this.Write("            builder.Property(a => a.");
+            
+            #line 19 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
+            
+            #line default
+            #line hidden
+            this.Write(").HasConversion(StringSplitConverter.DefaultConverter);\r\n");
+            
+            #line 20 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+ if(item.Type.StartsWith("E")){ 
+            
+            #line default
+            #line hidden
+            this.Write("            builder.Property(a => a.");
+            
+            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
+            
+            #line default
+            #line hidden
+            this.Write(").HasConversion<string>();\r\n");
+            
+            #line 24 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 26 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+
+    }
+
+            
+            #line default
+            #line hidden
+            this.Write("        }\r\n    }\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

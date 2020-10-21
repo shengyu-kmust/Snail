@@ -5,12 +5,27 @@ using Snail.Web.EntityTypeConfiguration;
 
 namespace Infrastructure.Data.Config
 {
-    public class <#=Name #>Configuration : BaseConfiguration,IEntityTypeConfiguration<<#=Name #>>
+    public class <#=Entity.Name #>Configuration : BaseConfiguration,IEntityTypeConfiguration<<#=Entity.Name #>>
     {
-        public void Configure(EntityTypeBuilder<<#=Name #>> builder)
+        public void Configure(EntityTypeBuilder<<#=Entity.Name #>> builder)
         {
             base.Config(builder);
-            builder.ToTable("<#=TableName #>");
+            builder.ToTable("<#=Entity.TableName #>");
+<#
+    foreach(var item in Entity.Fields){
+#>
+
+<# if(item.Type=="List<string>"){ #>
+            builder.Property(a => a.<#=item.Name#>).HasConversion(StringSplitConverter.DefaultConverter);
+<# } #>
+
+<# if(item.Type.StartsWith("E")){ #>
+            builder.Property(a => a.<#=item.Name#>).HasConversion<string>();
+<# } #>
+
+<#
+    }
+#>
         }
     }
 }

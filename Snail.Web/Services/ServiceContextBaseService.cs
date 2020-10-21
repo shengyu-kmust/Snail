@@ -9,7 +9,7 @@ using Snail.Core.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Collections.Concurrent;
 namespace Snail.Web.Services
 {
     public abstract class ServiceContextBaseService : IService
@@ -24,6 +24,7 @@ namespace Snail.Web.Services
         public ISnailCache cache => serviceContext.cache;
         public IServiceProvider serviceProvider => serviceContext.serviceProvider;
         public ServiceContext serviceContext;
+  
         protected ServiceContextBaseService(ServiceContext serviceContext)
         {
             this.serviceContext = serviceContext;
@@ -38,20 +39,19 @@ namespace Snail.Web.Services
         public List<TEntityCache> GetEntityCache<TEntity, TEntityCache>()
          where TEntity : class, IEntity
         {
-            return cache.GetOrSet<List<TEntityCache>>(GetEntityCacheKey<TEntity, TEntityCache>(), key =>
-            {
-                return mapper.ProjectTo<TEntityCache>(db.Set<TEntity>().AsNoTracking()).ToList();
-            }, null);
+            return serviceContext.GetEntityCache<TEntity, TEntityCache>();
         }
 
         public void ClearEntityCache<TEntity, TEntityCache>()
         {
-            cache.Remove(GetEntityCacheKey<TEntity, TEntityCache>());
+            serviceContext.ClearEntityCache<TEntity, TEntityCache>();
+
         }
 
-        public string GetEntityCacheKey<TEntity, TEntityCache>()
+        public void ClearAllEntityCache()
         {
-            return $"cacheService_{typeof(TEntity).Name}_{typeof(TEntityCache).Name}";
+            serviceContext.ClearAllEntityCache();
+
         }
     }
 }

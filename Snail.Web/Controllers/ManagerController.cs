@@ -25,6 +25,7 @@ namespace Snail.Web.Controllers
         public void RefreashAllEntityCache()
         {
             entityCacheManager.RefreashAllEntityCache();
+            controllerContext.serviceContext.ClearAllEntityCache();
         }
 
 
