@@ -19,6 +19,7 @@ using Snail.Cache;
 using Snail.Core;
 using Snail.Core.Default;
 using Snail.Core.Interface;
+using Snail.Core.Permission;
 using Snail.FileStore;
 using Snail.Office;
 using Snail.Permission;
@@ -34,10 +35,10 @@ namespace Snail.Web
 {
     public static class SnailWebConfigureServicesExtenssions
     {
-       
-
-        public static IServiceCollection ConfigSnailWebServices<TDbContext>(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+        public static IServiceCollection ConfigSnailWebServices<TDbContext, TUser>(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
           where TDbContext : DbContext
+          where TUser : class, IUser, new()
+
         {
             #region option配置
             services.ConfigAllOption(configuration);
@@ -99,10 +100,10 @@ namespace Snail.Web
             #endregion
 
             #region 增加通用权限
-            services.AddDefaultPermission(options =>
+            services.AddPermission<TDbContext, TUser>(options =>
             {
                 configuration.GetSection("PermissionOptions").Bind(options);
-                options.ResourceAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };// 从哪些程序集里，将Controller的action设置成权限资源
+                options.ResourceAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();// 从哪些程序集里，将Controller的action设置成权限资源
             });
             #endregion
 
@@ -249,8 +250,6 @@ namespace Snail.Web
             });
             #endregion
 
-
-
             #region profiler
             //开发环境时，打开分析工具
             if (environment.IsDevelopment())
@@ -261,8 +260,6 @@ namespace Snail.Web
                 services.AddMiniProfiler(options => { options.RouteBasePath = "/profiler"; }).AddEntityFramework();
             }
             #endregion
-
-
 
             #region 增加cap
             services.TryAddSingleton<IConsumerServiceSelector, SnailCapConsumerServiceSelector>();//默认的ConsumerServiceSelector实现不支持和autofac的完美结合，默认的实现的用法，是需用microsoft di进行服务注册后再调用service.AddCap。但用autofac后，所有的服务注册是在autofac里，即在下面的ConfigureContainer里，为了让cap知道事件和事件的处理方法，重写IConsumerServiceSelector的实现，SnailCapConsumerServiceSelector
@@ -280,8 +277,6 @@ namespace Snail.Web
             #endregion
 
             services.AddCors();
-
-
 
             return services;
         }

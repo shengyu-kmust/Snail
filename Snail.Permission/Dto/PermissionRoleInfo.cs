@@ -1,11 +1,9 @@
-﻿using Snail.Core.Permission;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Snail.Core;
+using Snail.Core.Permission;
 
 namespace Snail.Permission.Dto
 {
-    public class PermissionRoleInfo:IRole
+    public class PermissionRoleInfo:IRole, IIdField<string>
     {
         public string Id { get; set; }
         public string Name { get; set; }
@@ -18,6 +16,11 @@ namespace Snail.Permission.Dto
         public string GetName()
         {
             return Name;
+        }
+
+        public void SetKey(string key)
+        {
+            this.Id = key;
         }
 
         public void SetName(string name)

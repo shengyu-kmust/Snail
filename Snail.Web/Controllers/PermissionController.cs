@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Snail.Common.Extenssions;
 using Snail.Core.Attributes;
 using Snail.Core.Permission;
@@ -33,7 +34,7 @@ namespace Snail.Web.Controllers
 
         #region 查询权限数据
         [HttpGet, Resource(Description = "查询所有用户")]
-        public List<PermissionUserInfo> GetAllPermissionUserInfo()
+        public List<PermissionUserInfo> GetAllUserInfo()
         {
             return _permissionStore.GetAllUser().Select(a => new PermissionUserInfo
             {
@@ -101,12 +102,27 @@ namespace Snail.Web.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public Snail.Core.Permission.UserInfo GetUserInfo(string token)
+        public UserInfo GetUserInfo(string token)
         {
             var claims=_token.ResolveFromToken(token);
             return _permission.GetUserInfo(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, PermissionConstant.userIdClaim, PermissionConstant.roleIdsClaim)));
         }
 
+
+        [AllowAnonymous]
+        [HttpGet]
+        public UserInfo GetCurrentLoginUserInfo()
+        {
+            if(HttpContext.Request.Headers.TryGetValue("Authorization",out StringValues values))
+            {
+                var token = (values.FirstOrDefault() ?? "").Replace("Bearer ", "");
+                return GetUserInfo(token);
+            }
+            else
+            {
+                return _permission.GetUserInfo(new ClaimsPrincipal(new ClaimsIdentity(HttpContext.User.Claims, CookieAuthenticationDefaults.AuthenticationScheme, PermissionConstant.userIdClaim, PermissionConstant.roleIdsClaim)));
+            }
+        }
         /// <summary>
         /// 获取所有的资源以及资源角色的对应关系信息
         /// </summary>
@@ -117,6 +133,11 @@ namespace Snail.Web.Controllers
             return _permission.GetAllResourceRoles();
         }
 
+        [HttpGet, AllowAnonymous]
+        public virtual List<ResourceRoleInfo> GetOwnedResourceRoles(string userKey)
+        {
+            return _permission.GetOwnedResourceRoles(userKey);
+        }
         /// <summary>
         /// 初始化权限资源
         /// </summary>
@@ -159,7 +180,7 @@ namespace Snail.Web.Controllers
         /// </summary>
         /// <param name="role"></param>
         [HttpPost, Resource(Description = "保存角色")]
-        public void SaveRole(IRole role)
+        public void SaveRole(PermissionRoleInfo role)
         {
             _permissionStore.SaveRole(role);
         }

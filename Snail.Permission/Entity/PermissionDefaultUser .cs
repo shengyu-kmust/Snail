@@ -37,9 +37,24 @@ namespace Snail.Permission.Entity
             return Pwd;
         }
 
+        public void SetAccount(string account)
+        {
+            this.Account = account;
+        }
+
+        public void SetKey(string key)
+        {
+            this.Id = key;
+        }
+
         public void SetName(string name)
         {
             this.Name = name;
+        }
+
+        public void SetPassword(string pwd)
+        {
+            this.Pwd = pwd;
         }
     }
 }

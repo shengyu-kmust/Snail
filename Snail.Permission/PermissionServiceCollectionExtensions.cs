@@ -20,7 +20,7 @@ namespace Snail.Permission
     {
 
         /// <summary>
-        /// 增加权限的默认实现
+        /// 增加权限的默认实现，即默认的权限实现为DefaultPermission和DefaultPermissionStore
         /// </summary>
         /// <param name="services"></param>
         /// <param name="action"></param>
@@ -51,7 +51,7 @@ namespace Snail.Permission
                        //下面的委托方法只会在第一次cookie验证时调用，调用时会用到上面的permissionOption变量，但其实permissionOption变量是在以前已经初始化的，所以在此方法调用之前，permissionOption变量不会被释放
                        options.Cookie.Name = "auth";
                        options.AccessDeniedPath = permissionOption.AccessDeniedPath;// 当403时，返回到无授权界面
-                       options.LoginPath = permissionOption.LoginPath;// 当401时，返回到登录界面
+                       options.LoginPath = permissionOption.LoginPath;// 当401时，返回到登录界面，会自动在url后加上returnUrl=xxx
                        options.ExpireTimeSpan = permissionOption.ExpireTimeSpan != default ? permissionOption.ExpireTimeSpan : new TimeSpan(12, 0, 0);
                        options.ForwardDefaultSelector = context =>
                        {
@@ -143,13 +143,44 @@ namespace Snail.Permission
             #endregion
         }
 
-        public static void AddPermission<TUser>(this IServiceCollection services, Action<PermissionOptions> action)
-         where TUser : class, IUser, new()
+        /// <summary>
+        /// 自定义用户表，其它的表用默认的表
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void AddPermission<TDbContext,TUser>(this IServiceCollection services, Action<PermissionOptions> action)
+            where TDbContext : DbContext
+            where TUser : class, IUser, new()
+        {
+            AddPermission<TDbContext,TUser,PermissionDefaultRole,PermissionDefaultUserRole,PermissionDefaultResource,PermissionDefaultRoleResource>(services, action);
+        }
+
+        /// <summary>
+        /// 自定义权限表的权限功能注册
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TRole"></typeparam>
+        /// <typeparam name="TUserRole"></typeparam>
+        /// <typeparam name="TResource"></typeparam>
+        /// <typeparam name="TRoleResource"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services, Action<PermissionOptions> action)
+            where TDbContext : DbContext
+            where TUser : class, IUser, new()
+            where TRole : class, IRole, new()
+            where TUserRole : class, IUserRole, new()
+            where TResource : class, IResource, new()
+            where TRoleResource : class, IRoleResource, new()
         {
             services.TryAddScoped<IPermission, DefaultPermission>();
-            services.TryAddScoped<IPermissionStore, BasePermissionStore<DbContext,TUser,PermissionDefaultRole,PermissionDefaultUserRole ,PermissionDefaultResource ,PermissionDefaultRoleResource >>();
+            services.TryAddScoped<IPermissionStore, BasePermissionStore<TDbContext, TUser, PermissionDefaultRole, PermissionDefaultUserRole, PermissionDefaultResource, PermissionDefaultRoleResource>>();
             AddCorePermission(services, action);
         }
+
 
     }
 }

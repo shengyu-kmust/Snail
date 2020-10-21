@@ -24,6 +24,11 @@ namespace Snail.Permission.Entity
             return this.Name;
         }
 
+        public void SetKey(string key)
+        {
+            this.Id = key;
+        }
+
         public void SetName(string name)
         {
             this.Name = name;

@@ -109,7 +109,7 @@ namespace Snail.Permission
         /// </summary>
         public override void InitResource()
         {
-            var resources = new List<PermissionDefaultResource >();
+            var resources = new List<PermissionDefaultResource>();
             if (PermissionOptions.ResourceAssemblies == null)
             {
                 PermissionOptions.ResourceAssemblies = new List<Assembly>();
@@ -185,8 +185,14 @@ namespace Snail.Permission
                         item.ParentId = matchPa.GetKey();
                     }
                 }
-                _permissionStore.SaveResource(item);
             });
+            var resourceList = new List<IResource>();
+            resources.ForEach(resource =>
+            {
+                resourceList.Add(resource);
+            });
+            _permissionStore.SaveResources(resourceList);
+
         }
 
         private bool IsSuperAdmin(string userKey)

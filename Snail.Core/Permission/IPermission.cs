@@ -58,6 +58,12 @@ namespace Snail.Core.Permission
         /// </remarks>
         List<ResourceRoleInfo> GetAllResourceRoles();
 
+        /// <summary>
+        /// 获取人员所拥有的资源以及资源角色的对应关系信息，即未拥有的资源，用户不能进行查询和授权操作
+        /// </summary>
+        /// <returns></returns>
+        List<ResourceRoleInfo> GetOwnedResourceRoles(string userKey);
+
 
         /// <summary>
         /// 通过userInfo生成Claims，Claims会用于生成token

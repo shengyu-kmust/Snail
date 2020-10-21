@@ -65,6 +65,11 @@ namespace Snail.Core.Permission
         /// <param name="resource"></param>
         void SaveResource(IResource resource);
         /// <summary>
+        /// 批量保存资源
+        /// </summary>
+        /// <param name="resource"></param>
+        void SaveResources(List<IResource> resources);
+        /// <summary>
         /// 删除资源
         /// </summary>
         /// <param name="resourceKey"></param>

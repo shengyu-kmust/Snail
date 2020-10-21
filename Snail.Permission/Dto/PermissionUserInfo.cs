@@ -1,12 +1,9 @@
-﻿using Snail.Core.Enum;
+﻿using Snail.Core;
 using Snail.Core.Permission;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Snail.Permission.Dto
 {
-    public class PermissionUserInfo:IUser
+    public class PermissionUserInfo:IUser, IIdField<string>
     {
         public string Id { get; set; }
         public string Account { get; set; }
@@ -33,9 +30,24 @@ namespace Snail.Permission.Dto
             return Pwd;
         }
 
+        public void SetAccount(string account)
+        {
+            this.Account = account;
+        }
+
+        public void SetKey(string key)
+        {
+            this.Id = key;
+        }
+
         public void SetName(string name)
         {
             this.Name = name;
+        }
+
+        public void SetPassword(string pwd)
+        {
+            this.Pwd = pwd;
         }
     }
 }

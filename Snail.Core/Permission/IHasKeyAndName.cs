@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Snail.Core.Permission
+﻿namespace Snail.Core.Permission
 {
     public interface IHasKeyAndName
     {
@@ -20,5 +16,6 @@ namespace Snail.Core.Permission
         /// 设置名
         /// </summary>
         void SetName(string name);
+        void SetKey(string key);
     }
 }

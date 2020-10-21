@@ -104,7 +104,16 @@ namespace Snail.Core.Permission
             {
                 _db.Set<TRole>().Remove(roleEntity);
             }
-            _db.SaveChanges();
+            //roleUser
+            _db.Set<TUserRole>().AsEnumerable().Where(a => a.GetRoleKey() == roleKey).ToList().ForEach(userRole =>
+            {
+                _db.Remove(userRole);
+            });
+            //roleResource
+            _db.Set<TRoleResource>().AsEnumerable().Where(a => a.GetRoleKey() == roleKey).ToList().ForEach(roleResource =>
+            {
+                _db.Remove(roleResource);
+            });
             _memoryCache.Remove(roleCacheKey);
 
         }
@@ -121,6 +130,13 @@ namespace Snail.Core.Permission
             {
                 _db.Set<TUser>().Remove(userEntity);
             }
+
+            //roleUser
+            _db.Set<TUserRole>().AsEnumerable().Where(a => a.GetUserKey() == userKey).ToList().ForEach(userRole =>
+            {
+                _db.Remove(userRole);
+            });
+
             _db.SaveChanges();
             _memoryCache.Remove(userCacheKey);
         }
@@ -131,8 +147,15 @@ namespace Snail.Core.Permission
             if (resourceEntity != null)
             {
                 _db.Remove(resourceEntity);//资源为真删
-                _db.SaveChanges();
             }
+
+            //roleResource
+            _db.Set<TRoleResource>().AsEnumerable().Where(a => a.GetResourceKey() == resourceKey).ToList().ForEach(roleResource =>
+            {
+                _db.Remove(roleResource);
+            });
+            _db.SaveChanges();
+
             _memoryCache.Remove(resourceCacheKey);
         }
 
@@ -143,7 +166,8 @@ namespace Snail.Core.Permission
         public virtual void SaveResource(IResource resource)
         {
             var resourceKey = resource.GetKey();
-            var resourceEntity = _db.Set<TResource>().FirstOrDefault(a => a.GetKey() == resourceKey || a.GetResourceCode() == resource.GetResourceCode());
+            // todo 全表查询了
+            var resourceEntity = _db.Set<TResource>().AsEnumerable().FirstOrDefault(a => a.GetKey() == resourceKey || a.GetResourceCode() == resource.GetResourceCode());
             if (resourceEntity == null)
             {
                 //add
@@ -159,6 +183,37 @@ namespace Snail.Core.Permission
             _db.SaveChanges();
             _memoryCache.Remove(resourceCacheKey);
         }
+        /// <summary>
+        /// 保存资源。会从资源id和资源code两字段考虑是新增还是修改
+        /// </summary>
+        /// <param name="resource"></param>
+        public virtual void SaveResources(List<IResource> resources)
+        {
+            var allResources = _db.Set<TResource>().ToList();
+            resources.ForEach(resource =>
+            {
+                var resourceKey = resource.GetKey();
+                var resourceEntity = allResources.FirstOrDefault(a => a.GetKey() == resourceKey || a.GetResourceCode() == resource.GetResourceCode());
+
+                if (resourceEntity == null)
+                {
+                    //add
+                    var addDto = new TResource();
+                    EasyMap.Map(resource.GetType(), typeof(TResource), resource, addDto, null);
+                    _db.Add(addDto);
+                }
+                else
+                {
+                    EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
+                }
+                SetAuditSoftDelete(resourceEntity);
+            });
+        
+            _db.SaveChanges();
+            _memoryCache.Remove(resourceCacheKey);
+        }
+
+
 
         public virtual void UpdateRoleEntityByDto(IRole entity, IRole dto, bool isAdd)
         {
@@ -192,26 +247,28 @@ namespace Snail.Core.Permission
 
         public virtual void SaveUser(IUser user)
         {
-            var userKey = user.GetKey();
-            if (string.IsNullOrEmpty(userKey))
+            TUser saveUser;
+            if (string.IsNullOrEmpty(user.GetKey()))
             {
-                var addUser = new TUser();
-                UpdateUserEntityByDto(addUser, user, true);
-                _db.Add(addUser);
+                saveUser = new TUser();
+                UpdateUserEntityByDto(saveUser, user, true);
+                _db.Add(saveUser);
             }
             else
             {
-                var editRole = _db.Set<TUser>().Find(user.GetKey());
-                UpdateUserEntityByDto(editRole, user, false);
+                saveUser = _db.Set<TUser>().Find(user.GetKey());
+                UpdateUserEntityByDto(saveUser, user, false);
             }
+            saveUser.SetName(user.GetName());
+            saveUser.SetAccount(user.GetAccount());
+            saveUser.SetPassword(user.GetPassword());
             _db.SaveChanges();
             _memoryCache.Remove(userCacheKey);
         }
 
         public virtual void SetRoleResources(string roleKey, List<string> resourceKeys)
         {
-            var userId = _applicationContext.GetCurrentUserId();
-            var allRoleResources = _db.Set<TRoleResource>().AsNoTracking().Where(a => a.GetRoleKey() == roleKey).ToList(); // 这个是否为全表查询
+            var allRoleResources = _db.Set<TRoleResource>().AsNoTracking().ToList().Where(a => a.GetRoleKey() == roleKey).ToList(); // 这个是否为全表查询
             var allResources = _db.Set<TResource>().AsNoTracking().ToList();
 
             // 删除角色权限
@@ -229,6 +286,7 @@ namespace Snail.Core.Permission
                     SetAuditSoftDelete(addRoleResource);
                     addRoleResource.SetRoleKey(roleKey);
                     addRoleResource.SetResourceKey(resourceKey);
+                    _db.Add(addRoleResource);
                 }
             });
             _db.SaveChanges();
@@ -237,8 +295,8 @@ namespace Snail.Core.Permission
 
         public virtual void SetUserRoles(string userKey, List<string> roleKeys)
         {
-            var userId = _applicationContext.GetCurrentUserId();
-            var allUserRoles = _db.Set<TUserRole>().AsNoTracking().Where(a => a.GetUserKey() == userKey).ToList();
+            // todo 全表查了
+            var allUserRoles = _db.Set<TUserRole>().AsEnumerable().Where(a => a.GetUserKey() == userKey).ToList();
             var allRole = _db.Set<TRole>().AsNoTracking().ToList();
             allUserRoles.Where(a => !roleKeys.Contains(a.GetRoleKey())).ToList().ForEach(a =>
             {
@@ -252,6 +310,7 @@ namespace Snail.Core.Permission
                     SetAuditSoftDelete(addItem);
                     addItem.SetRoleKey(roleKey);
                     addItem.SetUserKey(userKey);
+                    _db.Add(addItem);
                 }
 
             });
@@ -262,12 +321,9 @@ namespace Snail.Core.Permission
         private void SetAuditSoftDelete(object obj)
         {
             var userId = _applicationContext.GetCurrentUserId();
-            if (obj is IIdField<string> entityOfIdField)
+            if (obj is IIdField<string> entityOfIdField && string.IsNullOrEmpty(entityOfIdField.Id))
             {
-                if (!string.IsNullOrEmpty(entityOfIdField.Id))
-                {
-                    entityOfIdField.Id = IdGenerator.Generate<string>();
-                }
+                entityOfIdField.Id = IdGenerator.Generate<string>();
             }
             if (obj is IAudit<string> entityOfAudit)
             {

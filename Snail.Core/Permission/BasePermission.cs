@@ -99,7 +99,6 @@ namespace Snail.Core.Permission
         {
             var result = new List<ResourceRoleInfo>();
             var allResource = _permissionStore.GetAllResource();
-            var allRole = _permissionStore.GetAllRole();
             var allRoleResource = _permissionStore.GetAllRoleResource();
             allResource.ForEach(resource =>
             {
@@ -114,6 +113,13 @@ namespace Snail.Core.Permission
             });
             return result;
         }
+        public virtual List<ResourceRoleInfo> GetOwnedResourceRoles(string userKey)
+        {
+            var allResourceRoleInfo = GetAllResourceRoles();
+            var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a=>a.GetRoleKey()).ToList();
+            return allResourceRoleInfo.Where(a => userRoleKeys.Intersect(a.RoleKeys).Any()).ToList();
+        }
+        
         public virtual List<Claim> GetClaims(IUserInfo userInfo)
         {
             return new List<Claim>
