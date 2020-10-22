@@ -8,7 +8,7 @@ using Snail.Web;
 namespace Snail.Web.Controllers
 {
     /// <summary>
-    /// 所有contoller继承此类
+    /// 所有contoller继承此类re
     /// </summary>
     /// <remarks>
     /// 如果没有AuthorizeAttribute，HttpContext.User不会有用户

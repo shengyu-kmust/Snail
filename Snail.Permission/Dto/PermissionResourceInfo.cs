@@ -1,12 +1,19 @@
-﻿using Snail.Core.Entity;
+﻿using Snail.Core;
 using Snail.Core.Permission;
-using System.ComponentModel.DataAnnotations.Schema;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Snail.Permission.Entity
+namespace Snail.Permission.Dto
 {
-    [Table("Resource")]
-    public class PermissionDefaultResource : DefaultBaseEntity, IResource
+
+    public class PermissionResourceInfo :IResource, IIdField<string>
     {
+        /// <summary>
+        /// 资源id
+        /// </summary>
+        public string Id { get; set; }
+
         /// <summary>
         /// 资源键，如接口名，菜单名，唯一键
         /// </summary>
@@ -22,31 +29,32 @@ namespace Snail.Permission.Entity
 
         public string GetKey()
         {
-            return this.Id;
+            return Id;
         }
 
         public string GetName()
         {
-            return this.Name;
+            return Name;
+        }
+
+        public string GetParentKey()
+        {
+            return ParentId;
         }
 
         public string GetResourceCode()
         {
-            return this.Code;
+            return Code;
         }
 
-        public void SetName(string name)
-        {
-            this.Name = name;
-        }
         public void SetKey(string key)
         {
             this.Id = key;
         }
 
-        public string GetParentKey()
+        public void SetName(string name)
         {
-            return this.ParentId;
+            this.Name = name;
         }
 
         public void SetParentKey(string parentKey)

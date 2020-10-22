@@ -24,6 +24,11 @@ namespace Snail.Permission.Entity
             return this.Name;
         }
 
+        public string GetParentKey()
+        {
+            return this.ParentId;
+        }
+
         public void SetKey(string key)
         {
             this.Id = key;
@@ -32,6 +37,11 @@ namespace Snail.Permission.Entity
         public void SetName(string name)
         {
             this.Name = name;
+        }
+
+        public void SetParentKey(string parentKey)
+        {
+            this.ParentId = parentKey;
         }
     }
 }

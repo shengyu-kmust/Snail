@@ -104,6 +104,7 @@ namespace Snail.Web.Controllers
         }
         #endregion
 
+        #region 获取用户信息
         /// <summary>
         /// 根据token获取用户信息
         /// </summary>
@@ -113,7 +114,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public UserInfo GetUserInfo(string token)
         {
-            var claims=_token.ResolveFromToken(token);
+            var claims = _token.ResolveFromToken(token);
             return _permission.GetUserInfo(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, PermissionConstant.userIdClaim, PermissionConstant.roleIdsClaim)));
         }
 
@@ -125,7 +126,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public UserInfo GetCurrentLoginUserInfo()
         {
-            if(HttpContext.Request.Headers.TryGetValue("Authorization",out StringValues values))
+            if (HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues values))
             {
                 var token = (values.FirstOrDefault() ?? "").Replace("Bearer ", "");
                 return GetUserInfo(token);
@@ -135,6 +136,8 @@ namespace Snail.Web.Controllers
                 return _permission.GetUserInfo(new ClaimsPrincipal(new ClaimsIdentity(HttpContext.User.Claims, CookieAuthenticationDefaults.AuthenticationScheme, PermissionConstant.userIdClaim, PermissionConstant.roleIdsClaim)));
             }
         }
+        #endregion
+
         /// <summary>
         /// 获取所有的资源以及资源角色的对应关系信息
         /// </summary>
@@ -150,6 +153,8 @@ namespace Snail.Web.Controllers
         {
             return _permission.GetOwnedResourceRoles(userKey);
         }
+
+
         /// <summary>
         /// 初始化权限资源
         /// </summary>
@@ -158,6 +163,45 @@ namespace Snail.Web.Controllers
         {
             _permission.InitResource();
         }
+
+        [Resource(Description = "保存资源")]
+        [HttpPost]
+        public void Save(PermissionResourceInfo saveDto)
+        {
+            _permissionStore.SaveResource(saveDto);
+            _permissionStore.ReloadPemissionDatas();
+        }
+
+        [HttpPost, Resource(Description = "删除资源")]
+        public void Remove(List<string> ids)
+        {
+            ids.ForEach(id =>
+            {
+                _permissionStore.RemoveResource(id);
+            });
+            _permissionStore.ReloadPemissionDatas();
+        }
+        
+        [HttpGet, Resource(Description = "查询资源树")]
+        public List<PermissionResourceTreeInfo> QueryListTree()
+        {
+            var allResources= _permissionStore.GetAllResource().Select(a => new PermissionResourceInfo { Code = a.GetResourceCode(), Id = a.GetKey(), Name = a.GetName(), ParentId = a.GetParentKey()}).ToList();
+            return allResources.Where(a => !a.ParentId.HasValue()).Select(a => GetChildren(a, allResources)).ToList();
+        }
+
+        private PermissionResourceTreeInfo GetChildren(PermissionResourceInfo parent, List<PermissionResourceInfo> dtos)
+        {
+            return new PermissionResourceTreeInfo
+            {
+                Id = parent.Id,
+                Code = parent.Code,
+                Name = parent.Name,
+                ParentId = parent.ParentId,
+                Children = dtos.Where(a => a.ParentId == parent.Id).Select(a => GetChildren(a, dtos)).ToList()
+            };
+        }
+
+
 
         /// <summary>
         /// 用于权限的用户基本数据保存，请开发新接口以支持应用的用户保存逻辑
@@ -180,11 +224,13 @@ namespace Snail.Web.Controllers
                 }
             }
             _permissionStore.SaveUser(user);
+            _permissionStore.ReloadPemissionDatas();
         }
         [HttpPost, Resource(Description = "删除用户")]
         public void RemoveUser(string userKey)
         {
             _permissionStore.RemoveUser(userKey);
+            _permissionStore.ReloadPemissionDatas();
         }
 
         /// <summary>
@@ -195,23 +241,27 @@ namespace Snail.Web.Controllers
         public void SaveRole(PermissionRoleInfo role)
         {
             _permissionStore.SaveRole(role);
+            _permissionStore.ReloadPemissionDatas(); // todo ReloadPemissionDatas是否太重了
         }
 
         [HttpPost, Resource(Description = "删除角色")]
         public void RemoveRole(string roleKey)
         {
             _permissionStore.RemoveRole(roleKey);
+            _permissionStore.ReloadPemissionDatas();
         }
 
         [HttpPost, Resource(Description = "用户授予角色")]
         public void SetUserRoles(PermissionUserRoleInfo dto)
         {
             _permissionStore.SetUserRoles(dto.UserKey, dto.RoleKeys);
+            _permissionStore.ReloadPemissionDatas();
         }
         [HttpPost, Resource(Description = "角色授予资源")]
         public void SetRoleResources(PermissionRoleResourceInfo dto)
         {
             _permissionStore.SetRoleResources(dto.RoleKey, dto.ResourceKeys);
+            _permissionStore.ReloadPemissionDatas();
         }
 
     }

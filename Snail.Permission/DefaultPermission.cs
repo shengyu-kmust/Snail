@@ -109,7 +109,7 @@ namespace Snail.Permission
         /// </summary>
         public override void InitResource()
         {
-            var resources = new List<PermissionDefaultResource>();
+            var resources = new List<IResource>();
             if (PermissionOptions.ResourceAssemblies == null)
             {
                 PermissionOptions.ResourceAssemblies = new List<Assembly>();
@@ -156,17 +156,17 @@ namespace Snail.Permission
                     });
                 });
             });
+           
             resources.ForEach(item =>
             {
                 var temp = new PermissionDefaultResource 
                 {
-                    Id = item.Id,
-                    Code = item.Code,
+                    Id = item.GetKey(),
+                    Code = item.GetResourceCode(),
                     CreateTime = DateTime.Now,
                     IsDeleted = false,
-                    Name = item.Name,
-                    ParentId = item.ParentId,
-                    UpdateTime = DateTime.Now
+                    Name = item.GetName(),
+                    ParentId = item.GetParentKey()
                 };
                 // 设置资源的id
                 var matchRs = existResources.FirstOrDefault(i => i.GetResourceCode() == temp.Code);
@@ -178,11 +178,11 @@ namespace Snail.Permission
                 // 设置资源的父id
                 if (!string.IsNullOrEmpty(temp.ParentId))
                 {
-                    var pa = resources.FirstOrDefault(a => a.Id == temp.ParentId);
-                    var matchPa = existResources.FirstOrDefault(i => i.GetResourceCode() == pa?.Code);
+                    var pa = resources.FirstOrDefault(a => a.GetKey() == temp.ParentId);
+                    var matchPa = existResources.FirstOrDefault(i => i.GetResourceCode() == pa?.GetResourceCode());
                     if (matchPa != null)
                     {
-                        item.ParentId = matchPa.GetKey();
+                        item.SetParentKey(matchPa.GetKey());
                     }
                 }
             });
