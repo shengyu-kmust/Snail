@@ -8,22 +8,23 @@ using Snail.Core.Attributes;
 using Snail.Core.Permission;
 using Snail.Permission;
 using Snail.Permission.Dto;
-using Snail.Permission.Entity;
-using Snail.Web.Dtos;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
 namespace Snail.Web.Controllers
 {
+    [ApiController]
     [Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)]
     [Resource(Description = "权限管理")]
-    public class PermissionController : DefaultBaseController
+    [Route("api/[Controller]/[Action]")]
+    public class PermissionController : ControllerBase
+
     {
         private IPermission _permission;
         private IPermissionStore _permissionStore;
         private IToken _token;
-        public PermissionController(IPermission permission, IPermissionStore permissionStore, SnailControllerContext controllerContext, IToken token):base(controllerContext)
+        public PermissionController(IPermission permission, IPermissionStore permissionStore,IToken token)
         {
             _permission = permission;
             _permissionStore = permissionStore;
@@ -78,7 +79,7 @@ namespace Snail.Web.Controllers
 
         #region 登录注销
         /// <summary>
-        /// 获取token
+        /// 登录并获取token
         /// </summary>
         /// <returns></returns>
         [HttpPost, AllowAnonymous]
@@ -93,6 +94,9 @@ namespace Snail.Web.Controllers
             return result;
         }
 
+        /// <summary>
+        /// 注销
+        /// </summary>
         [HttpPost, AllowAnonymous]
         public void Logout()
         {
@@ -100,6 +104,11 @@ namespace Snail.Web.Controllers
         }
         #endregion
 
+        /// <summary>
+        /// 根据token获取用户信息
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         public UserInfo GetUserInfo(string token)
@@ -108,7 +117,10 @@ namespace Snail.Web.Controllers
             return _permission.GetUserInfo(new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, PermissionConstant.userIdClaim, PermissionConstant.roleIdsClaim)));
         }
 
-
+        /// <summary>
+        /// 获取当前已登录用户信息
+        /// </summary>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
         public UserInfo GetCurrentLoginUserInfo()

@@ -3,6 +3,9 @@ using Snail.Core.Permission;
 
 namespace Snail.Permission.Dto
 {
+    /// <summary>
+    /// 权限用户信息，用于默认的权限api dto
+    /// </summary>
     public class PermissionUserInfo:IUser, IIdField<string>
     {
         public string Id { get; set; }

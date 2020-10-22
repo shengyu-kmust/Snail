@@ -6,7 +6,7 @@ using System.Text;
 namespace Snail.Core.Permission
 {
     /// <summary>
-    /// 用户信息，用于给前端的数据
+    /// 用户信息
     /// </summary>
     public class UserInfo : IUserInfo
     {
