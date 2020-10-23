@@ -53,7 +53,7 @@ namespace Snail.Web.Controllers
                     dtoTemplate.Dto = new DtoModel { Name = entity.Name, Fields = preFix == "Query" ? new List<EntityFieldModel>() : entity.Fields, Prefix = preFix, BaseClass = preFix == "Query" ? "BasePagination,IDto" : "DefaultBaseDto" };
                     dtoTemplate.Dto.Fields.ForEach(field =>
                     {
-                        if (field.Type.StartsWith("E"))
+                        if (field.Type.StartsWith("E") && field.Attributes!=null)
                         {
                             field.Attributes = field.Attributes.Where(a => !a.Contains("MaxLength")).ToList();// dto的枚举过滤MaxLength特性
                         }

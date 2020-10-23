@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Snail.Web.EntityTypeConfiguration;
-
+using Snail.EntityFrameworkCore.EFValueConverter;
 namespace Infrastructure.Data.Config
 {
     public class <#=Entity.Name #>Configuration : BaseConfiguration,IEntityTypeConfiguration<<#=Entity.Name #>>
@@ -14,15 +14,12 @@ namespace Infrastructure.Data.Config
 <#
     foreach(var item in Entity.Fields){
 #>
-
 <# if(item.Type=="List<string>"){ #>
             builder.Property(a => a.<#=item.Name#>).HasConversion(StringSplitConverter.DefaultConverter);
 <# } #>
-
 <# if(item.Type.StartsWith("E")){ #>
             builder.Property(a => a.<#=item.Name#>).HasConversion<string>();
 <# } #>
-
 <#
     }
 #>
