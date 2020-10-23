@@ -4,6 +4,10 @@ using System.Text;
 
 namespace Snail.Core.Entity
 {
+    /// <summary>
+    /// 带增加/修改字段的实体基类
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class BaseAuditEntity<T> : IEntityId<T>, IAudit<T>
     {
         public T Id { get; set; }
