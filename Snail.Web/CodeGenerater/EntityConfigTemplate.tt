@@ -18,7 +18,7 @@ namespace Infrastructure.Data.Config
             builder.Property(a => a.<#=item.Name#>).HasConversion(StringSplitConverter.DefaultConverter);
 <# } #>
 <# if(item.Type.StartsWith("E")){ #>
-            builder.Property(a => a.<#=item.Name#>).HasConversion<string>();
+            builder.Property(a => a.<#=item.Name#>).HasConversion<string>().HasMaxLength(50);
 <# } #>
 <#
     }

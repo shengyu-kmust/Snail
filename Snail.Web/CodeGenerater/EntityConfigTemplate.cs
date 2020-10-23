@@ -103,7 +103,7 @@ namespace Infrastructure.Data.Config
             
             #line default
             #line hidden
-            this.Write(").HasConversion<string>();\r\n");
+            this.Write(").HasConversion<string>().HasMaxLength(50);\r\n");
             
             #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
  } 
