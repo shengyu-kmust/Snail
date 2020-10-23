@@ -166,14 +166,14 @@ namespace Snail.Web.Controllers
 
         [Resource(Description = "保存资源")]
         [HttpPost]
-        public void Save(PermissionResourceInfo saveDto)
+        public void SaveResource(PermissionResourceInfo saveDto)
         {
             _permissionStore.SaveResource(saveDto);
             _permissionStore.ReloadPemissionDatas();
         }
 
         [HttpPost, Resource(Description = "删除资源")]
-        public void Remove(List<string> ids)
+        public void RemoveResource(List<string> ids)
         {
             ids.ForEach(id =>
             {
@@ -183,7 +183,7 @@ namespace Snail.Web.Controllers
         }
         
         [HttpGet, Resource(Description = "查询资源树")]
-        public List<PermissionResourceTreeInfo> QueryListTree()
+        public List<PermissionResourceTreeInfo> GetAllResourceTreeInfo()
         {
             var allResources= _permissionStore.GetAllResource().Select(a => new PermissionResourceInfo { Code = a.GetResourceCode(), Id = a.GetKey(), Name = a.GetName(), ParentId = a.GetParentKey()}).ToList();
             return allResources.Where(a => !a.ParentId.HasValue()).Select(a => GetChildren(a, allResources)).ToList();

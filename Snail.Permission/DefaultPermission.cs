@@ -116,14 +116,27 @@ namespace Snail.Permission
             }
             var existResources = _permissionStore.GetAllResource();
             PermissionOptions.ResourceAssemblies.Add(this.GetType().Assembly);
+
+            // 根据程序集里的controller和action,计算所有的资源
             PermissionOptions.ResourceAssemblies?.Distinct().ToList().ForEach(assembly =>
             {
-                //对所有的controller类进行扫描
+                //对所有的controller类进行扫描，controller为父资源，action为子资源
                 assembly.GetTypes().Where(type => typeof(ControllerBase).IsAssignableFrom(type)).ToList().ForEach(controller =>
                 {
                     var controllerIsAdded = false;//父是否增加
-                    var parentId = IdGenerator.Generate<string>();
-                    var parentResource = controller.GetCustomAttribute<ResourceAttribute>();
+                    var ctlRAttr = controller.GetCustomAttribute<ResourceAttribute>();
+                    var ctlRCode = ctlRAttr?.ResourceCode ?? controller.Name;
+                    var ctlRName = ctlRAttr?.Description ?? controller.Name;
+                    var ctlRId = existResources.FirstOrDefault(a => a.GetResourceCode() == ctlRCode)?.GetKey() ?? IdGenerator.Generate<string>();
+                    var controllerResource = new PermissionDefaultResource
+                    {
+                        Id = ctlRId,
+                        Code = ctlRCode,
+                        CreateTime = DateTime.Now,
+                        IsDeleted = false,
+                        Name = ctlRName
+                    };
+
                     controller.GetMethods().ToList().ForEach(method =>
                     {
                         if (method.IsDefined(typeof(ResourceAttribute), true))
@@ -132,66 +145,26 @@ namespace Snail.Permission
                             if (!controllerIsAdded)
                             {
                                 // 增加父
-                                resources.Add(new PermissionDefaultResource 
-                                {
-                                    Id = parentId,
-                                    Code = parentResource?.ResourceCode ?? controller.Name,
-                                    CreateTime = DateTime.Now,
-                                    IsDeleted = false,
-                                    Name = parentResource?.Description ?? controller.Name
-                                });
+                                resources.Add(controllerResource);
                                 controllerIsAdded = true;
                             }
                             // 增加子
+                            var actionResourceCode = GetResourceCode(method);
+                            var actionResourceId= existResources.FirstOrDefault(a => a.GetResourceCode() == actionResourceCode)?.GetKey() ?? IdGenerator.Generate<string>();
                             resources.Add(new PermissionDefaultResource 
                             {
-                                Id = IdGenerator.Generate<string>(),
-                                Code = GetResourceCode(method),
+                                Id = actionResourceId,
+                                Code = actionResourceCode,
                                 CreateTime = DateTime.Now,
                                 IsDeleted = false,
-                                ParentId = parentId,
+                                ParentId = controllerResource.Id,
                                 Name = methodResource?.Description ?? method.Name
                             });
                         }
                     });
                 });
             });
-           
-            resources.ForEach(item =>
-            {
-                var temp = new PermissionDefaultResource 
-                {
-                    Id = item.GetKey(),
-                    Code = item.GetResourceCode(),
-                    CreateTime = DateTime.Now,
-                    IsDeleted = false,
-                    Name = item.GetName(),
-                    ParentId = item.GetParentKey()
-                };
-                // 设置资源的id
-                var matchRs = existResources.FirstOrDefault(i => i.GetResourceCode() == temp.Code);
-                if (matchRs != null)
-                {
-                    temp.Id = matchRs.GetKey();
-                }
-
-                // 设置资源的父id
-                if (!string.IsNullOrEmpty(temp.ParentId))
-                {
-                    var pa = resources.FirstOrDefault(a => a.GetKey() == temp.ParentId);
-                    var matchPa = existResources.FirstOrDefault(i => i.GetResourceCode() == pa?.GetResourceCode());
-                    if (matchPa != null)
-                    {
-                        item.SetParentKey(matchPa.GetKey());
-                    }
-                }
-            });
-            var resourceList = new List<IResource>();
-            resources.ForEach(resource =>
-            {
-                resourceList.Add(resource);
-            });
-            _permissionStore.SaveResources(resourceList);
+            _permissionStore.SaveResources(resources);
 
         }
 
