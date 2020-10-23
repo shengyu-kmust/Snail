@@ -42,9 +42,9 @@ namespace Snail.Web.CodeGenerater
                 }
                 result.Add(new EntityModel
                 {
-                    Name = item.Name,
-                    TableName = item.TableName,
-                    Comment=item.Comment,
+                    Name = item.Name.Trim(),
+                    TableName = item.TableName.Trim(),
+                    Comment=item.Comment.Trim(),
                     Fields = columns
                 });
             }
@@ -77,9 +77,9 @@ namespace Snail.Web.CodeGenerater
                 error.Add($"{val}少于3段");
                 return null;
             }
-            result.Name = items[0];
-            result.Type = items[1];
-            result.Comment = items[2];
+            result.Name = items[0].Trim();
+            result.Type = items[1].Trim();
+            result.Comment = items[2].Trim();
             if (items.Length > 3)
             {
                 var len = items[3];
