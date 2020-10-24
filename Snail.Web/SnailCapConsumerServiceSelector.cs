@@ -1,5 +1,4 @@
-﻿using ApplicationCore;
-using DotNetCore.CAP;
+﻿using DotNetCore.CAP;
 using DotNetCore.CAP.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

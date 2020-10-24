@@ -22,6 +22,7 @@ namespace Snail.DAL
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TSource">查询的全量字段返回类型，具体的返回类型TResult会从Source对类映射出来</typeparam>
     /// <typeparam name="TKey"></typeparam>
+    [Obsolete("不再用，设计的不是很灵活")]
     public abstract class EFCRUDService<TEntity, TSource, TKey> : ICRUDService<TEntity, TSource, TKey> where TEntity : class, IEntityId<TKey> where TSource :class
     {
         protected DbContext db;

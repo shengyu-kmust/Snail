@@ -1,15 +1,13 @@
-﻿using ApplicationCore.IServices;
-using AutoMapper;
+﻿using AutoMapper;
 using DotNetCore.CAP;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Snail.Cache;
 using Snail.Core.Entity;
 using Snail.Core.Interface;
+using Snail.Web.IServices;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Collections.Concurrent;
 namespace Snail.Web.Services
 {
     public abstract class ServiceContextBaseService : IService

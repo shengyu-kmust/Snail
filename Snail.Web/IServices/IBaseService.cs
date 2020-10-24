@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace ApplicationCore.IServices
+namespace Snail.Web.IServices
 {
     public interface IBaseService<TEntity> 
         where TEntity : class

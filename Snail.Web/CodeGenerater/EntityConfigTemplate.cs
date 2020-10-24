@@ -15,7 +15,7 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+    #line 1 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class EntityConfigTemplate : EntityConfigTemplateBase
     {
@@ -30,25 +30,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Snail.Web.EntityTypeConfiguration;
 using Snail.EntityFrameworkCore.EFValueConverter;
-namespace Infrastructure.Data.Config
+namespace Infrastructure.EntityTypeConfigurations
 {
     public class ");
             
-            #line 8 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 8 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
             #line hidden
             this.Write("Configuration : BaseConfiguration,IEntityTypeConfiguration<");
             
-            #line 8 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 8 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
             #line hidden
             this.Write(">\r\n    {\r\n        public void Configure(EntityTypeBuilder<");
             
-            #line 10 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 10 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Entity.Name));
             
             #line default
@@ -56,14 +56,14 @@ namespace Infrastructure.Data.Config
             this.Write("> builder)\r\n        {\r\n            base.Config(builder);\r\n            builder.ToT" +
                     "able(\"");
             
-            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 13 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Entity.TableName));
             
             #line default
             #line hidden
             this.Write("\");\r\n");
             
-            #line 14 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 14 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
 
     foreach(var item in Entity.Fields){
 
@@ -71,47 +71,47 @@ namespace Infrastructure.Data.Config
             #line default
             #line hidden
             
-            #line 17 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 17 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
  if(item.Type=="List<string>"){ 
             
             #line default
             #line hidden
             this.Write("            builder.Property(a => a.");
             
-            #line 18 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 18 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write(").HasConversion(StringSplitConverter.DefaultConverter);\r\n");
             
-            #line 19 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 19 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 20 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 20 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
  if(item.Type.StartsWith("E")){ 
             
             #line default
             #line hidden
             this.Write("            builder.Property(a => a.");
             
-            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 21 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write(").HasConversion<string>().HasMaxLength(50);\r\n");
             
-            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 22 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
+            #line 23 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EntityConfigTemplate.tt"
 
     }
 
