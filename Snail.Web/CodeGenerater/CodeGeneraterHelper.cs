@@ -18,13 +18,13 @@ namespace Snail.Web.CodeGenerater
             var tables = xml.GetElementsByTagName("o:Table");
             var codeGenerateDto = new CodeGenerateDto();
             Func<string, string> tableNameToEntityName = tableName =>
-             {
-                 if (tableName.Contains("_"))
-                 {
-                     return tableName.Substring(tableName.LastIndexOf('_')+1);
-                 }
-                 return tableName;
-             };
+            {
+                if (tableName.Contains("_"))
+                {
+                    return tableName.Substring(tableName.LastIndexOf('_') + 1);
+                }
+                return tableName;
+            };
             foreach (XmlElement table in tables)
             {
                 if (table.HasAttribute("Id"))
@@ -50,11 +50,12 @@ namespace Snail.Web.CodeGenerater
                         var columnName = column.GetElementsByTagName("a:Name")?[0]?.InnerText;
                         var columnDataType = column.GetElementsByTagName("a:DataType")?[0]?.InnerText;
                         var columnComment = column.GetElementsByTagName("a:Comment")?[0]?.InnerText ?? "";
+                        var columnLength = column.GetElementsByTagName("a:Length")?[0]?.InnerText ?? "";
                         if (string.IsNullOrEmpty(columnCode) || string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(columnDataType))
                         {
                             continue;
                         }
-                        entity.Fields.Add(new EntityFieldModel { Name = columnCode, Comment = columnName + columnComment, Type = columnDataType });
+                        entity.Fields.Add(GetFieldModelByPdmCfg(columnCode,columnName,columnDataType, columnLength,columnComment));
                     }
                     if (entity.Fields.Count > 0)
                     {
@@ -63,6 +64,41 @@ namespace Snail.Web.CodeGenerater
                 }
             }
             return codeGenerateDto;
+        }
+        private static EntityFieldModel GetFieldModelByPdmCfg(string code,string name,string dataType,string columnLength,string comment)
+        {
+            Func<string, string> getType = dt =>
+             {
+                 switch (dt)
+                 {
+                     case string v when v.Contains("uniqueidentifier"):
+                         return "string";
+                     case string v when v.Contains("datetime"):
+                         return "DateTime";
+                     case string v when v.Contains("bit"):
+                         return "bool";
+                     case string v when v.Contains("varchar"):
+                         return "string";
+                     default:
+                         return "";
+                 }
+             };
+            Func<string,string, List<string>> getAttrs = (dt,len) =>
+            {
+                if (dt.Contains("varchar") && len.HasValue())
+                {
+                    return new List<string> { $"MaxLength({len})" };
+                }
+                return new List<string>();
+            };
+            var field = new EntityFieldModel
+            {
+                Comment = name + comment,
+                Name = name,
+                Type= getType(dataType),
+                Attributes= getAttrs(dataType,columnLength)
+            };
+            return field;
         }
         public static CodeGenerateDto GenerateDtoFromConfig(string val, out List<string> errors)
         {

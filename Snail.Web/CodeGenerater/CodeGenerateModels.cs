@@ -112,6 +112,7 @@ namespace Snail.Web.CodeGenerater
         /// 描述
         /// </summary>
         public string Comment { get; set; }
+        public int Length { get; set; }
         /// <summary>
         /// 特性
         /// </summary>
