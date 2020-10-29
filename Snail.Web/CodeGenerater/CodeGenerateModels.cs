@@ -22,6 +22,30 @@ namespace Snail.Web.CodeGenerater
     }
 
     /// <summary>
+    /// 基于pdm生成代码的配置参数dto
+    /// </summary>
+    public class CodeGenerateConfigForPdm
+    {
+        public string PdmFilePath { get; set; }
+        /// <summary>
+        /// 生成文件的路径
+        /// </summary>
+        public string BasePath { get; set; }
+        /// <summary>
+        /// 枚举
+        /// </summary>
+        public List<string> Enums { get; set; }
+        /// <summary>
+        /// 哪些表不生成service
+        /// </summary>
+        public List<string> ExceptServices { get; set; }
+        /// <summary>
+        /// 哪些表不生成api
+        /// </summary>
+        public List<string> ExceptApis { get; set; }
+    }
+
+    /// <summary>
     /// 配置里的entity节点
     /// </summary>
     public class EntityConfigModel
@@ -35,6 +59,14 @@ namespace Snail.Web.CodeGenerater
     #region 配置文件解析dto
     public class CodeGenerateDto
     {
+        public CodeGenerateDto()
+        {
+            Entities = new List<EntityModel>();
+            Enums = new List<EnumModel>();
+            ExceptServices = new List<string>();
+            ExceptApis = new List<string>();
+            BasePath = "";
+        }
         public string BasePath { get; set; }
         public List<EntityModel> Entities { get; set; }
         public List<EnumModel> Enums { get; set; }
@@ -53,6 +85,10 @@ namespace Snail.Web.CodeGenerater
     #region 生成entity的model
     public class EntityModel
     {
+        public EntityModel()
+        {
+            Fields = new List<EntityFieldModel>();
+        }
         public List<EntityFieldModel> Fields { get; set; }
         public string Comment { get; set; }
         public string Name { get; set; }
@@ -60,6 +96,10 @@ namespace Snail.Web.CodeGenerater
     }
     public class EntityFieldModel
     {
+        public EntityFieldModel()
+        {
+            Attributes = new List<string>();
+        }
         /// <summary>
         /// 字段名
         /// </summary>

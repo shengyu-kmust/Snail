@@ -2,20 +2,75 @@
 using System.Collections.Generic;
 using System.Linq;
 using Snail.Common.Extenssions;
+using System.Xml;
+using System;
+
 namespace Snail.Web.CodeGenerater
 {
 
 
     public static class CodeGeneraterHelper
     {
-
-        public static CodeGenerateDto GenerateDtoFromConfig(string val,out List<string> errors)
+        public static CodeGenerateDto GenerateDtoFromPdm(string pdmString)
+        {
+            var xml = new XmlDocument();
+            xml.LoadXml(pdmString);
+            var tables = xml.GetElementsByTagName("o:Table");
+            var codeGenerateDto = new CodeGenerateDto();
+            Func<string, string> tableNameToEntityName = tableName =>
+             {
+                 if (tableName.Contains("_"))
+                 {
+                     return tableName.Substring(tableName.LastIndexOf('_')+1);
+                 }
+                 return tableName;
+             };
+            foreach (XmlElement table in tables)
+            {
+                if (table.HasAttribute("Id"))
+                {
+                    var columns = table.GetElementsByTagName("o:Column");
+                    var tableCode = table.GetElementsByTagName("a:Code")?[0]?.InnerText;
+                    var tableName = table.GetElementsByTagName("a:Name")?[0]?.InnerText;
+                    var tableComment = table.GetElementsByTagName("a:Comment")?[0]?.InnerText;
+                    var entity = new EntityModel()
+                    {
+                        Comment = tableName + tableComment,
+                        Fields = new List<EntityFieldModel>(),
+                        Name = tableNameToEntityName(tableCode),
+                        TableName = tableCode
+                    };
+                    if (string.IsNullOrEmpty(tableCode) || string.IsNullOrEmpty(tableName))
+                    {
+                        continue;
+                    }
+                    foreach (XmlElement column in columns)
+                    {
+                        var columnCode = column.GetElementsByTagName("a:Code")?[0]?.InnerText;
+                        var columnName = column.GetElementsByTagName("a:Name")?[0]?.InnerText;
+                        var columnDataType = column.GetElementsByTagName("a:DataType")?[0]?.InnerText;
+                        var columnComment = column.GetElementsByTagName("a:Comment")?[0]?.InnerText ?? "";
+                        if (string.IsNullOrEmpty(columnCode) || string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(columnDataType))
+                        {
+                            continue;
+                        }
+                        entity.Fields.Add(new EntityFieldModel { Name = columnCode, Comment = columnName + columnComment, Type = columnDataType });
+                    }
+                    if (entity.Fields.Count > 0)
+                    {
+                        codeGenerateDto.Entities.Add(entity);
+                    }
+                }
+            }
+            return codeGenerateDto;
+        }
+        public static CodeGenerateDto GenerateDtoFromConfig(string val, out List<string> errors)
         {
             var result = new CodeGenerateDto();
             errors = new List<string>();
             var configDto = JsonConvert.DeserializeObject<CodeGenerateConfig>(val);
             result.BasePath = configDto.BasePath.Trim('\\');
-            result.Entities = CodeGeneraterHelper.GenerateEntitiesModelFromTableModels(configDto,ref errors);
+            result.Entities = CodeGeneraterHelper.GenerateEntitiesModelFromTableModels(configDto, ref errors);
             result.Enums = GenerateEnumModelFromConfig(configDto, ref errors);
             result.ExceptApis = configDto.ExceptApis;
             result.ExceptServices = configDto.ExceptServices;
@@ -44,7 +99,7 @@ namespace Snail.Web.CodeGenerater
                 {
                     Name = item.Name.Trim(),
                     TableName = item.TableName.Trim(),
-                    Comment=item.Comment.Trim(),
+                    Comment = item.Comment.Trim(),
                     Fields = columns
                 });
             }
@@ -53,9 +108,9 @@ namespace Snail.Web.CodeGenerater
         public static List<EnumModel> GenerateEnumModelFromConfig(CodeGenerateConfig config, ref List<string> errors)
         {
             var result = new List<EnumModel>();
-            if (errors==null)
+            if (errors == null)
             {
-                errors = new List<string>(); 
+                errors = new List<string>();
             }
             foreach (var item in config.Enums)
             {
@@ -149,7 +204,7 @@ namespace Snail.Web.CodeGenerater
             if (CodeGeneraterHelper.IsEnumType(entityFieldModel))
             {
                 result.Type = "select";
-                result.KeyValues = entityFieldModel.Type=="bool"? "this.$enum.ETrueFalse" : $"this.$enum.{entityFieldModel.Type}s";
+                result.KeyValues = entityFieldModel.Type == "bool" ? "this.$enum.ETrueFalse" : $"this.$enum.{entityFieldModel.Type}s";
             }
             else
             {
@@ -177,7 +232,7 @@ namespace Snail.Web.CodeGenerater
         {
             return entityFieldModel.Type == "bool" || entityFieldModel.Type.StartsWith("E");
         }
-        
+
     }
 
 

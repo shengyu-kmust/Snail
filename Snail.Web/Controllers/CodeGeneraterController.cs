@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Snail.Common;
 using Snail.Common.Extenssions;
 using Snail.Core;
 using Snail.Core.Permission;
@@ -8,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using System.Xml;
 namespace Snail.Web.Controllers
 {
     /// <summary>
@@ -28,6 +29,23 @@ namespace Snail.Web.Controllers
             }
             var configValue = System.IO.File.ReadAllText($"{codeGeneraterConfigFile}");
             var configDto=CodeGeneraterHelper.GenerateDtoFromConfig(configValue, out List<string> errors);
+            Generater(configDto);
+        }
+
+        [HttpPost]
+        public void GeneraterByPdm(CodeGenerateConfigForPdm cfg)
+        {
+            if (cfg.PdmFilePath.HasNotValue())
+            {
+                throw new BusinessException("请转入代码生成的pdm路径（绝对或是相对路径）");
+            }
+            var pdmString=System.IO.File.ReadAllText(cfg.PdmFilePath);
+            var configDto = CodeGeneraterHelper.GenerateDtoFromPdm(pdmString);
+            EasyMap.Map(cfg, configDto);
+            Generater(configDto);
+        }
+        private void Generater(CodeGenerateDto configDto)
+        {
             GenerateEntity(configDto);
             GenerateService(configDto);
             GenerateEntityConfig(configDto);
@@ -39,8 +57,8 @@ namespace Snail.Web.Controllers
             GenerateVueRouter(configDto);
             GenerateEnumJs(configDto);
             GenerateEnum(configDto);
-            
         }
+
 
         #region ApplicationCore
         private void GenerateDto(CodeGenerateDto dto)
