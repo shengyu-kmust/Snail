@@ -52,11 +52,13 @@ namespace Snail.Web.CodeGenerater
                         var columnDataType = column.GetElementsByTagName("a:DataType")?[0]?.InnerText;
                         var columnComment = (column.GetElementsByTagName("a:Comment")?[0]?.InnerText ?? "").Replace("\n", "").Replace("\r", "");
                         var columnLength = column.GetElementsByTagName("a:Length")?[0]?.InnerText ?? "";
+                        var columnMandatory = column.GetElementsByTagName("a:Column.Mandatory")?[0]?.InnerText ?? "0";
+                    
                         if (string.IsNullOrEmpty(columnCode) || string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(columnDataType) || exceptFields.Contains(columnCode,StringComparer.OrdinalIgnoreCase))
                         {
                             continue;
                         }
-                        entity.Fields.Add(GetFieldModelByPdmCfg(columnCode, columnName, columnDataType, columnLength, columnComment));
+                        entity.Fields.Add(GetFieldModelByPdmCfg(columnCode, columnName, columnDataType, columnLength, columnComment, columnMandatory));
                     }
                     if (entity.Fields.Count > 0)
                     {
@@ -71,22 +73,23 @@ namespace Snail.Web.CodeGenerater
             codeGenerateDto.ExceptServices = configForPdm.ExceptServices;
             return codeGenerateDto;
         }
-        private static EntityFieldModel GetFieldModelByPdmCfg(string code, string name, string dataType, string columnLength, string comment)
+        private static EntityFieldModel GetFieldModelByPdmCfg(string code, string name, string dataType, string columnLength, string comment,string columnMandatory)
         {
+            var nullAblePrefix = columnMandatory == "1" ? "" : "?";
             Func<string, string> getType = dt =>
              {
                  switch (dt)
                  {
                      case string v when v.Contains("uniqueidentifier"):
-                         return "string";
+                         return "Guid"+ nullAblePrefix;
                      case string v when v.Contains("datetime"):
-                         return "DateTime";
+                         return "DateTime"+ nullAblePrefix;
                      case string v when v.Contains("bit"):
-                         return "bool";
+                         return "bool"+ nullAblePrefix;
                      case string v when v.Contains("varchar"):
                          return "string";
                      case string v when v.Contains("int"):
-                         return "int";
+                         return "int"+ nullAblePrefix;
                      default:
                          return "string";
                  }
