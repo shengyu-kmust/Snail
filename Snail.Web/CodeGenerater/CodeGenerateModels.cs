@@ -90,8 +90,17 @@ namespace Snail.Web.CodeGenerater
             Fields = new List<EntityFieldModel>();
         }
         public List<EntityFieldModel> Fields { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
         public string Comment { get; set; }
+        /// <summary>
+        /// 实体的命名
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 实体对应的表名
+        /// </summary>
         public string TableName { get; set; }
     }
     public class EntityFieldModel

@@ -29,6 +29,10 @@ namespace Snail.Web.Controllers
             }
             var configValue = System.IO.File.ReadAllText($"{codeGeneraterConfigFile}");
             var configDto=CodeGeneraterHelper.GenerateDtoFromConfig(configValue, out List<string> errors);
+            if (errors.Count>0)
+            {
+                throw new BusinessException(string.Join(",", errors));
+            }
             Generater(configDto);
         }
 
@@ -39,9 +43,11 @@ namespace Snail.Web.Controllers
             {
                 throw new BusinessException("请转入代码生成的pdm路径（绝对或是相对路径）");
             }
-            var pdmString=System.IO.File.ReadAllText(cfg.PdmFilePath);
-            var configDto = CodeGeneraterHelper.GenerateDtoFromPdm(pdmString);
-            EasyMap.Map(cfg, configDto);
+            var configDto = CodeGeneraterHelper.GenerateDtoFromPdm(cfg, out List<string> errors);
+            if (errors.Count > 0)
+            {
+                throw new BusinessException(string.Join(",", errors));
+            }
             Generater(configDto);
         }
         private void Generater(CodeGenerateDto configDto)

@@ -18,7 +18,7 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+    #line 1 "G:\mywork\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class VueRouterTemplate : VueRouterTemplateBase
     {
@@ -32,42 +32,42 @@ namespace Snail.Web.CodeGenerater
                     "ponent: Layout,\r\n  redirect: \'noRedirect\',\r\n  name: \'basic\',\r\n  meta: {\r\n    tit" +
                     "le: \'基础信息管理\',\r\n    iconClass: \'el-icon-setting\'\r\n  },\r\n  children: [\r\n");
             
-            #line 18 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            #line 18 "G:\mywork\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
     foreach(var router in VueRouteModels){ 
             
             #line default
             #line hidden
             this.Write("                {\r\n                  path: \'");
             
-            #line 20 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            #line 20 "G:\mywork\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(router.Name));
             
             #line default
             #line hidden
             this.Write("\',\r\n                  component: () => import(\'@/views/basic/");
             
-            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            #line 21 "G:\mywork\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(router.Name));
             
             #line default
             #line hidden
             this.Write("\'),\r\n                  name: \'user\',\r\n                  meta: { title: \'");
             
-            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            #line 23 "G:\mywork\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(router.Comment));
             
             #line default
             #line hidden
             this.Write("管理\',resourceCode: \'");
             
-            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            #line 23 "G:\mywork\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(router.Name));
             
             #line default
             #line hidden
             this.Write("Controller\' }\r\n                },\r\n");
             
-            #line 25 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
+            #line 25 "G:\mywork\Snail\Snail.Web\CodeGenerater\VueRouterTemplate.tt"
     }
             
             #line default
