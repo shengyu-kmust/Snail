@@ -511,24 +511,31 @@ namespace Snail.Common
        where TTarget : class
 
         {
+            if (includeFields == null)
+            {
+                if (exceptFields == null)
+                {
+                    return null;
 
-            if (includeFields == null && exceptFields == null)
-            {
-                return null;
-            }
-            else if (includeFields == null && exceptFields != null)
-            {
-                var allTargetFields = typeof(TTarget).GetProperties(BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public).Select(a => a.Name);
-                return allTargetFields.Except(exceptFields).ToList();
-            }
-            else if (includeFields != null && exceptFields == null)
-            {
-                return includeFields;
+                }
+                else
+                {
+                    var allTargetFields = typeof(TTarget).GetProperties(BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public).Select(a => a.Name);
+                    return allTargetFields.Except(exceptFields).ToList();
+                }
             }
             else
             {
-                //(includeFields != null && exceptFields != null)
-                return includeFields.Except(exceptFields).ToList();
+                if (exceptFields == null)
+                {
+                    return includeFields;
+
+                }
+                else
+                {
+                    return includeFields.Except(exceptFields).ToList();
+
+                }
             }
         }
 
