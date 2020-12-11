@@ -22,6 +22,30 @@ namespace Snail.Web.CodeGenerater
     }
 
     /// <summary>
+    /// 基于pdm生成代码的配置参数dto
+    /// </summary>
+    public class CodeGenerateConfigForPdm
+    {
+        public string PdmFilePath { get; set; }
+        /// <summary>
+        /// 生成文件的路径
+        /// </summary>
+        public string BasePath { get; set; }
+        /// <summary>
+        /// 枚举
+        /// </summary>
+        public List<string> Enums { get; set; }
+        /// <summary>
+        /// 哪些表不生成service
+        /// </summary>
+        public List<string> ExceptServices { get; set; }
+        /// <summary>
+        /// 哪些表不生成api
+        /// </summary>
+        public List<string> ExceptApis { get; set; }
+    }
+
+    /// <summary>
     /// 配置里的entity节点
     /// </summary>
     public class EntityConfigModel
@@ -35,6 +59,14 @@ namespace Snail.Web.CodeGenerater
     #region 配置文件解析dto
     public class CodeGenerateDto
     {
+        public CodeGenerateDto()
+        {
+            Entities = new List<EntityModel>();
+            Enums = new List<EnumModel>();
+            ExceptServices = new List<string>();
+            ExceptApis = new List<string>();
+            BasePath = "";
+        }
         public string BasePath { get; set; }
         public List<EntityModel> Entities { get; set; }
         public List<EnumModel> Enums { get; set; }
@@ -53,13 +85,30 @@ namespace Snail.Web.CodeGenerater
     #region 生成entity的model
     public class EntityModel
     {
+        public EntityModel()
+        {
+            Fields = new List<EntityFieldModel>();
+        }
         public List<EntityFieldModel> Fields { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
         public string Comment { get; set; }
+        /// <summary>
+        /// 实体的命名
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 实体对应的表名
+        /// </summary>
         public string TableName { get; set; }
     }
     public class EntityFieldModel
     {
+        public EntityFieldModel()
+        {
+            Attributes = new List<string>();
+        }
         /// <summary>
         /// 字段名
         /// </summary>
@@ -72,6 +121,7 @@ namespace Snail.Web.CodeGenerater
         /// 描述
         /// </summary>
         public string Comment { get; set; }
+        public int Length { get; set; }
         /// <summary>
         /// 特性
         /// </summary>

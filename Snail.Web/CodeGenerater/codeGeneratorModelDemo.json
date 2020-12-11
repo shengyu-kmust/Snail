@@ -1,0 +1,24 @@
+{
+  "BasePath": "G:\\mywork\\SnailAspNetCoreFramework",
+  "Entities": [
+    {
+      "name": "Demo",
+      "tableName": "示例",
+      "comment": "示例",
+      "columns": [
+        "Name,string,人员名,",
+        "Age,int,年龄,",
+        "Age,int,年龄,",
+        "BirthDay,DateTime?,出生日期,",
+        "WorkTime,DateTime?,出生日期,"
+        //date,select,multiSelect,time,check,radio
+      ]
+    }
+  ],
+  "Enums": [
+    "EGenderTest,性别,Female,女,Male,男"
+  ],
+  "ExceptServices": [],
+  "ExceptApis": []
+}
+

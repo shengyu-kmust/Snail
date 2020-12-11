@@ -43,5 +43,7 @@ namespace Snail.Permission.Entity
         {
             this.ParentId = parentKey;
         }
+
     }
+
 }

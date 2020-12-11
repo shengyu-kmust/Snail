@@ -134,7 +134,10 @@ namespace Snail.Web
                     };
                 });
                 app.UseSwaggerUi3();
-                //app.UseReDoc();//UseReDoc和UseSwaggerUi3任意用一个即可，UseSwaggerUi3生成的Ui界面可调用接口，而UseReDoc生成只读的接口文档
+                app.UseReDoc(cfg=>
+                {
+                    cfg.Path = "/doc";
+                });//UseReDoc和UseSwaggerUi3任意用一个即可，UseSwaggerUi3生成的Ui界面可调用接口，而UseReDoc生成只读的接口文档
             }
 
             #endregion
