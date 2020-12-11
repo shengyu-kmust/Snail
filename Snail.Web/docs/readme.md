@@ -1,0 +1,1 @@
+﻿文档已经移到SnailDoc项目，[进入github仓库](https://github.com/shengyu-kmust/SnailDoc)
