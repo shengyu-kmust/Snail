@@ -12,10 +12,11 @@ namespace Snail.Web.Services
 {
     public abstract class ServiceContextBaseService : IService
     {
-        protected IEntityCacheManager entityCacheManager => serviceContext.entityCacheManager;
-        protected IMapper mapper => serviceContext.mapper;
-        protected IApplicationContext applicationContext => serviceContext.applicationContext;
-        protected string currentUserId => serviceContext.applicationContext.GetCurrentUserId();
+        public IEntityCacheManager entityCacheManager => serviceContext.entityCacheManager;
+        public IMapper mapper => serviceContext.mapper;
+        public IApplicationContext applicationContext => serviceContext.applicationContext;
+        public string currentUserId => serviceContext.applicationContext.GetCurrentUserId();
+        public string currentTenantId => serviceContext.applicationContext.GetCurrnetTenantId();
         public DbContext db => serviceContext.db;
         public IMemoryCache memoryCache => serviceContext.memoryCache;
         public ICapPublisher publisher => serviceContext.publisher;
@@ -49,7 +50,11 @@ namespace Snail.Web.Services
         public void ClearAllEntityCache()
         {
             serviceContext.ClearAllEntityCache();
+        }
 
+        public bool HasTenant()
+        {
+            return !string.IsNullOrEmpty(currentTenantId);
         }
     }
 }
