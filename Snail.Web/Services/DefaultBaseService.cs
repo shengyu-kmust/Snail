@@ -1,6 +1,9 @@
-﻿namespace Snail.Web.Services
+﻿using Snail.Core;
+
+namespace Snail.Web.Services
 {
-    public class DefaultBaseService<TEntity> : BaseService<TEntity> where TEntity : class
+    public class DefaultBaseService<TEntity,TKey> : BaseService<TEntity,TKey> 
+           where TEntity : class, IIdField<TKey>
     {
         public DefaultBaseService(ServiceContext serviceContext) : base(serviceContext)
         {

@@ -1,6 +1,5 @@
 ﻿using Autofac.Extras.DynamicProxy;
 using DotNetCore.CAP;
-using Snail.Web.Const;
 using Snail.Web.Interceptor;
 using System;
 using System.Net.Http;
@@ -45,7 +44,7 @@ namespace Snail.Web.Services
 
         [CacheInterceptor(1)]
         [LogInerceptor(true, true, true)]
-        [CapSubscribe(SnailWebEventNameConst.TestEventName)]
+        [CapSubscribe(SnailWebConst.TestEventNameEvent)]
         public virtual string ReceiveEvent(string eventVal)
         {
             return eventVal;
@@ -53,7 +52,7 @@ namespace Snail.Web.Services
 
         public void EmitEvent()
         {
-            publisher.Publish(SnailWebEventNameConst.TestEventName, DateTime.Now.ToShortDateString());
+            publisher.Publish(SnailWebConst.TestEventNameEvent, DateTime.Now.ToShortDateString());
         }
     }
 

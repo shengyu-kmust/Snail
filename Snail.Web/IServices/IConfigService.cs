@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Snail.Web.IServices
 {
-    public interface IConfigService : IBaseService<Config>
+    public interface IConfigService : IBaseService<Config,string>
     {
         List<KeyValueDto> GetConfigKeyValue(string parentKey);
     }

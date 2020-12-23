@@ -51,10 +51,6 @@ namespace Snail.Web.Services
         {
             serviceContext.ClearAllEntityCache();
         }
-
-        public bool HasTenant()
-        {
-            return !string.IsNullOrEmpty(currentTenantId);
-        }
+       
     }
 }

@@ -2,6 +2,7 @@
 using Snail.Core.Attributes;
 using Snail.Core.Entity;
 using Snail.Web.Enums;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Snail.Web.Entities

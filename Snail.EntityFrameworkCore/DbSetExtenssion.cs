@@ -25,13 +25,13 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dtos"></param>
         /// <param name="addFunc"></param>
         /// <param name="userId"></param>
-        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, Func<TDto, TEntity> addFunc, TKey userId)
+        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, Func<TDto, TEntity> addFunc, TKey userId,TKey tenantId=default)
            where TEntity : class, IIdField<TKey>
          where TDto : class, IIdField<TKey>
         {
             dtos.ForEach(dto =>
             {
-                Add(entities, dto, addFunc, userId);
+                Add(entities, dto, addFunc, userId,tenantId);
             });
         }
 
@@ -46,13 +46,13 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dtos"></param>
         /// <param name="mapper"></param>
         /// <param name="userId"></param>
-        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, IMapper mapper, TKey userId)
+        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, IMapper mapper, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
          where TDto : class, IIdField<TKey>
         {
             dtos.ForEach(dto =>
             {
-                Add(entities, dto, mapper, userId);
+                Add(entities, dto, mapper, userId, tenantId);
             });
         }
 
@@ -70,7 +70,7 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dto"></param>
         /// <param name="addFunc"></param>
         /// <param name="userId"></param>
-        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId)
+        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId, TKey tenantId = default)
           where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
@@ -90,6 +90,10 @@ namespace Snail.EntityFrameworkCore
                 auditEntity.CreateTime = now;
                 auditEntity.UpdateTime = now;
             }
+            if (entity is ITenant<TKey> tenantEntity)
+            {
+                tenantEntity.TenantId = tenantId;
+            }
             entities.Add(entity);
         }
 
@@ -104,11 +108,11 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dto"></param>
         /// <param name="mapper"></param>
         /// <param name="userId"></param>
-        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId)
+        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
          where TDto : class, IIdField<TKey>
         {
-            Add(entities, dto, (dtoPara) => mapper.Map<TEntity>(dtoPara), userId);
+            Add(entities, dto, (dtoPara) => mapper.Map<TEntity>(dtoPara), userId,tenantId);
         }
         #endregion
 
@@ -126,7 +130,7 @@ namespace Snail.EntityFrameworkCore
         /// <param name="updateFunc"></param>
         /// <param name="userId"></param>
         /// <param name="existEntities"></param>
-        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, List<TEntity> existEntities = null)
+        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, TKey tenantId = default,List <TEntity> existEntities = null)
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
@@ -158,6 +162,10 @@ namespace Snail.EntityFrameworkCore
                 auditEntity.CreateTime = now;
                 auditEntity.UpdateTime = now;
             }
+            if (entity is ITenant<TKey> tenantEntity)
+            {
+                tenantEntity.TenantId = tenantId;
+            }
             return entity;
         }
 
@@ -172,7 +180,7 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dto"></param>
         /// <param name="mapper"></param>
         /// <param name="userId"></param>
-        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId, List<TEntity> existEntities = null)
+        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId,TKey tenantId = default,List<TEntity> existEntities = null)
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
@@ -181,6 +189,7 @@ namespace Snail.EntityFrameworkCore
                 dtoPara => mapper.Map<TEntity>(dtoPara), 
                 (dtoPara, entity) => mapper.Map<TDto, TEntity>(dtoPara, entity),
                 userId,
+                tenantId,
                 existEntities);
         }
 
@@ -189,19 +198,19 @@ namespace Snail.EntityFrameworkCore
         #region addOrUpdateList
 
         /// <summary>
-        /// 增加或更新多个
+        /// 实体列表的差异更新，包含增加、删除、更新
         /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
         /// <typeparam name="TKey"></typeparam>
-        /// <param name="entities"></param>
-        /// <param name="existEntities">已经存在的实体</param>
-        /// <param name="dtos">要</param>
+        /// <param name="entities">dbset</param>
+        /// <param name="existEntities">已经存在的实体列表</param>
+        /// <param name="dtos">最终要更新为的实体列表</param>
         /// <param name="addFunc"></param>
         /// <param name="updateFunc"></param>
         /// <param name="userId"></param>
-        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existEntities, List<TDto> dtos, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId)
+        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existEntities, List<TDto> dtos, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
            where TDto : class, IIdField<TKey>
         {
@@ -214,19 +223,19 @@ namespace Snail.EntityFrameworkCore
             // 要删除的ids
             var removeIds = existEntities?.Select(a => a.Id).Except(dtoIds).ToList() ?? new List<TKey>();
             // 更新ids删除对象
-            RemoveByIds<TEntity, TKey>(entities, removeIds, existEntities);
+            RemoveByIds<TEntity, TKey>(entities, removeIds, userId, existEntities);
 
 
             // 增加或更新
             foreach (var dto in dtos.Where(a => !removeIds.Contains(a.Id)))
             {
-                AddOrUpdate(entities, dto, addFunc, updateFunc, userId);
+                AddOrUpdate(entities, dto, addFunc, updateFunc, userId,tenantId);
             }
         }
 
 
         /// <summary>
-        /// 增加或更新多个
+        /// 实体列表的差异更新，包含增加、删除、更新
         /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
@@ -237,11 +246,11 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dtos"></param>
         /// <param name="mapper"></param>
         /// <param name="userId"></param>
-        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existsEntities, List<TDto> dtos, IMapper mapper, TKey userId)
+        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existsEntities, List<TDto> dtos, IMapper mapper, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
            where TDto : class, IIdField<TKey>
         {
-            AddOrUpdateList(entities, existsEntities, dtos, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId);
+            AddOrUpdateList(entities, existsEntities, dtos, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId,tenantId);
         }
 
         #endregion
