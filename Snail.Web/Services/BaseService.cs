@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Snail.Common;
-using Snail.Common.Extenssions;
 using Snail.Core;
+using Snail.EntityFrameworkCore;
 using Snail.Web.IServices;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace Snail.Web.Services
 {
-    public abstract class BaseService<TEntity> : ServiceContextBaseService, IBaseService<TEntity> 
-        where TEntity : class
+    public abstract class BaseService<TEntity,TKey> : ServiceContextBaseService, IBaseService<TEntity,TKey>
+           where TEntity : class, IIdField<TKey>
     {
         protected BaseService(ServiceContext serviceContext) : base(serviceContext)
         {
@@ -35,77 +35,26 @@ namespace Snail.Web.Services
             return GetQueryable<TEntity>().Where(pred);
         }
 
-        public virtual void Remove(List<string> ids)
+        public virtual void Remove(List<TKey> ids)
         {
-            if (ids == null)
-            {
-                throw new ArgumentNullException();
-            }
-            var userId = applicationContext.GetCurrentUserId();
-            ids.ForEach(id =>
-            {
-                var entity = db.Set<TEntity>().Find(id);
-                if (entity == null)
-                {
-                    throw new BusinessException($"您要删除的对象不存在，id为{id}");
-                }
-                if (entity is IAudit<string> entityAudit)
-                {
-                    entityAudit.UpdateTime = DateTime.Now;
-                    if (userId != null)
-                    {
-                        entityAudit.Updater = userId;
-                    }
-                }
-                if (entity is ISoftDelete entitySoftDelete)
-                {
-                    entitySoftDelete.IsDeleted = true;
-                }
-                else
-                {
-                    db.Set<TEntity>().Remove(entity);
-                }
-            });
-
+            db.Set<TEntity>().RemoveByIds(ids, GetCurrentUserId());
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// 增加或修改
+        /// </summary>
+        /// <typeparam name="TSaveDto"></typeparam>
+        /// <param name="saveDto"></param>
         public virtual void Save<TSaveDto>(TSaveDto saveDto) 
-            where TSaveDto : IIdField<string>
+            where TSaveDto : class, IIdField<TKey>
         {
-            var userId = applicationContext.GetCurrentUserId();
-            if (saveDto.Id.HasNotValue())
-            {
-                saveDto.Id = IdGenerator.Generate<string>();
-                var entity = mapper.Map<TEntity>(saveDto);
-                if (entity is IAudit<string> entityAudit)
-                {
-                    entityAudit.UpdateTime = DateTime.Now;
-                    entityAudit.CreateTime = DateTime.Now;
-                    entityAudit.Creater = userId;
-                    entityAudit.Updater = userId;
-                }
-                db.Set<TEntity>().Add(entity);
-            }
-            else
-            {
-                var entity = db.Set<TEntity>().Find(saveDto.Id);
-                if (entity == null)
-                {
-                    throw new Exception("要修改的实体不存在");
-                }
-                mapper.Map(saveDto, entity, typeof(TSaveDto), typeof(TEntity));
-                if (entity is IAudit<string> entityAudit)
-                {
-                    entityAudit.UpdateTime = DateTime.Now;
-                    entityAudit.CreateTime = DateTime.Now;
-                    if (userId.HasValue())
-                    {
-                        entityAudit.Updater = userId;
-                    }
-                }
-            }
+            db.Set<TEntity>().AddOrUpdate(saveDto, mapper, GetCurrentUserId());
             db.SaveChanges();
+        }
+        private TKey GetCurrentUserId()
+        {
+            return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(applicationContext.GetCurrentUserId());
         }
     }
 }

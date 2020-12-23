@@ -16,6 +16,7 @@ namespace Snail.EntityFrameworkCore
         #region addList
         /// <summary>
         /// 增加多个实体
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -36,6 +37,7 @@ namespace Snail.EntityFrameworkCore
 
         /// <summary>
         /// 增加多个实体
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -59,6 +61,7 @@ namespace Snail.EntityFrameworkCore
         #region add
         /// <summary>
         /// 增加单个实体
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -92,6 +95,7 @@ namespace Snail.EntityFrameworkCore
 
         /// <summary>
         /// 增加单个实体
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -111,6 +115,7 @@ namespace Snail.EntityFrameworkCore
         #region addOrUpdate
         /// <summary>
         /// 增加或更新
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -158,6 +163,7 @@ namespace Snail.EntityFrameworkCore
 
         /// <summary>
         /// 增加或更新
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -184,6 +190,7 @@ namespace Snail.EntityFrameworkCore
 
         /// <summary>
         /// 增加或更新多个
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -220,6 +227,7 @@ namespace Snail.EntityFrameworkCore
 
         /// <summary>
         /// 增加或更新多个
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDto"></typeparam>
@@ -240,20 +248,33 @@ namespace Snail.EntityFrameworkCore
 
         /// <summary>
         /// 删除实体
+        /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TKey"></typeparam>
         /// <param name="entities"></param>
         /// <param name="ids"></param>
         /// <param name="existEntities"></param>
-        public static void RemoveByIds<TEntity, TKey>(this DbSet<TEntity> entities, List<TKey> ids, List<TEntity> existEntities = null)
+        public static void RemoveByIds<TEntity, TKey>(this DbSet<TEntity> entities, List<TKey> ids,TKey userId, List<TEntity> existEntities = null)
            where TEntity : class, IIdField<TKey>
         {
+            if (ids==null || ids.Count==0)
+            {
+                return;
+            }
             foreach (var id in ids)
             {
                 var entity = existEntities == null ? entities.Find(id) : existEntities.FirstOrDefault(a => a.Id.Equals(id));
                 if (entity != null)
                 {
+                    if (entity is IAudit<TKey> entityAudit)
+                    {
+                        entityAudit.UpdateTime = DateTime.Now;
+                        if (userId != null)
+                        {
+                            entityAudit.Updater = userId;
+                        }
+                    }
                     if (entity is ISoftDelete entitySoftDeleteEntity)
                     {
                         entitySoftDeleteEntity.IsDeleted = true;
