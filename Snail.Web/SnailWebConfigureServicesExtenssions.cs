@@ -25,9 +25,7 @@ using Snail.Office;
 using Snail.Permission;
 using Snail.Web.Filter;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using IFileProvider = Snail.FileStore.IFileProvider;
 
 
@@ -35,9 +33,17 @@ namespace Snail.Web
 {
     public static class SnailWebConfigureServicesExtenssions
     {
-        public static IServiceCollection ConfigSnailWebServices<TDbContext, TUser>(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
-          where TDbContext : DbContext
-          where TUser : class, IUser, new()
+        /// <summary>
+        /// 注册snailWeb框架的service依赖,如：
+        /// MVC、cap、healthCheck、signalr、spa、swagger、easycaching、snailCache、hangfire、miniProfiler、option配置、日志、缓存、应用上下文、实体缓存、license、excel、文件存储
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+        public static IServiceCollection ConfigSnailWebServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
 
         {
             #region option配置
@@ -75,37 +81,7 @@ namespace Snail.Web
 
             #endregion
 
-            #region 数据库配置
-            var dbType = configuration.GetSection("DbSetting")["DbType"];
-            var connectString = configuration.GetSection("DbSetting")["ConnectionString"];
-            var hangfireConnectString = configuration.GetSection("DbSetting")["Hangfire"];
-
-            Action<DbContextOptionsBuilder> optionsAction = options =>
-            {
-                if (dbType.Equals("MySql", StringComparison.OrdinalIgnoreCase))
-                {
-                    options.UseMySql(connectString);
-                }
-                else if (dbType.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
-                {
-                    options.UseSqlServer(connectString);
-                }
-                else if (dbType.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
-                {
-                    options.UseSqlite(connectString);
-                }
-            };
-            services.AddDbContext<TDbContext>(optionsAction);
-            services.AddDbContext<DbContext, TDbContext>(optionsAction);
-            #endregion
-
-            #region 增加通用权限
-            services.AddPermission<TDbContext, TUser>(options =>
-            {
-                configuration.GetSection("PermissionOptions").Bind(options);
-                options.ResourceAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();// 从哪些程序集里，将Controller的action设置成权限资源
-            });
-            #endregion
+        
 
             #region MVC
             //3.1模板的mvc
@@ -172,6 +148,7 @@ namespace Snail.Web
             #endregion
 
             #region 注入easyCaching
+            // todo:是用easyCaching还是snailCache
             services.AddEasyCaching(option =>
             {
                 //配置方式一：用config配置
@@ -206,6 +183,8 @@ namespace Snail.Web
 
 
             #region 定时任务
+            var dbType = configuration.GetSection("DbSetting")["DbType"];
+            var hangfireConnectString = configuration.GetSection("DbSetting")["Hangfire"];
             services.AddHangfireServer();//hangfire.aspnetcore的扩展，用这个方法后，hangfire的JobActivator会用asp.net core的IServiceProvider去做ioc，所以不需要额外配置JobActivator。而本项目Autofac已经实现了IServiceProvider
             services.AddHangfire(configuration =>
             {
@@ -280,5 +259,60 @@ namespace Snail.Web
 
             return services;
         }
+
+        /// <summary>
+        /// 注册snailWeb框架的权限和数据库配置。
+        /// 数据库配置在json文件的DbSetting节点，权限option配置依赖于json文件的PermissionOptions节点
+        /// </summary>
+        /// <typeparam name="TDbContext"></typeparam>
+        /// <typeparam name="TUser"></typeparam>
+        /// <typeparam name="TRole"></typeparam>
+        /// <typeparam name="TUserRole"></typeparam>
+        /// <typeparam name="TResource"></typeparam>
+        /// <typeparam name="TRoleResource"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection ConfigSnailWebDbAndPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services,IConfiguration configuration)
+                    where TDbContext : DbContext
+            where TUser : class, IUser, new()
+            where TRole : class, IRole, new()
+            where TUserRole : class, IUserRole, new()
+            where TResource : class, IResource, new()
+            where TRoleResource : class, IRoleResource, new()
+        {
+            #region 数据库配置
+            var dbType = configuration.GetSection("DbSetting")["DbType"];
+            var connectString = configuration.GetSection("DbSetting")["ConnectionString"];
+
+            Action<DbContextOptionsBuilder> optionsAction = options =>
+            {
+                if (dbType.Equals("MySql", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.UseMySql(connectString);
+                }
+                else if (dbType.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.UseSqlServer(connectString);
+                }
+                else if (dbType.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.UseSqlite(connectString);
+                }
+            };
+            services.AddDbContext<TDbContext>(optionsAction);
+            services.AddDbContext<DbContext, TDbContext>(optionsAction);
+            #endregion
+
+            #region 增加通用权限
+            services.AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(options =>
+            {
+                configuration.GetSection("PermissionOptions").Bind(options);
+                options.ResourceAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();// 从哪些程序集里，将Controller的action设置成权限资源
+            });
+            #endregion
+            return services;
+        }
+
     }
 }

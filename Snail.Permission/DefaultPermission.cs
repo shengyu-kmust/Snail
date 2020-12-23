@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
 using Snail.Core.Attributes;
 using Snail.Core.Permission;
-using Snail.Permission.Entity;
+using Snail.Permission.Dto;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -128,12 +128,10 @@ namespace Snail.Permission
                     var ctlRCode = ctlRAttr?.ResourceCode ?? controller.Name;
                     var ctlRName = ctlRAttr?.Description ?? controller.Name;
                     var ctlRId = existResources.FirstOrDefault(a => a.GetResourceCode() == ctlRCode)?.GetKey() ?? IdGenerator.Generate<string>();
-                    var controllerResource = new PermissionDefaultResource
+                    var controllerResource = new PermissionResourceInfo
                     {
                         Id = ctlRId,
                         Code = ctlRCode,
-                        CreateTime = DateTime.Now,
-                        IsDeleted = false,
                         Name = ctlRName
                     };
 
@@ -151,12 +149,10 @@ namespace Snail.Permission
                             // 增加子
                             var actionResourceCode = GetResourceCode(method);
                             var actionResourceId= existResources.FirstOrDefault(a => a.GetResourceCode() == actionResourceCode)?.GetKey() ?? IdGenerator.Generate<string>();
-                            resources.Add(new PermissionDefaultResource 
+                            resources.Add(new PermissionResourceInfo
                             {
                                 Id = actionResourceId,
                                 Code = actionResourceCode,
-                                CreateTime = DateTime.Now,
-                                IsDeleted = false,
                                 ParentId = controllerResource.Id,
                                 Name = methodResource?.Description ?? method.Name
                             });
