@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Snail.Common;
 using Snail.Core;
 using Snail.Core.Enum;
+using Snail.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,12 +27,12 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dtos"></param>
         /// <param name="addFunc"></param>
         /// <param name="userId"></param>
-        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, Func<TDto, TEntity> addFunc, TKey userId,TKey tenantId=default)
+        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, Func<TDto, TEntity> addFunc, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
         {
             dtos.ForEach(dto =>
             {
-                Add(entities, dto, addFunc, userId,tenantId);
+                AddInternal(entities, dto, addFunc, userId, tenantId);
             });
         }
 
@@ -66,19 +67,19 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dtos"></param>
         /// <param name="userId"></param>
         /// <param name="tenantId"></param>
-        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos,TKey userId, TKey tenantId = default)
-           where TEntity : class, IIdField<TKey>,new()
+        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, TKey userId, TKey tenantId = default)
+           where TEntity : class, IIdField<TKey>, new()
         {
             dtos.ForEach(dto =>
             {
-                Add(entities, dto,userId, tenantId);
+                Add(entities, dto, userId, tenantId);
             });
         }
 
         #endregion
         #region add
         /// <summary>
-        /// 增加单个实体，实体映射由用户自定义
+        /// 增加单个实体，实体映射由用户自定义，所有增加单个实体的最终实现
         /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
@@ -88,7 +89,7 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dto"></param>
         /// <param name="addFunc"></param>
         /// <param name="userId"></param>
-        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId, TKey tenantId = default)
+        public static void AddInternal<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId, TKey tenantId = default)
           where TEntity : class, IIdField<TKey>
         {
             var entity = addFunc(dto);
@@ -97,6 +98,7 @@ namespace Snail.EntityFrameworkCore
                 entity.Id = IdGenerator.Generate<TKey>();
             }
             UpdateEntityCommonField(entity, EEntityOperType.Add, userId, tenantId);
+            CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
             entities.Add(entity);
         }
 
@@ -114,7 +116,7 @@ namespace Snail.EntityFrameworkCore
         public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
         {
-            Add(entities, dto, (dtoPara) => mapper.Map<TEntity>(dtoPara), userId,tenantId);
+            AddInternal(entities, dto, (dtoPara) => mapper.Map<TEntity>(dtoPara), userId, tenantId);
         }
 
         /// <summary>
@@ -128,16 +130,16 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dto"></param>
         /// <param name="userId"></param>
         /// <param name="tenantId"></param>
-        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto,TKey userId, TKey tenantId = default)
-           where TEntity : class, IIdField<TKey>,new()
+        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, TKey userId, TKey tenantId = default)
+           where TEntity : class, IIdField<TKey>, new()
         {
-            Add(entities, dto, sourceDto=>EasyMap.MapToNew<TEntity>(sourceDto), userId, tenantId);
+            AddInternal(entities, dto, sourceDto => EasyMap.MapToNew<TEntity>(sourceDto), userId, tenantId);
         }
         #endregion
 
         #region addOrUpdate
         /// <summary>
-        /// 增加或更新
+        /// 增加或更新的最终实现
         /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
@@ -149,21 +151,21 @@ namespace Snail.EntityFrameworkCore
         /// <param name="updateFunc"></param>
         /// <param name="userId"></param>
         /// <param name="existEntities"></param>
-        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, TKey tenantId = default,List <TEntity> existEntities = null)
+        public static TEntity AddOrUpdateInternal<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, TKey tenantId = default, List<TEntity> existEntities = null)
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
             var entity = existEntities == null ? entities.Find(dto.Id) : existEntities.FirstOrDefault(a => a.Id.Equals(dto.Id));
             if (entity == null)
             {
-                Add(entities, dto, addFunc, userId, tenantId);
+                AddInternal(entities, dto, addFunc, userId, tenantId);
             }
             else
             {
                 //update
+                CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
                 updateFunc(dto, entity);
                 UpdateEntityCommonField(entity, EEntityOperType.Update, userId, tenantId);
-
             }
 
 
@@ -181,27 +183,27 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dto"></param>
         /// <param name="mapper"></param>
         /// <param name="userId"></param>
-        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId,TKey tenantId = default,List<TEntity> existEntities = null)
+        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId, TKey tenantId = default, List<TEntity> existEntities = null)
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
-            return AddOrUpdate(entities, 
-                dto, 
-                dtoPara => mapper.Map<TEntity>(dtoPara), 
+            return AddOrUpdateInternal(entities,
+                dto,
+                dtoPara => mapper.Map<TEntity>(dtoPara),
                 (dtoPara, entity) => mapper.Map<TDto, TEntity>(dtoPara, entity),
                 userId,
                 tenantId,
                 existEntities);
         }
 
-        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto,TKey userId, TKey tenantId = default, List<TEntity> existEntities = null)
-       where TEntity : class, IIdField<TKey>,new()
+        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, TKey userId, TKey tenantId = default, List<TEntity> existEntities = null)
+       where TEntity : class, IIdField<TKey>, new()
        where TDto : class, IIdField<TKey>
         {
-            return AddOrUpdate(entities,
+            return AddOrUpdateInternal(entities,
                 dto,
-                sourceDto=>EasyMap.MapToNew<TEntity>(sourceDto),
-                (sourceDto,entityDto)=>EasyMap.Map(sourceDto.GetType(),entityDto.GetType(),sourceDto,entityDto,null),
+                sourceDto => EasyMap.MapToNew<TEntity>(sourceDto),
+                (sourceDto, entityDto) => EasyMap.Map(sourceDto.GetType(), entityDto.GetType(), sourceDto, entityDto, null),
                 userId,
                 tenantId,
                 existEntities);
@@ -224,7 +226,7 @@ namespace Snail.EntityFrameworkCore
         /// <param name="addFunc"></param>
         /// <param name="updateFunc"></param>
         /// <param name="userId"></param>
-        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existEntities, List<TDto> dtos, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, TKey tenantId = default)
+        public static void AddOrUpdateListInternal<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existEntities, List<TDto> dtos, Func<TDto, TEntity> addFunc, Action<TDto, TEntity> updateFunc, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
            where TDto : class, IIdField<TKey>
         {
@@ -237,13 +239,13 @@ namespace Snail.EntityFrameworkCore
             // 要删除的ids
             var removeIds = existEntities?.Select(a => a.Id).Except(dtoIds).ToList() ?? new List<TKey>();
             // 更新ids删除对象
-            RemoveByIds<TEntity, TKey>(entities, removeIds, userId, existEntities);
+            RemoveByIds<TEntity, TKey>(entities, removeIds, userId,tenantId);
 
 
             // 增加或更新
             foreach (var dto in dtos.Where(a => !removeIds.Contains(a.Id)))
             {
-                AddOrUpdate(entities, dto, addFunc, updateFunc, userId,tenantId);
+                AddOrUpdateInternal(entities, dto, addFunc, updateFunc, userId, tenantId);
             }
         }
 
@@ -264,11 +266,12 @@ namespace Snail.EntityFrameworkCore
            where TEntity : class, IIdField<TKey>
            where TDto : class, IIdField<TKey>
         {
-            AddOrUpdateList(entities, existsEntities, dtos, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId,tenantId);
+            AddOrUpdateListInternal(entities, existsEntities, dtos, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId, tenantId);
         }
 
         #endregion
 
+        #region 删除实体
         /// <summary>
         /// 删除实体
         /// 请在外部提交更改
@@ -278,29 +281,49 @@ namespace Snail.EntityFrameworkCore
         /// <param name="entities"></param>
         /// <param name="ids"></param>
         /// <param name="existEntities"></param>
-        public static void RemoveByIds<TEntity, TKey>(this DbSet<TEntity> entities, List<TKey> ids,TKey userId, List<TEntity> existEntities = null)
+        public static void RemoveByIds<TEntity, TKey>(this DbSet<TEntity> entities, List<TKey> ids, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
         {
-            if (ids==null || ids.Count==0)
+            if (ids == null || ids.Count == 0)
             {
                 return;
             }
             foreach (var id in ids)
             {
-                var entity = existEntities == null ? entities.Find(id) : existEntities.FirstOrDefault(a => a.Id.Equals(id));
-                if (entity != null)
-                {
-                    if (entity is ISoftDelete entitySoftDeleteEntity)
-                    {
-                        UpdateEntityCommonField(entity, EEntityOperType.Delete, userId, default);
-                    }
-                    else
-                    {
-                        entities.Remove(entity);
-                    }
-                }
+                RemoveById(entities, id, userId, tenantId);
             }
         }
+
+        /// <summary>
+        /// 删除实体
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities">dbset</param>
+        /// <param name="id">id</param>
+        /// <param name="userId"></param>
+        /// <param name="tenantId"></param>
+        /// <param name="existEntities">从existEntities里删除而不是从dbset里删除</param>
+        public static void RemoveById<TEntity, TKey>(this DbSet<TEntity> entities, TKey id, TKey userId, TKey tenantId = default)
+           where TEntity : class, IIdField<TKey>
+        {
+            var entity = entities.Find(id);
+           
+            if (entity != null)
+            {
+                CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
+                if (entity is ISoftDelete entitySoftDeleteEntity)
+                {
+                    UpdateEntityCommonField(entity, EEntityOperType.Delete, userId, default);
+                }
+                else
+                {
+                    entities.Remove(entity);
+                }
+            }
+
+        }
+        #endregion
 
         /// <summary>
         /// 根据实体的操作类型，修改IAudit,ISoftDelete,ITenant等字段
@@ -310,11 +333,11 @@ namespace Snail.EntityFrameworkCore
         /// <param name="operType"></param>
         /// <param name="userId"></param>
         /// <param name="tenantId"></param>
-        public static void UpdateEntityCommonField<TKey>(object entity,EEntityOperType operType,TKey userId,TKey tenantId=default)
+        public static void UpdateEntityCommonField<TKey>(object entity, EEntityOperType operType, TKey userId, TKey tenantId = default)
         {
             if (entity is IAudit<TKey> auditEntity)
             {
-                if (operType==EEntityOperType.Add)
+                if (operType == EEntityOperType.Add)
                 {
                     auditEntity.Creater = userId;
                     auditEntity.CreateTime = DateTime.Now;
@@ -327,10 +350,21 @@ namespace Snail.EntityFrameworkCore
                 auditEntity.UpdateTime = DateTime.Now;
             }
 
-            if (entity is ISoftDelete entitySoftDeleteEntity && operType==EEntityOperType.Delete)
+            if (entity is ISoftDelete entitySoftDeleteEntity && operType == EEntityOperType.Delete)
             {
                 entitySoftDeleteEntity.IsDeleted = true;
             }
         }
+
+        public static void CheckEntityTenantOper<TEntity,TKey>(EEntityOperType operType,TEntity entity,TKey userId,TKey tenantId)
+           where TEntity : class, IIdField<TKey>
+        {
+            // 跨租户实体操作限制
+            if (tenantId != null && TenantHelper.HasTenant(entity, out TKey tenantIdTmp) && !tenantId.Equals(tenantIdTmp))
+            {
+                throw new InvalidOperationException($"不允许跨租户操作数据，操作类型:{operType}，表:{typeof(TEntity).Name}，实体id:{entity.Id}，操作人:{userId}，操作者租户:{tenantId}");
+            }
+        }
+       
     }
 }

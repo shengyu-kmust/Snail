@@ -19,6 +19,7 @@ namespace Snail.Core.Permission
     /// <typeparam name="TUserRole"></typeparam>
     /// <typeparam name="TResource"></typeparam>
     /// <typeparam name="TRoleResource"></typeparam>
+    /// <typeparam name="TKey">系统主键的类型，如string,int,guid等</typeparam>
     /// 
     public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource,TKey> : IPermissionStore
         where TDbContext : DbContext
@@ -29,18 +30,55 @@ namespace Snail.Core.Permission
         where TRoleResource : class, IRoleResource, IIdField<TKey>, new()
 
     {
+        /// <summary>
+        /// 数据库
+        /// </summary>
         protected TDbContext _db;
+        /// <summary>
+        /// 缓存
+        /// </summary>
         protected IMemoryCache _memoryCache;
+        /// <summary>
+        /// 应用上下文
+        /// </summary>
         protected IApplicationContext _applicationContext;
+        /// <summary>
+        /// 所有用户缓存的key
+        /// </summary>
         protected readonly string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}";
+        /// <summary>
+        /// 所有用户角色缓存的key
+        /// </summary>
         protected readonly string roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}";
+        /// <summary>
+        /// 所有角色的key
+        /// </summary>
         protected readonly string userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}";
+        /// <summary>
+        /// 所有资源的key
+        /// </summary>
         protected readonly string resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}";
+        /// <summary>
+        /// 所有角色资源对应关系的key
+        /// </summary>
         protected readonly string roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
+        /// <summary>
+        /// 是否为多租户系统
+        /// </summary>
         private bool? _isTenant;
         
+        /// <summary>
+        /// 权限组件配置
+        /// </summary>
         protected IOptionsMonitor<PermissionOptions> _permissionOptions;
 
+        /// <summary>
+        /// BasePermissionStore
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="memoryCache"></param>
+        /// <param name="permissionOptions"></param>
+        /// <param name="applicationContext"></param>
         public BasePermissionStore(TDbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext)
         {
             _db = db;
@@ -49,12 +87,12 @@ namespace Snail.Core.Permission
             _applicationContext = applicationContext;
         }
 
-        #region 查询数据
+        #region 查询权限基础表数据，用缓存，缓存所有的基础表数据
         public virtual List<IResource> GetAllResource()
         {
             return _memoryCache.GetOrCreate(resourceCacheKey, a => _db.Set<TResource>().AsNoTracking().Select(i => (IResource)i).ToList());
         }
-
+        
         public virtual List<IRole> GetAllRole()
         {
             return _memoryCache.GetOrCreate(roleCacheKey, a => _db.Set<TRole>().AsNoTracking().Select(i => (IRole)i).ToList());
@@ -85,11 +123,8 @@ namespace Snail.Core.Permission
 
 
         /// <summary>
-        /// 
+        /// 重新加载获取的基础表数据
         /// </summary>
-        /// <remarks>
-        /// 经验证，cache里的值在remove后，之前已经从cache里获取的值不会删除
-        /// </remarks>
         public virtual void ReloadPemissionDatas()
         {
             _memoryCache.Remove(userCacheKey);
@@ -105,8 +140,12 @@ namespace Snail.Core.Permission
 
         public virtual void RemoveRole(string roleKey)
         {
-            // todo 不能跨租户删除，删除操作抽到DbSetExtenssion里;
+            // 删除角色为真删除，不保留历史的角色和角色资源关系
             var roleEntity = GetAllRole().FirstOrDefault(a => a.GetKey() == roleKey) as TRole;
+            if (HasTenant(out string tenantId) && !((ITenant<TKey>)roleEntity).TenantId.Equals(tenantId.ConvertTo<TKey>()))
+            {
+                throw new BusinessException($"不能跨租户删除数据");
+            }
             if (roleEntity != null)
             {
                 _db.Set<TRole>().Remove(roleEntity);
