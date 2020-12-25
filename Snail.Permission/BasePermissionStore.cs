@@ -3,7 +3,9 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Snail.Common;
 using Snail.Common.Extenssions;
+using Snail.Core.Enum;
 using Snail.Core.Interface;
+using Snail.Core.Utilities;
 using Snail.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -146,6 +148,7 @@ namespace Snail.Core.Permission
             {
                 throw new BusinessException($"不能跨租户删除数据");
             }
+            CheckEntityTenantOper(EEntityOperType.Delete, roleEntity);
             if (roleEntity != null)
             {
                 _db.Set<TRole>().Remove(roleEntity);
@@ -168,6 +171,7 @@ namespace Snail.Core.Permission
         public virtual void RemoveUser(string userKey)
         {
             var userEntity = _db.Set<TUser>().Find(userKey);
+            CheckEntityTenantOper(EEntityOperType.Delete, userEntity);
             if (userEntity is ISoftDelete entitySoftDeleteEntity)
             {
                 entitySoftDeleteEntity.IsDeleted = true;
@@ -391,6 +395,18 @@ namespace Snail.Core.Permission
                 tenantId = _applicationContext.GetCurrnetTenantId();
             }
             return _isTenant.Value;
+        }
+
+        public void CheckEntityTenantOper<TEntity>(EEntityOperType operType, TEntity entity)
+       where TEntity : class, IIdField<TKey>
+        {
+            var tenantId = _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
+            var userId = _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
+            // 跨租户实体操作限制
+            if (tenantId != null && TenantHelper.HasTenant(entity, out TKey tenantIdTmp) && !tenantId.Equals(tenantIdTmp))
+            {
+                throw new InvalidOperationException($"不允许跨租户操作数据，操作类型:{operType}，表:{typeof(TEntity).Name}，实体id:{entity.Id}，操作人:{userId}，操作者租户:{tenantId}");
+            }
         }
     }
 }

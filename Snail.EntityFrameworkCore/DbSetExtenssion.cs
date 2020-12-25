@@ -98,7 +98,7 @@ namespace Snail.EntityFrameworkCore
                 entity.Id = IdGenerator.Generate<TKey>();
             }
             UpdateEntityCommonField(entity, EEntityOperType.Add, userId, tenantId);
-            CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
+            TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
             entities.Add(entity);
         }
 
@@ -163,7 +163,7 @@ namespace Snail.EntityFrameworkCore
             else
             {
                 //update
-                CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
+                TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
                 updateFunc(dto, entity);
                 UpdateEntityCommonField(entity, EEntityOperType.Update, userId, tenantId);
             }
@@ -311,7 +311,7 @@ namespace Snail.EntityFrameworkCore
            
             if (entity != null)
             {
-                CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
+                TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
                 if (entity is ISoftDelete entitySoftDeleteEntity)
                 {
                     UpdateEntityCommonField(entity, EEntityOperType.Delete, userId, default);
@@ -356,15 +356,7 @@ namespace Snail.EntityFrameworkCore
             }
         }
 
-        public static void CheckEntityTenantOper<TEntity,TKey>(EEntityOperType operType,TEntity entity,TKey userId,TKey tenantId)
-           where TEntity : class, IIdField<TKey>
-        {
-            // 跨租户实体操作限制
-            if (tenantId != null && TenantHelper.HasTenant(entity, out TKey tenantIdTmp) && !tenantId.Equals(tenantIdTmp))
-            {
-                throw new InvalidOperationException($"不允许跨租户操作数据，操作类型:{operType}，表:{typeof(TEntity).Name}，实体id:{entity.Id}，操作人:{userId}，操作者租户:{tenantId}");
-            }
-        }
+     
        
     }
 }
