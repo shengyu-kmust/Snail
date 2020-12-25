@@ -34,6 +34,7 @@
 		<ProjectReference Include="..\Snail.Core.Default\Snail.Core.Default.csproj" />
 		<ProjectReference Include="..\Snail.Core\Snail.Core.csproj" />
 		<ProjectReference Include="..\Snail.Common\Snail.Common.csproj" />
+		<ProjectReference Include="..\Snail.EntityFrameworkCore\Snail.EntityFrameworkCore.csproj" />
 	</ItemGroup>
 
 </Project>

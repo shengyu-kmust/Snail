@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
+using Snail.Core;
 using Snail.Core.Default;
 using Snail.Core.Interface;
 using Snail.Core.Permission;
@@ -142,16 +143,16 @@ namespace Snail.Permission
         /// <typeparam name="TRoleResource"></typeparam>
         /// <param name="services"></param>
         /// <param name="action"></param>
-        public static void AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services, Action<PermissionOptions> action)
+        public static void AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource, TKey>(this IServiceCollection services, Action<PermissionOptions> action)
             where TDbContext : DbContext
-            where TUser : class, IUser, new()
-            where TRole : class, IRole, new()
-            where TUserRole : class, IUserRole, new()
-            where TResource : class, IResource, new()
-            where TRoleResource : class, IRoleResource, new()
+            where TUser : class, IUser, IIdField<TKey>, new()
+            where TRole : class, IRole, IIdField<TKey>, new()
+            where TUserRole : class, IUserRole, IIdField<TKey>, new()
+            where TResource : class, IResource, IIdField<TKey>, new()
+            where TRoleResource : class, IRoleResource, IIdField<TKey>, new()
         {
             services.TryAddScoped<IPermission, DefaultPermission>();
-            services.TryAddScoped<IPermissionStore, BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>>();
+            services.TryAddScoped<IPermissionStore, BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource,TKey>>();
             AddCorePermission(services, action);
         }
 

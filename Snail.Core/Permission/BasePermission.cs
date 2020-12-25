@@ -57,6 +57,7 @@ namespace Snail.Core.Permission
                 RoleNames = (claimsPrincipal.FindFirst(PermissionConstant.rolesNamesClaim)?.Value ?? "").Split(',').ToList(),
                 UserKey = claimsPrincipal.FindFirst(PermissionConstant.userIdClaim)?.Value,
                 UserName = claimsPrincipal.FindFirst(PermissionConstant.userNameClaim)?.Value,
+                TenantId = claimsPrincipal.FindFirst(PermissionConstant.tenantIdClaim)?.Value,
             };
         }
         #endregion
@@ -80,8 +81,12 @@ namespace Snail.Core.Permission
                     RoleKeys = roleKeys.ToList(),
                     RoleNames = roleNames.ToList(),
                     UserKey = user.GetKey(),
-                    UserName = user.GetName()
+                    UserName = user.GetName(),
                 };
+                if (user is ITenant<string> userTenant)
+                {
+                    userInfo.TenantId = userTenant.TenantId; // todo 让string为泛型
+                }
                 var claims = GetClaims(userInfo);
                 var tokenStr = GenerateTokenStr(claims);
                 return new LoginResult

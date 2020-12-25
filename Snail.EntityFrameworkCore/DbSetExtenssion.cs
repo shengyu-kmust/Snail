@@ -156,7 +156,7 @@ namespace Snail.EntityFrameworkCore
             var entity = existEntities == null ? entities.Find(dto.Id) : existEntities.FirstOrDefault(a => a.Id.Equals(dto.Id));
             if (entity == null)
             {
-                Add(dto, addFunc, updateFunc, userId, tenantId);
+                Add(entities, dto, addFunc, userId, tenantId);
             }
             else
             {
@@ -189,6 +189,19 @@ namespace Snail.EntityFrameworkCore
                 dto, 
                 dtoPara => mapper.Map<TEntity>(dtoPara), 
                 (dtoPara, entity) => mapper.Map<TDto, TEntity>(dtoPara, entity),
+                userId,
+                tenantId,
+                existEntities);
+        }
+
+        public static TEntity AddOrUpdate<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto,TKey userId, TKey tenantId = default, List<TEntity> existEntities = null)
+       where TEntity : class, IIdField<TKey>,new()
+       where TDto : class, IIdField<TKey>
+        {
+            return AddOrUpdate(entities,
+                dto,
+                sourceDto=>EasyMap.MapToNew<TEntity>(sourceDto),
+                (sourceDto,entityDto)=>EasyMap.Map(sourceDto.GetType(),entityDto.GetType(),sourceDto,entityDto,null),
                 userId,
                 tenantId,
                 existEntities);

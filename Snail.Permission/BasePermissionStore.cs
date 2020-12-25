@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Snail.Common;
-using Snail.Core.Entity;
+using Snail.Common.Extenssions;
 using Snail.Core.Interface;
+using Snail.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace Snail.Core.Permission
 {
     /// <summary>
@@ -20,13 +20,14 @@ namespace Snail.Core.Permission
     /// <typeparam name="TResource"></typeparam>
     /// <typeparam name="TRoleResource"></typeparam>
     /// 
-    public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource> : IPermissionStore
+    public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource,TKey> : IPermissionStore
         where TDbContext : DbContext
-        where TUser : class, IUser, new()
-        where TRole : class, IRole, new()
-        where TUserRole : class, IUserRole, new()
-        where TResource : class, IResource, new()
-        where TRoleResource : class, IRoleResource, new()
+        where TUser : class, IUser, IIdField<TKey>, new()
+        where TRole : class, IRole, IIdField<TKey>, new()
+        where TUserRole : class, IUserRole, IIdField<TKey>, new()
+        where TResource : class, IResource, IIdField<TKey>, new()
+        where TRoleResource : class, IRoleResource, IIdField<TKey>, new()
+
     {
         protected TDbContext _db;
         protected IMemoryCache _memoryCache;
@@ -36,7 +37,8 @@ namespace Snail.Core.Permission
         protected readonly string userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}";
         protected readonly string resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}";
         protected readonly string roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
-
+        private bool? _isTenant;
+        
         protected IOptionsMonitor<PermissionOptions> _permissionOptions;
 
         public BasePermissionStore(TDbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext)
@@ -67,9 +69,13 @@ namespace Snail.Core.Permission
 
         public virtual List<IUser> GetAllUser()
         {
-            return _memoryCache.GetOrCreate(userCacheKey, a => _db.Set<TUser>().AsNoTracking().Select(i => (IUser)i).ToList());
+            
+            return _memoryCache.GetOrCreate(userCacheKey, 
+                a => _db.Set<TUser>().AsNoTracking().Select(i => (IUser)i).ToList());
 
         }
+
+  
 
         public virtual List<IUserRole> GetAllUserRole()
         {
@@ -99,6 +105,7 @@ namespace Snail.Core.Permission
 
         public virtual void RemoveRole(string roleKey)
         {
+            // todo 不能跨租户删除，删除操作抽到DbSetExtenssion里;
             var roleEntity = GetAllRole().FirstOrDefault(a => a.GetKey() == roleKey) as TRole;
             if (roleEntity != null)
             {
@@ -179,7 +186,7 @@ namespace Snail.Core.Permission
             {
                 EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
             }
-            SetAuditSoftDelete(resourceEntity);
+            SetAuditSoftDeleteTenant(resourceEntity);
             _db.SaveChanges();
             _memoryCache.Remove(resourceCacheKey);
         }
@@ -206,7 +213,7 @@ namespace Snail.Core.Permission
                 {
                     EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
                 }
-                SetAuditSoftDelete(resourceEntity);
+                SetAuditSoftDeleteTenant(resourceEntity);
             });
         
             _db.SaveChanges();
@@ -218,28 +225,21 @@ namespace Snail.Core.Permission
         public virtual void UpdateRoleEntityByDto(IRole entity, IRole dto, bool isAdd)
         {
             EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
-            SetAuditSoftDelete(entity);
+            SetAuditSoftDeleteTenant(entity);
         }
         public virtual void UpdateUserEntityByDto(IUser entity, IUser dto, bool isAdd)
         {
             EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
-            SetAuditSoftDelete(entity);
+            SetAuditSoftDeleteTenant(entity);
         }
 
         public virtual void SaveRole(IRole role)
         {
             var roleKey = role.GetKey();
-            if (string.IsNullOrEmpty(roleKey))
-            {
-                var addRole = new TRole();
-                UpdateRoleEntityByDto(addRole, role, true);
-                _db.Add(addRole);
-            }
-            else
-            {
-                var editRole = _db.Set<TRole>().Find(role.GetKey());
-                UpdateRoleEntityByDto(editRole, role, false);
-            }
+            TKey userId = _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
+            TKey tenantId = _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
+            var roleTmp = EasyMap.MapToNew<TUser>(role);
+
             _db.SaveChanges();
             _memoryCache.Remove(roleCacheKey);
 
@@ -247,23 +247,25 @@ namespace Snail.Core.Permission
 
         public virtual void SaveUser(IUser user)
         {
-            TUser saveUser;
-            if (string.IsNullOrEmpty(user.GetKey()))
+            lock (Locker.GetLocker($"BasePermissionStore_SaveUser"))
             {
-                saveUser = new TUser();
-                UpdateUserEntityByDto(saveUser, user, true);
-                _db.Add(saveUser);
+                // 账号不能重复.如果是多租户,同一租户里的账号不能重复.
+                var allUser = GetAllUser();
+                var existAccountUser = allUser.FirstOrDefault(a => a.GetAccount() == user.GetAccount());
+                if (existAccountUser!=null && existAccountUser.GetKey()!=user.GetKey())
+                {
+                    throw new BusinessException($"已经存在账号为{existAccountUser.GetAccount()}的用户");
+                }
+                TKey userId = _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
+                TKey tenantId = _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
+                var userTmp = EasyMap.MapToNew<TUser>(user);
+                var userEntity=_db.Set<TUser>().AddOrUpdate(userTmp, userId,tenantId,null);
+                userEntity.SetName(user.GetName());
+                userEntity.SetAccount(user.GetAccount());
+                userEntity.SetPassword(user.GetPassword());
+                _db.SaveChanges();
+                _memoryCache.Remove(userCacheKey);
             }
-            else
-            {
-                saveUser = _db.Set<TUser>().Find(user.GetKey());
-                UpdateUserEntityByDto(saveUser, user, false);
-            }
-            saveUser.SetName(user.GetName());
-            saveUser.SetAccount(user.GetAccount());
-            saveUser.SetPassword(user.GetPassword());
-            _db.SaveChanges();
-            _memoryCache.Remove(userCacheKey);
         }
 
         public virtual void SetRoleResources(string roleKey, List<string> resourceKeys)
@@ -283,7 +285,7 @@ namespace Snail.Core.Permission
                 if (allResources.Any(a => a.GetKey() == resourceKey))
                 {
                     var addRoleResource = new TRoleResource();
-                    SetAuditSoftDelete(addRoleResource);
+                    SetAuditSoftDeleteTenant(addRoleResource);
                     addRoleResource.SetRoleKey(roleKey);
                     addRoleResource.SetResourceKey(resourceKey);
                     _db.Add(addRoleResource);
@@ -307,7 +309,7 @@ namespace Snail.Core.Permission
                 if (allRole.Any(a => a.GetKey() == roleKey))
                 {
                     var addItem = new TUserRole();
-                    SetAuditSoftDelete(addItem);
+                    SetAuditSoftDeleteTenant(addItem);
                     addItem.SetRoleKey(roleKey);
                     addItem.SetUserKey(userKey);
                     _db.Add(addItem);
@@ -318,7 +320,7 @@ namespace Snail.Core.Permission
             _memoryCache.Remove(userRoleCacheKey);
         }
 
-        private void SetAuditSoftDelete(object obj)
+        private void SetAuditSoftDeleteTenant(object obj)
         {
             var userId = _applicationContext.GetCurrentUserId();
             if (obj is IIdField<string> entityOfIdField && string.IsNullOrEmpty(entityOfIdField.Id))
@@ -332,6 +334,24 @@ namespace Snail.Core.Permission
                 entityOfAudit.Updater = userId;
                 entityOfAudit.Creater = userId;
             }
+            if (obj is ITenant<string> tenantEntity)
+            {
+                tenantEntity.TenantId = _applicationContext.GetCurrnetTenantId();
+            }
+        }
+
+        public bool HasTenant(out string tenantId)
+        {
+            tenantId = string.Empty;
+            if (!_isTenant.HasValue)
+            {
+                _isTenant=typeof(ITenant<string>).IsAssignableFrom(typeof(TUser));
+            }
+            if (_isTenant.Value)
+            {
+                tenantId = _applicationContext.GetCurrnetTenantId();
+            }
+            return _isTenant.Value;
         }
     }
 }

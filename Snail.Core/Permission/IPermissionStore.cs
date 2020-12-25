@@ -93,6 +93,11 @@ namespace Snail.Core.Permission
         /// </summary>
         void ReloadPemissionDatas();
         #endregion
+        /// <summary>
+        /// 是否为多租户系统
+        /// </summary>
+        /// <returns></returns>
+        bool HasTenant(out string tenantId);
 
     }
 }
