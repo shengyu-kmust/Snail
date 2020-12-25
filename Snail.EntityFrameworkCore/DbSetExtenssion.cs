@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Snail.Common;
 using Snail.Core;
+using Snail.Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,6 @@ namespace Snail.EntityFrameworkCore
         /// <param name="userId"></param>
         public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos, Func<TDto, TEntity> addFunc, TKey userId,TKey tenantId=default)
            where TEntity : class, IIdField<TKey>
-         where TDto : class, IIdField<TKey>
         {
             dtos.ForEach(dto =>
             {
@@ -56,11 +56,29 @@ namespace Snail.EntityFrameworkCore
             });
         }
 
+        /// <summary>
+        /// 增加多个实体,用EasyMap对实体进行映射
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dtos"></param>
+        /// <param name="userId"></param>
+        /// <param name="tenantId"></param>
+        public static void AddList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TDto> dtos,TKey userId, TKey tenantId = default)
+           where TEntity : class, IIdField<TKey>,new()
+        {
+            dtos.ForEach(dto =>
+            {
+                Add(entities, dto,userId, tenantId);
+            });
+        }
 
         #endregion
         #region add
         /// <summary>
-        /// 增加单个实体
+        /// 增加单个实体，实体映射由用户自定义
         /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
@@ -72,33 +90,18 @@ namespace Snail.EntityFrameworkCore
         /// <param name="userId"></param>
         public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId, TKey tenantId = default)
           where TEntity : class, IIdField<TKey>
-        where TDto : class, IIdField<TKey>
         {
-            var now = DateTime.Now;
             var entity = addFunc(dto);
             if (string.IsNullOrEmpty(entity.Id?.ToString()))
             {
                 entity.Id = IdGenerator.Generate<TKey>();
             }
-            if (entity is IAudit<TKey> auditEntity)
-            {
-                if (!string.IsNullOrEmpty(userId?.ToString()))
-                {
-                    auditEntity.Creater = userId;
-                    auditEntity.Updater = userId;
-                }
-                auditEntity.CreateTime = now;
-                auditEntity.UpdateTime = now;
-            }
-            if (entity is ITenant<TKey> tenantEntity)
-            {
-                tenantEntity.TenantId = tenantId;
-            }
+            UpdateEntityCommonField(entity, EEntityOperType.Add, userId, tenantId);
             entities.Add(entity);
         }
 
         /// <summary>
-        /// 增加单个实体
+        /// 增加单个实体，映射实体只automapper处理
         /// 请在外部提交更改
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
@@ -110,9 +113,25 @@ namespace Snail.EntityFrameworkCore
         /// <param name="userId"></param>
         public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, IMapper mapper, TKey userId, TKey tenantId = default)
            where TEntity : class, IIdField<TKey>
-         where TDto : class, IIdField<TKey>
         {
             Add(entities, dto, (dtoPara) => mapper.Map<TEntity>(dtoPara), userId,tenantId);
+        }
+
+        /// <summary>
+        /// 增加单个实体，会用EasyMap做实体映射
+        /// 请在外部提交更改
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="dto"></param>
+        /// <param name="userId"></param>
+        /// <param name="tenantId"></param>
+        public static void Add<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto,TKey userId, TKey tenantId = default)
+           where TEntity : class, IIdField<TKey>,new()
+        {
+            Add(entities, dto, sourceDto=>EasyMap.MapToNew<TEntity>(sourceDto), userId, tenantId);
         }
         #endregion
 
@@ -134,38 +153,20 @@ namespace Snail.EntityFrameworkCore
         where TEntity : class, IIdField<TKey>
         where TDto : class, IIdField<TKey>
         {
-            var now = DateTime.Now;
             var entity = existEntities == null ? entities.Find(dto.Id) : existEntities.FirstOrDefault(a => a.Id.Equals(dto.Id));
             if (entity == null)
             {
-                //add
-                entity = addFunc(dto);
-                if (string.IsNullOrEmpty(entity.Id?.ToString()))
-                {
-                    entity.Id = IdGenerator.Generate<TKey>();
-                }
-                entities.Add(entity);
+                Add(dto, addFunc, updateFunc, userId, tenantId);
             }
             else
             {
                 //update
                 updateFunc(dto, entity);
+                UpdateEntityCommonField(entity, EEntityOperType.Update, userId, tenantId);
+
             }
 
-            if (entity is IAudit<TKey> auditEntity)
-            {
-                if (!string.IsNullOrEmpty(userId?.ToString()))
-                {
-                    auditEntity.Creater = userId;
-                    auditEntity.Updater = userId;
-                }
-                auditEntity.CreateTime = now;
-                auditEntity.UpdateTime = now;
-            }
-            if (entity is ITenant<TKey> tenantEntity)
-            {
-                tenantEntity.TenantId = tenantId;
-            }
+
             return entity;
         }
 
@@ -276,28 +277,46 @@ namespace Snail.EntityFrameworkCore
                 var entity = existEntities == null ? entities.Find(id) : existEntities.FirstOrDefault(a => a.Id.Equals(id));
                 if (entity != null)
                 {
-                    if (entity is IAudit<TKey> entityAudit)
-                    {
-                        entityAudit.UpdateTime = DateTime.Now;
-                        if (userId != null)
-                        {
-                            entityAudit.Updater = userId;
-                        }
-                    }
                     if (entity is ISoftDelete entitySoftDeleteEntity)
                     {
-                        entitySoftDeleteEntity.IsDeleted = true;
-                        if (entity is IAudit<TKey> auditEntity)
-                        {
-                            auditEntity.CreateTime = DateTime.Now;
-                            auditEntity.UpdateTime = DateTime.Now;
-                        }
+                        UpdateEntityCommonField(entity, EEntityOperType.Delete, userId, default);
                     }
                     else
                     {
                         entities.Remove(entity);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// 根据实体的操作类型，修改IAudit,ISoftDelete,ITenant等字段
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="operType"></param>
+        /// <param name="userId"></param>
+        /// <param name="tenantId"></param>
+        public static void UpdateEntityCommonField<TKey>(object entity,EEntityOperType operType,TKey userId,TKey tenantId=default)
+        {
+            if (entity is IAudit<TKey> auditEntity)
+            {
+                if (operType==EEntityOperType.Add)
+                {
+                    auditEntity.Creater = userId;
+                    auditEntity.CreateTime = DateTime.Now;
+                    if (entity is ITenant<TKey> tenantEntity)
+                    {
+                        tenantEntity.TenantId = tenantId;
+                    }
+                }
+                auditEntity.Updater = userId;
+                auditEntity.UpdateTime = DateTime.Now;
+            }
+
+            if (entity is ISoftDelete entitySoftDeleteEntity && operType==EEntityOperType.Delete)
+            {
+                entitySoftDeleteEntity.IsDeleted = true;
             }
         }
     }
