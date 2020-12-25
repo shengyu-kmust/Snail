@@ -25,7 +25,7 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using ApplicationCore.Entity;\r\nusing Snail.Web.Services;\r\n\r\nnamespace Service\r\n{\r" +
+            this.Write("using ApplicationCore.Entities;\r\nusing Snail.Web.Services;\r\n\r\nnamespace Service\r\n{\r" +
                     "\n    public class ");
             
             #line 6 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\ServiceTemplate.tt"

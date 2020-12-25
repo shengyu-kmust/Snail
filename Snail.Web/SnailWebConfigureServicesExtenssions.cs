@@ -273,13 +273,13 @@ namespace Snail.Web
         /// <param name="services"></param>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static IServiceCollection ConfigSnailWebDbAndPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services,IConfiguration configuration)
+        public static IServiceCollection ConfigSnailWebDbAndPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource,TKey>(this IServiceCollection services,IConfiguration configuration)
                     where TDbContext : DbContext
-            where TUser : class, IUser, new()
-            where TRole : class, IRole, new()
-            where TUserRole : class, IUserRole, new()
-            where TResource : class, IResource, new()
-            where TRoleResource : class, IRoleResource, new()
+        where TUser : class, IUser, IIdField<TKey>, new()
+        where TRole : class, IRole, IIdField<TKey>, new()
+        where TUserRole : class, IUserRole, IIdField<TKey>, new()
+        where TResource : class, IResource, IIdField<TKey>, new()
+        where TRoleResource : class, IRoleResource, IIdField<TKey>, new()
         {
             #region 数据库配置
             var dbType = configuration.GetSection("DbSetting")["DbType"];
@@ -305,7 +305,7 @@ namespace Snail.Web
             #endregion
 
             #region 增加通用权限
-            services.AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(options =>
+            services.AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource,TKey>(options =>
             {
                 configuration.GetSection("PermissionOptions").Bind(options);
                 options.ResourceAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();// 从哪些程序集里，将Controller的action设置成权限资源
