@@ -23,7 +23,7 @@ namespace Snail.Core.Permission
     /// <typeparam name="TRoleResource"></typeparam>
     /// <typeparam name="TKey">系统主键的类型，如string,int,guid等</typeparam>
     /// 
-    public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource,TKey> : IPermissionStore
+    public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource, TKey> : IPermissionStore
         where TDbContext : DbContext
         where TUser : class, IUser, IIdField<TKey>, new()
         where TRole : class, IRole, IIdField<TKey>, new()
@@ -68,7 +68,7 @@ namespace Snail.Core.Permission
         /// 是否为多租户系统
         /// </summary>
         private bool? _isTenant;
-        
+
         /// <summary>
         /// 权限组件配置
         /// </summary>
@@ -94,7 +94,7 @@ namespace Snail.Core.Permission
         {
             return _memoryCache.GetOrCreate(resourceCacheKey, a => _db.Set<TResource>().AsNoTracking().Select(i => (IResource)i).ToList());
         }
-        
+
         public virtual List<IRole> GetAllRole()
         {
             return _memoryCache.GetOrCreate(roleCacheKey, a => _db.Set<TRole>().AsNoTracking().Select(i => (IRole)i).ToList());
@@ -109,13 +109,13 @@ namespace Snail.Core.Permission
 
         public virtual List<IUser> GetAllUser()
         {
-            
-            return _memoryCache.GetOrCreate(userCacheKey, 
+
+            return _memoryCache.GetOrCreate(userCacheKey,
                 a => _db.Set<TUser>().AsNoTracking().Select(i => (IUser)i).ToList());
 
         }
 
-  
+
 
         public virtual List<IUserRole> GetAllUserRole()
         {
@@ -135,8 +135,6 @@ namespace Snail.Core.Permission
             _memoryCache.Remove(resourceCacheKey);
             _memoryCache.Remove(roleResourceCacheKey);
         }
-
-
         #endregion
 
 
@@ -144,11 +142,7 @@ namespace Snail.Core.Permission
         {
             // 删除角色为真删除，不保留历史的角色和角色资源关系
             var roleEntity = GetAllRole().FirstOrDefault(a => a.GetKey() == roleKey) as TRole;
-            if (HasTenant(out string tenantId) && !((ITenant<TKey>)roleEntity).TenantId.Equals(tenantId.ConvertTo<TKey>()))
-            {
-                throw new BusinessException($"不能跨租户删除数据");
-            }
-            CheckEntityTenantOper(EEntityOperType.Delete, roleEntity);
+            TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, roleEntity, CurrentUserId, CurrentTenantId);
             if (roleEntity != null)
             {
                 _db.Set<TRole>().Remove(roleEntity);
@@ -171,7 +165,7 @@ namespace Snail.Core.Permission
         public virtual void RemoveUser(string userKey)
         {
             var userEntity = _db.Set<TUser>().Find(userKey);
-            CheckEntityTenantOper(EEntityOperType.Delete, userEntity);
+            TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, userEntity, CurrentUserId, CurrentTenantId);
             if (userEntity is ISoftDelete entitySoftDeleteEntity)
             {
                 entitySoftDeleteEntity.IsDeleted = true;
@@ -215,28 +209,17 @@ namespace Snail.Core.Permission
         /// <param name="resource"></param>
         public virtual void SaveResource(IResource resource)
         {
-            var resourceKey = resource.GetKey();
-            // todo 全表查询了
-            var resourceEntity = _db.Set<TResource>().AsEnumerable().FirstOrDefault(a => a.GetKey() == resourceKey || a.GetResourceCode() == resource.GetResourceCode());
-            if (resourceEntity == null)
-            {
-                //add
-                var addDto = new TResource();
-                EasyMap.Map(resource.GetType(), typeof(TResource), resource, addDto,null);
-                _db.Add(addDto);
-            }
-            else
-            {
-                EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
-            }
-            SetAuditSoftDeleteTenant(resourceEntity);
+            var resourceTmp = EasyMap.MapToNew<TResource>(resource);
+            var resourceEntity = _db.Set<TResource>().AddOrUpdate(resourceTmp, CurrentUserId, default, null);
+            resourceEntity.SetName(resourceTmp.GetName());
+            resourceEntity.SetParentKey(resourceTmp.GetParentKey());
             _db.SaveChanges();
             _memoryCache.Remove(resourceCacheKey);
         }
         /// <summary>
-        /// 保存资源。会从资源id和资源code两字段考虑是新增还是修改
+        /// 保存资源。会从资源id和资源code两字段考虑是新增还是修改，无删除
         /// </summary>
-        /// <param name="resource"></param>
+        /// <param name="resources"></param>
         public virtual void SaveResources(List<IResource> resources)
         {
             var allResources = _db.Set<TResource>().ToList();
@@ -251,41 +234,27 @@ namespace Snail.Core.Permission
                     var addDto = new TResource();
                     EasyMap.Map(resource.GetType(), typeof(TResource), resource, addDto, null);
                     _db.Add(addDto);
+                    DbSetExtenssion.UpdateEntityCommonField(resourceEntity, EEntityOperType.Add, CurrentUserId, CurrentTenantId);
                 }
                 else
                 {
                     EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
+                    DbSetExtenssion.UpdateEntityCommonField(resourceEntity, EEntityOperType.Update, CurrentUserId, CurrentTenantId);
                 }
-                SetAuditSoftDeleteTenant(resourceEntity);
             });
-        
+
             _db.SaveChanges();
             _memoryCache.Remove(resourceCacheKey);
         }
-
-
-
-        public virtual void UpdateRoleEntityByDto(IRole entity, IRole dto, bool isAdd)
-        {
-            EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
-            SetAuditSoftDeleteTenant(entity);
-        }
-        public virtual void UpdateUserEntityByDto(IUser entity, IUser dto, bool isAdd)
-        {
-            EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
-            SetAuditSoftDeleteTenant(entity);
-        }
-
         public virtual void SaveRole(IRole role)
         {
-            var roleKey = role.GetKey();
-            TKey userId = _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
-            TKey tenantId = _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
-            var roleTmp = EasyMap.MapToNew<TUser>(role);
-
-            _db.SaveChanges();
-            _memoryCache.Remove(roleCacheKey);
-
+            lock (Locker.GetLocker($"BasePermissionStore_SaveRole"))
+            {
+                var roleTmp = EasyMap.MapToNew<TRole>(role);
+                _db.Set<TUser>().AddOrUpdate(roleTmp, CurrentUserId, CurrentTenantId, null);
+                _db.SaveChanges();
+                _memoryCache.Remove(roleCacheKey);
+            }
         }
 
         public virtual void SaveUser(IUser user)
@@ -295,14 +264,12 @@ namespace Snail.Core.Permission
                 // 账号不能重复.如果是多租户,同一租户里的账号不能重复.
                 var allUser = GetAllUser();
                 var existAccountUser = allUser.FirstOrDefault(a => a.GetAccount() == user.GetAccount());
-                if (existAccountUser!=null && existAccountUser.GetKey()!=user.GetKey())
+                if (existAccountUser != null && existAccountUser.GetKey() != user.GetKey())
                 {
                     throw new BusinessException($"已经存在账号为{existAccountUser.GetAccount()}的用户");
                 }
-                TKey userId = _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
-                TKey tenantId = _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
                 var userTmp = EasyMap.MapToNew<TUser>(user);
-                var userEntity=_db.Set<TUser>().AddOrUpdate(userTmp, userId,tenantId,null);
+                var userEntity = _db.Set<TUser>().AddOrUpdate(userTmp, CurrentUserId, CurrentTenantId, null);
                 userEntity.SetName(user.GetName());
                 userEntity.SetAccount(user.GetAccount());
                 userEntity.SetPassword(user.GetPassword());
@@ -328,7 +295,7 @@ namespace Snail.Core.Permission
                 if (allResources.Any(a => a.GetKey() == resourceKey))
                 {
                     var addRoleResource = new TRoleResource();
-                    SetAuditSoftDeleteTenant(addRoleResource);
+                    DbSetExtenssion.UpdateEntityCommonField(addRoleResource, EEntityOperType.Update, CurrentUserId, CurrentTenantId);
                     addRoleResource.SetRoleKey(roleKey);
                     addRoleResource.SetResourceKey(resourceKey);
                     _db.Add(addRoleResource);
@@ -352,7 +319,7 @@ namespace Snail.Core.Permission
                 if (allRole.Any(a => a.GetKey() == roleKey))
                 {
                     var addItem = new TUserRole();
-                    SetAuditSoftDeleteTenant(addItem);
+                    DbSetExtenssion.UpdateEntityCommonField(addItem, EEntityOperType.Update, CurrentUserId, CurrentTenantId);
                     addItem.SetRoleKey(roleKey);
                     addItem.SetUserKey(userKey);
                     _db.Add(addItem);
@@ -363,32 +330,32 @@ namespace Snail.Core.Permission
             _memoryCache.Remove(userRoleCacheKey);
         }
 
-        private void SetAuditSoftDeleteTenant(object obj)
-        {
-            var userId = _applicationContext.GetCurrentUserId();
-            if (obj is IIdField<string> entityOfIdField && string.IsNullOrEmpty(entityOfIdField.Id))
-            {
-                entityOfIdField.Id = IdGenerator.Generate<string>();
-            }
-            if (obj is IAudit<string> entityOfAudit)
-            {
-                entityOfAudit.CreateTime = DateTime.Now;
-                entityOfAudit.Updater = userId;
-                entityOfAudit.Updater = userId;
-                entityOfAudit.Creater = userId;
-            }
-            if (obj is ITenant<string> tenantEntity)
-            {
-                tenantEntity.TenantId = _applicationContext.GetCurrnetTenantId();
-            }
-        }
+        //private void SetAuditSoftDeleteTenant(object obj)
+        //{
+        //    var userId = _applicationContext.GetCurrentUserId();
+        //    if (obj is IIdField<string> entityOfIdField && string.IsNullOrEmpty(entityOfIdField.Id))
+        //    {
+        //        entityOfIdField.Id = IdGenerator.Generate<string>();
+        //    }
+        //    if (obj is IAudit<string> entityOfAudit)
+        //    {
+        //        entityOfAudit.CreateTime = DateTime.Now;
+        //        entityOfAudit.Updater = userId;
+        //        entityOfAudit.Updater = userId;
+        //        entityOfAudit.Creater = userId;
+        //    }
+        //    if (obj is ITenant<string> tenantEntity)
+        //    {
+        //        tenantEntity.TenantId = _applicationContext.GetCurrnetTenantId();
+        //    }
+        //}
 
         public bool HasTenant(out string tenantId)
         {
             tenantId = string.Empty;
             if (!_isTenant.HasValue)
             {
-                _isTenant=typeof(ITenant<string>).IsAssignableFrom(typeof(TUser));
+                _isTenant = typeof(ITenant<string>).IsAssignableFrom(typeof(TUser));
             }
             if (_isTenant.Value)
             {
@@ -397,15 +364,19 @@ namespace Snail.Core.Permission
             return _isTenant.Value;
         }
 
-        public void CheckEntityTenantOper<TEntity>(EEntityOperType operType, TEntity entity)
-       where TEntity : class, IIdField<TKey>
+      
+        public TKey CurrentUserId
         {
-            var tenantId = _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
-            var userId = _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
-            // 跨租户实体操作限制
-            if (tenantId != null && TenantHelper.HasTenant(entity, out TKey tenantIdTmp) && !tenantId.Equals(tenantIdTmp))
+            get
             {
-                throw new InvalidOperationException($"不允许跨租户操作数据，操作类型:{operType}，表:{typeof(TEntity).Name}，实体id:{entity.Id}，操作人:{userId}，操作者租户:{tenantId}");
+                return _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
+            }
+        }
+        public TKey CurrentTenantId
+        {
+            get
+            {
+                return _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
             }
         }
     }

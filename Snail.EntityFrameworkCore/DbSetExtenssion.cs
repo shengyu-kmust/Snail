@@ -239,7 +239,7 @@ namespace Snail.EntityFrameworkCore
             // 要删除的ids
             var removeIds = existEntities?.Select(a => a.Id).Except(dtoIds).ToList() ?? new List<TKey>();
             // 更新ids删除对象
-            RemoveByIds<TEntity, TKey>(entities, removeIds, userId,tenantId);
+            RemoveByIds<TEntity, TKey>(entities, removeIds, userId, tenantId);
 
 
             // 增加或更新
@@ -267,6 +267,31 @@ namespace Snail.EntityFrameworkCore
            where TDto : class, IIdField<TKey>
         {
             AddOrUpdateListInternal(entities, existsEntities, dtos, dto => mapper.Map<TEntity>(dto), (dto, entity) => mapper.Map<TDto, TEntity>(dto, entity), userId, tenantId);
+        }
+
+
+        /// <summary>
+        /// 实体列表的差异更新，包含增加、删除、更新
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDto"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="existsEntities"></param>
+        /// <param name="dtos"></param>
+        /// <param name="userId"></param>
+        /// <param name="tenantId"></param>
+        public static void AddOrUpdateList<TEntity, TDto, TKey>(this DbSet<TEntity> entities, List<TEntity> existsEntities, List<TDto> dtos, TKey userId, TKey tenantId = default)
+           where TEntity : class, IIdField<TKey>, new()
+           where TDto : class, IIdField<TKey>
+        {
+            AddOrUpdateListInternal(entities,
+                existsEntities,
+                dtos,
+               sourceDto => EasyMap.MapToNew<TEntity>(sourceDto),
+                (sourceDto, entityDto) => EasyMap.Map(sourceDto.GetType(), entityDto.GetType(), sourceDto, entityDto, null),
+                userId,
+                tenantId);
         }
 
         #endregion
@@ -308,7 +333,7 @@ namespace Snail.EntityFrameworkCore
            where TEntity : class, IIdField<TKey>
         {
             var entity = entities.Find(id);
-           
+
             if (entity != null)
             {
                 TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
@@ -356,7 +381,7 @@ namespace Snail.EntityFrameworkCore
             }
         }
 
-     
-       
+
+
     }
 }
