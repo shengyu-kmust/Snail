@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Snail.Core.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -70,7 +71,19 @@ namespace Snail.Core.Permission
         /// <returns>用户的基本信息和token对象</returns>
         public virtual LoginResult Login(LoginDto loginDto)
         {
-            var user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase));
+            IUser user;
+            if (_permissionStore.HasTenant(out string tenantId))
+            {
+                if (string.IsNullOrEmpty(loginDto.TenantId))
+                {
+                    throw new BusinessException("多租户系统，必须传入租户id");
+                }
+                user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase) && ((ITenant<string>)a).TenantId==loginDto.TenantId);
+            }
+            else
+            {
+                user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase));
+            }
             if (user != null && HashPwd(loginDto.Pwd).Equals(user.GetPassword(), StringComparison.OrdinalIgnoreCase))
             {
                 var roleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == user.GetKey()).Select(a => a.GetRoleKey()) ?? new List<string>();
@@ -105,6 +118,11 @@ namespace Snail.Core.Permission
             var result = new List<ResourceRoleInfo>();
             var allResource = _permissionStore.GetAllResource();
             var allRoleResource = _permissionStore.GetAllRoleResource();
+            if (_permissionStore.HasTenant(out string tenantId))
+            {
+                var allRole = _permissionStore.GetAllRole().Where(a => ((ITenant<string>)a).TenantId == tenantId).Select(a => a.GetKey()).ToList();
+                allRoleResource = allRoleResource.Where(a => allRole.Contains(a.GetRoleKey())).ToList();
+            }
             allResource.ForEach(resource =>
             {
                 var resourceRoleKeys = allRoleResource.Where(a => a.GetResourceKey() == resource.GetKey()).Select(a => a.GetRoleKey()).Distinct().ToList();

@@ -159,7 +159,7 @@ namespace Snail.Web.Controllers
         [HttpGet, Resource(Description = "查询所有角色")]
         public List<PermissionRoleInfo> GetAllRole()
         {
-            return _permissionStore.GetAllRole().Select(a => new PermissionRoleInfo
+            return _permissionStore.GetAllRole().AsQueryable().WhereIf(IsTanent(out Expression<Func<IRole, bool>> pred), pred).Select(a => new PermissionRoleInfo
             {
                 Id = a.GetKey(),
                 Name = a.GetName(),
@@ -213,7 +213,7 @@ namespace Snail.Web.Controllers
         /// 获取所有的资源以及资源角色的对应关系信息
         /// </summary>
         /// <returns></returns>
-        [HttpGet, AllowAnonymous]
+        [HttpGet]
         public List<ResourceRoleInfo> GetAllResourceRoles()
         {
             return _permission.GetAllResourceRoles();
@@ -327,8 +327,11 @@ namespace Snail.Web.Controllers
 
         private bool IsTanent<T>(out Expression<Func<T, bool>> pred)
         {
-            var isTanent = typeof(ITenant<string>).IsAssignableFrom(typeof(T));
-            var tenantId = _applicationContext.GetCurrnetTenantId();
+            var isTanent = _permissionStore.HasTenant(out string tenantId);
+            if (string.IsNullOrEmpty(tenantId))
+            {
+                throw new BusinessException($"无法获取当前用户的租户id");
+            }
             pred = ExpressionExtensions.True<T>().AndIf(isTanent,
                 a => ((ITenant<string>)a).TenantId == tenantId 
                 || ((ITenant<string>)a).TenantId == ""

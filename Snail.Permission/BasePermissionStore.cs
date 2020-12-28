@@ -251,7 +251,7 @@ namespace Snail.Core.Permission
             lock (Locker.GetLocker($"BasePermissionStore_SaveRole"))
             {
                 var roleTmp = EasyMap.MapToNew<TRole>(role);
-                _db.Set<TUser>().AddOrUpdate(roleTmp, CurrentUserId, CurrentTenantId, null);
+                _db.Set<TRole>().AddOrUpdate(roleTmp, CurrentUserId, CurrentTenantId, null);
                 _db.SaveChanges();
                 _memoryCache.Remove(roleCacheKey);
             }
@@ -310,10 +310,14 @@ namespace Snail.Core.Permission
             // todo 全表查了
             var allUserRoles = _db.Set<TUserRole>().AsEnumerable().Where(a => a.GetUserKey() == userKey).ToList();
             var allRole = _db.Set<TRole>().AsNoTracking().ToList();
+
+            // 删除授权
             allUserRoles.Where(a => !roleKeys.Contains(a.GetRoleKey())).ToList().ForEach(a =>
             {
                 _db.Remove(a);
             });
+
+            //增加授权
             roleKeys.Where(a => !allUserRoles.Select(i => i.GetRoleKey()).Contains(a) && !string.IsNullOrEmpty(a)).ToList().ForEach(roleKey =>
             {
                 if (allRole.Any(a => a.GetKey() == roleKey))
@@ -355,11 +359,11 @@ namespace Snail.Core.Permission
             tenantId = string.Empty;
             if (!_isTenant.HasValue)
             {
-                _isTenant = typeof(ITenant<string>).IsAssignableFrom(typeof(TUser));
+                _isTenant = TenantHelper.HasTenant<TUser, TKey>(); 
             }
             if (_isTenant.Value)
             {
-                tenantId = _applicationContext.GetCurrnetTenantId();
+                tenantId = CurrentTenantId.ToString();
             }
             return _isTenant.Value;
         }

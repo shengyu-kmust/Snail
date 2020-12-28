@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Snail.Core.Permission
+﻿namespace Snail.Core.Permission
 {
     /// <summary>
     /// 登录dto
@@ -21,5 +17,9 @@ namespace Snail.Core.Permission
         /// 是否登录到cookie
         /// </summary>
         public bool SignIn { get; set; }
+        /// <summary>
+        /// 租户id，无则为空
+        /// </summary>
+        public string TenantId { get; set; }
     }
 }

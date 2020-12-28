@@ -89,7 +89,7 @@ namespace Snail.EntityFrameworkCore
         /// <param name="dto"></param>
         /// <param name="addFunc"></param>
         /// <param name="userId"></param>
-        public static void AddInternal<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId, TKey tenantId = default)
+        public static TEntity AddInternal<TEntity, TDto, TKey>(this DbSet<TEntity> entities, TDto dto, Func<TDto, TEntity> addFunc, TKey userId, TKey tenantId = default)
           where TEntity : class, IIdField<TKey>
         {
             var entity = addFunc(dto);
@@ -100,6 +100,7 @@ namespace Snail.EntityFrameworkCore
             UpdateEntityCommonField(entity, EEntityOperType.Add, userId, tenantId);
             TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
             entities.Add(entity);
+            return entity;
         }
 
         /// <summary>
@@ -158,7 +159,7 @@ namespace Snail.EntityFrameworkCore
             var entity = existEntities == null ? entities.Find(dto.Id) : existEntities.FirstOrDefault(a => a.Id.Equals(dto.Id));
             if (entity == null)
             {
-                AddInternal(entities, dto, addFunc, userId, tenantId);
+                entity=AddInternal(entities, dto, addFunc, userId, tenantId);
             }
             else
             {
@@ -167,8 +168,6 @@ namespace Snail.EntityFrameworkCore
                 updateFunc(dto, entity);
                 UpdateEntityCommonField(entity, EEntityOperType.Update, userId, tenantId);
             }
-
-
             return entity;
         }
 
@@ -370,6 +369,10 @@ namespace Snail.EntityFrameworkCore
                     {
                         tenantEntity.TenantId = tenantId;
                     }
+                }
+                if (entity is IIdField<TKey> idEntity && idEntity.Id==null)
+                {
+                    idEntity.Id = IdGenerator.Generate<TKey>();
                 }
                 auditEntity.Updater = userId;
                 auditEntity.UpdateTime = DateTime.Now;
