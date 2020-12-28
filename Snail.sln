@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.Permission", "Snail.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snail.EntityFrameworkCore", "Snail.EntityFrameworkCore\Snail.EntityFrameworkCore.csproj", "{E641EF1E-233A-4706-91AF-00C716ED094D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snail.WeiXin.Test", "Snail.WeiXin.Test\Snail.WeiXin.Test.csproj", "{3E604AC0-4E96-443D-B4A4-A886EF2E9814}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -271,6 +273,18 @@ Global
 		{E641EF1E-233A-4706-91AF-00C716ED094D}.Release|x64.Build.0 = Release|Any CPU
 		{E641EF1E-233A-4706-91AF-00C716ED094D}.Release|x86.ActiveCfg = Release|Any CPU
 		{E641EF1E-233A-4706-91AF-00C716ED094D}.Release|x86.Build.0 = Release|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Debug|x64.Build.0 = Debug|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Debug|x86.Build.0 = Debug|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Release|x64.ActiveCfg = Release|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Release|x64.Build.0 = Release|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Release|x86.ActiveCfg = Release|Any CPU
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -279,6 +293,7 @@ Global
 		{BF83E16A-8A46-4159-B1F5-A3C396679A96} = {87806174-3460-4457-99C1-963A3D795497}
 		{4CD36342-037A-46E1-BC4E-CE42D06ECFBB} = {87806174-3460-4457-99C1-963A3D795497}
 		{F11036FC-A4B8-40D5-A09E-4DBC849C59CE} = {87806174-3460-4457-99C1-963A3D795497}
+		{3E604AC0-4E96-443D-B4A4-A886EF2E9814} = {87806174-3460-4457-99C1-963A3D795497}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64958474-38DF-48E9-AF4B-467E3EC01A98}
