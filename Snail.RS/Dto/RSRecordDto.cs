@@ -2,7 +2,7 @@
 using System;
 namespace Snail.RS.Dto
 {
-    public class RSRecordDto : IDto
+    public class RSRecordDto : IDtoId<string>
     {
         public DateTime ScheduleDate { get; set; }
 
@@ -56,6 +56,7 @@ namespace Snail.RS.Dto
         /// 排班结束时间
         /// </summary>
         public TimeSpan RuleEndTime { set; get; }
+        public string Id { get; set; }
         #endregion
     }
 

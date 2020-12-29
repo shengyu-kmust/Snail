@@ -207,7 +207,7 @@ namespace Snail.RS
         }
 
         /// <summary>
-        /// 释放规则
+        /// 释放号源/取消预约
         /// </summary>
         /// <param name="rsRecordId"></param>
         public void ReleaseAppoint(string rsRecordId)
@@ -230,6 +230,7 @@ namespace Snail.RS
                         from c in c_group.DefaultIfEmpty()
                         select new RSRecordDto
                         {
+                            Id=a.Id,
                             OrderNum = a.OrderNum,
                             ScheduleName = b.ScheduleName,
                             ScheduleOfDayId = a.ScheduleOfDayId,
