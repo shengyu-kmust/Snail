@@ -3,7 +3,7 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-using ApplicationCore.Entity;
+using ApplicationCore.Entities;
 using Microsoft.EntityFrameworkCore;
 using Snail.Permission.Entity;
 using Snail.Web;

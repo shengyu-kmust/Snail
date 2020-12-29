@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Snail.Core.Attributes;
 using Snail.Core.Default;
 using Snail.Core.Permission;
-using Snail.Permission.Entity;
+using Snail.FileStore;
+using Snail.Web.Entities;
 using System;
 using System.Linq;
-using System.Reflection;
 
 namespace Snail.Web
 {
@@ -29,8 +29,8 @@ namespace Snail.Web
         public DbSet<TUserOrg> UserOrgs { get; set; }
         #endregion
         #region 公共表
-        public DbSet<Snail.Web.Entities.Config> Config { get; set; }
-        public DbSet<Snail.FileStore.FileInfo> FileInfo { get; set; }
+        public DbSet<Config> Config { get; set; }
+        public DbSet<FileInfo> FileInfo { get; set; }
         #endregion
 
         protected ICapPublisher _publisher;
@@ -59,7 +59,11 @@ namespace Snail.Web
             //统一在数据库上下文的操作前，触发缓存实体的数据清空。
             if (_publisher != null)
             {
-                this.ChangeTracker.Entries().Where(a =>(a.State == EntityState.Added || a.State == EntityState.Modified || a.State == EntityState.Deleted) && Attribute.IsDefined(a.Entity.GetType(), typeof(EnableEntityCacheAttribute))).Select(a => a.Entity.GetType().Name).Distinct().ToList().ForEach(entityName =>
+                this.ChangeTracker.Entries().Where(a =>
+                (a.State == EntityState.Added || a.State == EntityState.Modified || a.State == EntityState.Deleted) 
+                && Attribute.IsDefined(a.Entity.GetType(), typeof(EnableEntityCacheAttribute)))
+                    .Select(a => a.Entity.GetType().Name).Distinct().ToList()
+                    .ForEach(entityName =>
                 {
                     _publisher.Publish(EntityCacheManager.EntityCacheEventName, new EntityChangeEvent { EntityName = entityName });
                 });
@@ -68,6 +72,6 @@ namespace Snail.Web
             return base.SaveChanges();
         }
 
-        // 不用要SeedData会数据初始化，此方法会在每次migration时删除和创建数据
+        // 不用要SeedData进行数据初始化，此方法会在每次migration时删除和创建数据
     }
 }

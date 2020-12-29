@@ -26,7 +26,7 @@ namespace Snail.Web.CodeGenerater
         public virtual string TransformText()
         {
             this.Write(@"using ApplicationCore.Dtos;
-using ApplicationCore.Entity;
+using ApplicationCore.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service;

@@ -11,6 +11,12 @@ namespace Snail.Web
     /// </summary>
     public static class SnailWebConfigureOptionsExtenssion
     {
+        /// <summary>
+        /// 从configuration里配置snailWeb框架的所有Option
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
         public static IServiceCollection ConfigAllOption(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<StaticFileUploadOption>(configuration.GetSection("StaticFileUploadOption"));

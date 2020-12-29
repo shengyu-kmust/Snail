@@ -80,5 +80,11 @@ namespace Snail.Web.Services
         {
             return $"cacheService_{typeof(TEntity).Name}_{typeof(TEntityCache).Name}";
         }
+
+        public bool HasTenant(out string tenantId)
+        {
+            tenantId = applicationContext.GetCurrnetTenantId();
+            return !string.IsNullOrEmpty(tenantId);
+        }
     }
 }

@@ -2,12 +2,14 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Snail.Common;
-using Snail.Core.Entity;
+using Snail.Common.Extenssions;
+using Snail.Core.Enum;
 using Snail.Core.Interface;
+using Snail.Core.Utilities;
+using Snail.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace Snail.Core.Permission
 {
     /// <summary>
@@ -19,26 +21,66 @@ namespace Snail.Core.Permission
     /// <typeparam name="TUserRole"></typeparam>
     /// <typeparam name="TResource"></typeparam>
     /// <typeparam name="TRoleResource"></typeparam>
+    /// <typeparam name="TKey">系统主键的类型，如string,int,guid等</typeparam>
     /// 
-    public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource> : IPermissionStore
+    public class BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource, TKey> : IPermissionStore
         where TDbContext : DbContext
-        where TUser : class, IUser, new()
-        where TRole : class, IRole, new()
-        where TUserRole : class, IUserRole, new()
-        where TResource : class, IResource, new()
-        where TRoleResource : class, IRoleResource, new()
-    {
-        protected TDbContext _db;
-        protected IMemoryCache _memoryCache;
-        protected IApplicationContext _applicationContext;
-        protected readonly string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}";
-        protected readonly string roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}";
-        protected readonly string userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}";
-        protected readonly string resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}";
-        protected readonly string roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
+        where TUser : class, IUser, IIdField<TKey>, new()
+        where TRole : class, IRole, IIdField<TKey>, new()
+        where TUserRole : class, IUserRole, IIdField<TKey>, new()
+        where TResource : class, IResource, IIdField<TKey>, new()
+        where TRoleResource : class, IRoleResource, IIdField<TKey>, new()
 
+    {
+        /// <summary>
+        /// 数据库
+        /// </summary>
+        protected TDbContext _db;
+        /// <summary>
+        /// 缓存
+        /// </summary>
+        protected IMemoryCache _memoryCache;
+        /// <summary>
+        /// 应用上下文
+        /// </summary>
+        protected IApplicationContext _applicationContext;
+        /// <summary>
+        /// 所有用户缓存的key
+        /// </summary>
+        protected readonly string userCacheKey = $"DefaultPermissionStore_{nameof(userCacheKey)}";
+        /// <summary>
+        /// 所有用户角色缓存的key
+        /// </summary>
+        protected readonly string roleCacheKey = $"DefaultPermissionStore_{nameof(roleCacheKey)}";
+        /// <summary>
+        /// 所有角色的key
+        /// </summary>
+        protected readonly string userRoleCacheKey = $"DefaultPermissionStore_{nameof(userRoleCacheKey)}";
+        /// <summary>
+        /// 所有资源的key
+        /// </summary>
+        protected readonly string resourceCacheKey = $"DefaultPermissionStore_{nameof(resourceCacheKey)}";
+        /// <summary>
+        /// 所有角色资源对应关系的key
+        /// </summary>
+        protected readonly string roleResourceCacheKey = $"DefaultPermissionStore_{nameof(roleResourceCacheKey)}";
+        /// <summary>
+        /// 是否为多租户系统
+        /// </summary>
+        private bool? _isTenant;
+
+        /// <summary>
+        /// 权限组件配置
+        /// </summary>
         protected IOptionsMonitor<PermissionOptions> _permissionOptions;
 
+        /// <summary>
+        /// BasePermissionStore
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="memoryCache"></param>
+        /// <param name="permissionOptions"></param>
+        /// <param name="applicationContext"></param>
         public BasePermissionStore(TDbContext db, IMemoryCache memoryCache, IOptionsMonitor<PermissionOptions> permissionOptions, IApplicationContext applicationContext)
         {
             _db = db;
@@ -47,7 +89,7 @@ namespace Snail.Core.Permission
             _applicationContext = applicationContext;
         }
 
-        #region 查询数据
+        #region 查询权限基础表数据，用缓存，缓存所有的基础表数据
         public virtual List<IResource> GetAllResource()
         {
             return _memoryCache.GetOrCreate(resourceCacheKey, a => _db.Set<TResource>().AsNoTracking().Select(i => (IResource)i).ToList());
@@ -67,9 +109,13 @@ namespace Snail.Core.Permission
 
         public virtual List<IUser> GetAllUser()
         {
-            return _memoryCache.GetOrCreate(userCacheKey, a => _db.Set<TUser>().AsNoTracking().Select(i => (IUser)i).ToList());
+
+            return _memoryCache.GetOrCreate(userCacheKey,
+                a => _db.Set<TUser>().AsNoTracking().Select(i => (IUser)i).ToList());
 
         }
+
+
 
         public virtual List<IUserRole> GetAllUserRole()
         {
@@ -79,11 +125,8 @@ namespace Snail.Core.Permission
 
 
         /// <summary>
-        /// 
+        /// 重新加载获取的基础表数据
         /// </summary>
-        /// <remarks>
-        /// 经验证，cache里的值在remove后，之前已经从cache里获取的值不会删除
-        /// </remarks>
         public virtual void ReloadPemissionDatas()
         {
             _memoryCache.Remove(userCacheKey);
@@ -92,14 +135,14 @@ namespace Snail.Core.Permission
             _memoryCache.Remove(resourceCacheKey);
             _memoryCache.Remove(roleResourceCacheKey);
         }
-
-
         #endregion
 
 
         public virtual void RemoveRole(string roleKey)
         {
+            // 删除角色为真删除，不保留历史的角色和角色资源关系
             var roleEntity = GetAllRole().FirstOrDefault(a => a.GetKey() == roleKey) as TRole;
+            TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, roleEntity, CurrentUserId, CurrentTenantId);
             if (roleEntity != null)
             {
                 _db.Set<TRole>().Remove(roleEntity);
@@ -122,6 +165,7 @@ namespace Snail.Core.Permission
         public virtual void RemoveUser(string userKey)
         {
             var userEntity = _db.Set<TUser>().Find(userKey);
+            TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, userEntity, CurrentUserId, CurrentTenantId);
             if (userEntity is ISoftDelete entitySoftDeleteEntity)
             {
                 entitySoftDeleteEntity.IsDeleted = true;
@@ -165,28 +209,17 @@ namespace Snail.Core.Permission
         /// <param name="resource"></param>
         public virtual void SaveResource(IResource resource)
         {
-            var resourceKey = resource.GetKey();
-            // todo 全表查询了
-            var resourceEntity = _db.Set<TResource>().AsEnumerable().FirstOrDefault(a => a.GetKey() == resourceKey || a.GetResourceCode() == resource.GetResourceCode());
-            if (resourceEntity == null)
-            {
-                //add
-                var addDto = new TResource();
-                EasyMap.Map(resource.GetType(), typeof(TResource), resource, addDto,null);
-                _db.Add(addDto);
-            }
-            else
-            {
-                EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
-            }
-            SetAuditSoftDelete(resourceEntity);
+            var resourceTmp = EasyMap.MapToNew<TResource>(resource);
+            var resourceEntity = _db.Set<TResource>().AddOrUpdate(resourceTmp, CurrentUserId, default, null);
+            resourceEntity.SetName(resourceTmp.GetName());
+            resourceEntity.SetParentKey(resourceTmp.GetParentKey());
             _db.SaveChanges();
             _memoryCache.Remove(resourceCacheKey);
         }
         /// <summary>
-        /// 保存资源。会从资源id和资源code两字段考虑是新增还是修改
+        /// 保存资源。会从资源id和资源code两字段考虑是新增还是修改，无删除
         /// </summary>
-        /// <param name="resource"></param>
+        /// <param name="resources"></param>
         public virtual void SaveResources(List<IResource> resources)
         {
             var allResources = _db.Set<TResource>().ToList();
@@ -201,69 +234,48 @@ namespace Snail.Core.Permission
                     var addDto = new TResource();
                     EasyMap.Map(resource.GetType(), typeof(TResource), resource, addDto, null);
                     _db.Add(addDto);
+                    DbSetExtenssion.UpdateEntityCommonField(resourceEntity, EEntityOperType.Add, CurrentUserId, CurrentTenantId);
                 }
                 else
                 {
                     EasyMap.Map(resource.GetType(), typeof(TResource), resource, resourceEntity, null);
+                    DbSetExtenssion.UpdateEntityCommonField(resourceEntity, EEntityOperType.Update, CurrentUserId, CurrentTenantId);
                 }
-                SetAuditSoftDelete(resourceEntity);
             });
-        
+
             _db.SaveChanges();
             _memoryCache.Remove(resourceCacheKey);
         }
-
-
-
-        public virtual void UpdateRoleEntityByDto(IRole entity, IRole dto, bool isAdd)
-        {
-            EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
-            SetAuditSoftDelete(entity);
-        }
-        public virtual void UpdateUserEntityByDto(IUser entity, IUser dto, bool isAdd)
-        {
-            EasyMap.Map(dto.GetType(), entity.GetType(), dto, entity, null);
-            SetAuditSoftDelete(entity);
-        }
-
         public virtual void SaveRole(IRole role)
         {
-            var roleKey = role.GetKey();
-            if (string.IsNullOrEmpty(roleKey))
+            lock (Locker.GetLocker($"BasePermissionStore_SaveRole"))
             {
-                var addRole = new TRole();
-                UpdateRoleEntityByDto(addRole, role, true);
-                _db.Add(addRole);
+                var roleTmp = EasyMap.MapToNew<TRole>(role);
+                _db.Set<TRole>().AddOrUpdate(roleTmp, CurrentUserId, CurrentTenantId, null);
+                _db.SaveChanges();
+                _memoryCache.Remove(roleCacheKey);
             }
-            else
-            {
-                var editRole = _db.Set<TRole>().Find(role.GetKey());
-                UpdateRoleEntityByDto(editRole, role, false);
-            }
-            _db.SaveChanges();
-            _memoryCache.Remove(roleCacheKey);
-
         }
 
         public virtual void SaveUser(IUser user)
         {
-            TUser saveUser;
-            if (string.IsNullOrEmpty(user.GetKey()))
+            lock (Locker.GetLocker($"BasePermissionStore_SaveUser"))
             {
-                saveUser = new TUser();
-                UpdateUserEntityByDto(saveUser, user, true);
-                _db.Add(saveUser);
+                // 账号不能重复.如果是多租户,同一租户里的账号不能重复.
+                var allUser = GetAllUser();
+                var existAccountUser = allUser.FirstOrDefault(a => a.GetAccount() == user.GetAccount());
+                if (existAccountUser != null && existAccountUser.GetKey() != user.GetKey())
+                {
+                    throw new BusinessException($"已经存在账号为{existAccountUser.GetAccount()}的用户");
+                }
+                var userTmp = EasyMap.MapToNew<TUser>(user);
+                var userEntity = _db.Set<TUser>().AddOrUpdate(userTmp, CurrentUserId, CurrentTenantId, null);
+                userEntity.SetName(user.GetName());
+                userEntity.SetAccount(user.GetAccount());
+                userEntity.SetPassword(user.GetPassword());
+                _db.SaveChanges();
+                _memoryCache.Remove(userCacheKey);
             }
-            else
-            {
-                saveUser = _db.Set<TUser>().Find(user.GetKey());
-                UpdateUserEntityByDto(saveUser, user, false);
-            }
-            saveUser.SetName(user.GetName());
-            saveUser.SetAccount(user.GetAccount());
-            saveUser.SetPassword(user.GetPassword());
-            _db.SaveChanges();
-            _memoryCache.Remove(userCacheKey);
         }
 
         public virtual void SetRoleResources(string roleKey, List<string> resourceKeys)
@@ -283,7 +295,7 @@ namespace Snail.Core.Permission
                 if (allResources.Any(a => a.GetKey() == resourceKey))
                 {
                     var addRoleResource = new TRoleResource();
-                    SetAuditSoftDelete(addRoleResource);
+                    DbSetExtenssion.UpdateEntityCommonField(addRoleResource, EEntityOperType.Update, CurrentUserId, CurrentTenantId);
                     addRoleResource.SetRoleKey(roleKey);
                     addRoleResource.SetResourceKey(resourceKey);
                     _db.Add(addRoleResource);
@@ -298,16 +310,20 @@ namespace Snail.Core.Permission
             // todo 全表查了
             var allUserRoles = _db.Set<TUserRole>().AsEnumerable().Where(a => a.GetUserKey() == userKey).ToList();
             var allRole = _db.Set<TRole>().AsNoTracking().ToList();
+
+            // 删除授权
             allUserRoles.Where(a => !roleKeys.Contains(a.GetRoleKey())).ToList().ForEach(a =>
             {
                 _db.Remove(a);
             });
+
+            //增加授权
             roleKeys.Where(a => !allUserRoles.Select(i => i.GetRoleKey()).Contains(a) && !string.IsNullOrEmpty(a)).ToList().ForEach(roleKey =>
             {
                 if (allRole.Any(a => a.GetKey() == roleKey))
                 {
                     var addItem = new TUserRole();
-                    SetAuditSoftDelete(addItem);
+                    DbSetExtenssion.UpdateEntityCommonField(addItem, EEntityOperType.Update, CurrentUserId, CurrentTenantId);
                     addItem.SetRoleKey(roleKey);
                     addItem.SetUserKey(userKey);
                     _db.Add(addItem);
@@ -318,19 +334,53 @@ namespace Snail.Core.Permission
             _memoryCache.Remove(userRoleCacheKey);
         }
 
-        private void SetAuditSoftDelete(object obj)
+        //private void SetAuditSoftDeleteTenant(object obj)
+        //{
+        //    var userId = _applicationContext.GetCurrentUserId();
+        //    if (obj is IIdField<string> entityOfIdField && string.IsNullOrEmpty(entityOfIdField.Id))
+        //    {
+        //        entityOfIdField.Id = IdGenerator.Generate<string>();
+        //    }
+        //    if (obj is IAudit<string> entityOfAudit)
+        //    {
+        //        entityOfAudit.CreateTime = DateTime.Now;
+        //        entityOfAudit.Updater = userId;
+        //        entityOfAudit.Updater = userId;
+        //        entityOfAudit.Creater = userId;
+        //    }
+        //    if (obj is ITenant<string> tenantEntity)
+        //    {
+        //        tenantEntity.TenantId = _applicationContext.GetCurrnetTenantId();
+        //    }
+        //}
+
+        public bool HasTenant(out string tenantId)
         {
-            var userId = _applicationContext.GetCurrentUserId();
-            if (obj is IIdField<string> entityOfIdField && string.IsNullOrEmpty(entityOfIdField.Id))
+            tenantId = string.Empty;
+            if (!_isTenant.HasValue)
             {
-                entityOfIdField.Id = IdGenerator.Generate<string>();
+                _isTenant = TenantHelper.HasTenant<TUser, TKey>(); 
             }
-            if (obj is IAudit<string> entityOfAudit)
+            if (_isTenant.Value)
             {
-                entityOfAudit.CreateTime = DateTime.Now;
-                entityOfAudit.Updater = userId;
-                entityOfAudit.Updater = userId;
-                entityOfAudit.Creater = userId;
+                tenantId = CurrentTenantId.ToString();
+            }
+            return _isTenant.Value;
+        }
+
+      
+        public TKey CurrentUserId
+        {
+            get
+            {
+                return _applicationContext.GetCurrentUserId().ConvertTo<TKey>();
+            }
+        }
+        public TKey CurrentTenantId
+        {
+            get
+            {
+                return _applicationContext.GetCurrnetTenantId().ConvertTo<TKey>();
             }
         }
     }

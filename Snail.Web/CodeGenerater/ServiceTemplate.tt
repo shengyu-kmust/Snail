@@ -1,4 +1,4 @@
-﻿using ApplicationCore.Entity;
+﻿using ApplicationCore.Entities;
 using Snail.Web.Services;
 
 namespace Service

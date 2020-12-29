@@ -7,9 +7,10 @@ using Snail.Web.Dtos;
 using Snail.Web.Dtos.Config;
 using Snail.Web.Entities;
 using Snail.Web.IServices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Linq.Expressions;
 
 namespace Snail.Web.Controllers
 {
@@ -28,16 +29,14 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public List<ConfigResultDto> QueryList([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Config>().AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Key.Contains(queryDto.KeyWord) || a.Value.Contains(queryDto.KeyWord));
-            return controllerContext.mapper.ProjectTo<ConfigResultDto>(_service.QueryList(pred)).ToList();
+            return controllerContext.mapper.ProjectTo<ConfigResultDto>(_service.QueryList(GetPredByKeyQueryDto(queryDto))).ToList();
         }
 
         [Resource(Description = "查询配置树")]
         [HttpGet]
         public List<ConfigTreeResultDto> QueryListTree([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Config>().AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Key.Contains(queryDto.KeyWord) || a.Value.Contains(queryDto.KeyWord));
-            var list=controllerContext.mapper.ProjectTo<ConfigTreeResultDto>(_service.QueryList(pred)).ToList();
+            var list=controllerContext.mapper.ProjectTo<ConfigTreeResultDto>(_service.QueryList(GetPredByKeyQueryDto(queryDto))).ToList();
             return list.Where(a => !a.ParentId.HasValue()).Select(a => GetChildren(a, list)).ToList();
         }
 
@@ -60,8 +59,7 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public IPageResult<ConfigResultDto> QueryPage([FromQuery]KeyQueryDto queryDto)
         {
-            var pred = ExpressionExtensions.True<Config>().AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Key.Contains(queryDto.KeyWord) || a.Value.Contains(queryDto.KeyWord));
-            return controllerContext.mapper.ProjectTo<ConfigResultDto>(_service.QueryList(pred)).ToPageList(queryDto);
+            return controllerContext.mapper.ProjectTo<ConfigResultDto>(_service.QueryList(GetPredByKeyQueryDto(queryDto))).ToPageList(queryDto);
         }
 
         [Resource(Description = "查询单个")]
@@ -82,6 +80,12 @@ namespace Snail.Web.Controllers
         public void Save(ConfigSaveDto saveDto)
         {
             _service.Save(saveDto);
+        }
+
+        private Expression<Func<Config,bool>> GetPredByKeyQueryDto(KeyQueryDto queryDto)
+        {
+            return ExpressionExtensions.True<Config>().AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Key.Contains(queryDto.KeyWord) || a.Value.Contains(queryDto.KeyWord))
+               .AndIf(controllerContext.serviceContext.HasTenant(out string tenantId), a => a.TenantId == "" || a.TenantId == null || a.TenantId == tenantId);
         }
     }
 }

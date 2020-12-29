@@ -1,6 +1,11 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Snail.Core;
 using Snail.Core.Interface;
 using Snail.WeiXin.Models;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -8,7 +13,7 @@ namespace Snail.WeiXin
 {
     public class OAuthApiOption
     {
-        public string ApiMpHost { get; set; }
+        public string ApiMpHost { get; set; } = "https://api.weixin.qq.com";
     }
     /// <summary>
     /// 代公众号发起网页授权，参考Senparc的方法
@@ -17,12 +22,13 @@ namespace Snail.WeiXin
     {
         private ISnailHttpClient _snailHttpClient;
         private IOptionsMonitor<OAuthApiOption> _optionsMonitor;
-        public OAuthApi(ISnailHttpClient snailHttpClient,IOptionsMonitor<OAuthApiOption> optionsMonitor)
+        private IMemoryCache _memoryCache;
+        public OAuthApi(ISnailHttpClient snailHttpClient, IOptionsMonitor<OAuthApiOption> optionsMonitor, IMemoryCache memoryCache)
         {
             _snailHttpClient = snailHttpClient;
             _optionsMonitor = optionsMonitor;
-        } 
-        #region 同步方法
+            _memoryCache = memoryCache;
+        }
         /// <summary>
         /// 获取验证地址
         /// </summary>
@@ -33,7 +39,7 @@ namespace Snail.WeiXin
         /// <param name="scope">授权作用域，拥有多个作用域用逗号（,）分隔。此处暂时只放一作用域。</param>
         /// <param name="responseType">默认，填code</param>
         /// <returns></returns>
-        public string GetAuthorizeUrl(string appId, string componentAppId, string redirectUrl, string state,string scope, string responseType = "code")
+        public string GetAuthorizeUrl(string appId, string componentAppId, string redirectUrl, string state, string scope, string responseType = "code")
         {
             //此URL比MP中的对应接口多了&component_appid=component_appid参数
             var url =
@@ -93,8 +99,41 @@ namespace Snail.WeiXin
             var url = string.Format(_optionsMonitor.CurrentValue.ApiMpHost + "/sns/userinfo?access_token={0}&openid={1}&lang={2}", HttpUtility.UrlEncode(accessToken), HttpUtility.UrlEncode(openId), lang);
             return await _snailHttpClient.GetAsync<OAuthUserInfo>(url);
         }
-        #endregion
-        
+
+        /// <summary>
+        /// 获取appid的接口请求access_token
+        /// </summary>
+        /// <param name="appId"></param>
+        /// <param name="appSecret"></param>
+        /// <returns></returns>
+        public async Task<string> GetAccessToken(string appId, string appSecret)
+        {
+            var token=await _memoryCache.GetOrCreate($"{appId}_accessToken", async entry =>
+             {
+                 var accessUrl = "https://api.weixin.qq.com/cgi-bin/token";
+                 var res = await _snailHttpClient.GetAsync<AccessTokenResult>(accessUrl, new Dictionary<string, string>()
+                 {
+                    {"appid",appId },
+                    {"secret",appSecret },
+                    {"grant_type","client_credential" }
+                 });
+                 if (!string.IsNullOrEmpty(res.access_token))
+                 {
+                     var tokenStr = res.access_token;
+                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(res.expires_in);
+                     return tokenStr;
+                 }
+                 else
+                 {
+                     throw new BusinessException($"获取access_token失败，失败返回：{JsonConvert.SerializeObject(res)}");
+                 }
+
+               
+             });
+            return token;
+        }
+
+
     }
 
 }

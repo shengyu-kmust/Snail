@@ -28,7 +28,7 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"using ApplicationCore.Entity;
+            this.Write(@"using ApplicationCore.Entities;
 using Microsoft.EntityFrameworkCore;
 using Snail.Permission.Entity;
 using Snail.Web;

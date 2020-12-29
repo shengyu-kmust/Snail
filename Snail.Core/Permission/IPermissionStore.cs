@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Snail.Core.Permission
 {
@@ -93,6 +91,11 @@ namespace Snail.Core.Permission
         /// </summary>
         void ReloadPemissionDatas();
         #endregion
+        /// <summary>
+        /// 是否为多租户系统
+        /// </summary>
+        /// <returns></returns>
+        bool HasTenant(out string tenantId);
 
     }
 }

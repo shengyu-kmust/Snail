@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Snail.Common;
+using Snail.Core;
 using Snail.Core.Default;
 using Snail.Core.Interface;
 using Snail.Core.Permission;
-using Snail.Permission.Entity;
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,18 +18,6 @@ namespace Snail.Permission
 {
     public static class PermissionServiceCollectionExtensions
     {
-
-        /// <summary>
-        /// 增加权限的默认实现，即默认的权限实现为DefaultPermission和DefaultPermissionStore
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="action"></param>
-        public static void AddDefaultPermission(this IServiceCollection services, Action<PermissionOptions> action)
-        {
-            services.TryAddScoped<IPermission, DefaultPermission>();
-            services.TryAddScoped<IPermissionStore, DefaultPermissionStore>();
-            AddCorePermission(services, action);
-        }
 
         /// <summary>
         /// 权限控制核心，即必须的配置
@@ -143,19 +131,6 @@ namespace Snail.Permission
             #endregion
         }
 
-        /// <summary>
-        /// 自定义用户表，其它的表用默认的表
-        /// </summary>
-        /// <typeparam name="TDbContext"></typeparam>
-        /// <typeparam name="TUser"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="action"></param>
-        public static void AddPermission<TDbContext,TUser>(this IServiceCollection services, Action<PermissionOptions> action)
-            where TDbContext : DbContext
-            where TUser : class, IUser, new()
-        {
-            AddPermission<TDbContext,TUser,PermissionDefaultRole,PermissionDefaultUserRole,PermissionDefaultResource,PermissionDefaultRoleResource>(services, action);
-        }
 
         /// <summary>
         /// 自定义权限表的权限功能注册
@@ -168,16 +143,16 @@ namespace Snail.Permission
         /// <typeparam name="TRoleResource"></typeparam>
         /// <param name="services"></param>
         /// <param name="action"></param>
-        public static void AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource>(this IServiceCollection services, Action<PermissionOptions> action)
+        public static void AddPermission<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource, TKey>(this IServiceCollection services, Action<PermissionOptions> action)
             where TDbContext : DbContext
-            where TUser : class, IUser, new()
-            where TRole : class, IRole, new()
-            where TUserRole : class, IUserRole, new()
-            where TResource : class, IResource, new()
-            where TRoleResource : class, IRoleResource, new()
+            where TUser : class, IUser, IIdField<TKey>, new()
+            where TRole : class, IRole, IIdField<TKey>, new()
+            where TUserRole : class, IUserRole, IIdField<TKey>, new()
+            where TResource : class, IResource, IIdField<TKey>, new()
+            where TRoleResource : class, IRoleResource, IIdField<TKey>, new()
         {
             services.TryAddScoped<IPermission, DefaultPermission>();
-            services.TryAddScoped<IPermissionStore, BasePermissionStore<TDbContext, TUser, PermissionDefaultRole, PermissionDefaultUserRole, PermissionDefaultResource, PermissionDefaultRoleResource>>();
+            services.TryAddScoped<IPermissionStore, BasePermissionStore<TDbContext, TUser, TRole, TUserRole, TResource, TRoleResource,TKey>>();
             AddCorePermission(services, action);
         }
 

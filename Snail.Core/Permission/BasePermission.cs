@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Snail.Core.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -16,7 +17,7 @@ namespace Snail.Core.Permission
     public abstract class BasePermission : IPermission
     {
         protected IPermissionStore _permissionStore;
-        protected abstract PermissionOptions PermissionOptions {set;get;}
+        protected abstract PermissionOptions PermissionOptions { set; get; }
         public BasePermission(IPermissionStore permissionStore)
         {
             _permissionStore = permissionStore;
@@ -39,9 +40,9 @@ namespace Snail.Core.Permission
         {
             var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a => a.GetRoleKey());
             var resource = _permissionStore.GetAllResource().FirstOrDefault(a => a.GetKey() == resourceKey);
-            
+
             //未纳入到资源表里的资源，如果进入到鉴权过程时，不允许访问。请将不需要做权限控制的资源设置成允许匿名访问，避免进入到鉴权流程
-            if (resource==null)
+            if (resource == null)
             {
                 return false;
             }
@@ -57,6 +58,7 @@ namespace Snail.Core.Permission
                 RoleNames = (claimsPrincipal.FindFirst(PermissionConstant.rolesNamesClaim)?.Value ?? "").Split(',').ToList(),
                 UserKey = claimsPrincipal.FindFirst(PermissionConstant.userIdClaim)?.Value,
                 UserName = claimsPrincipal.FindFirst(PermissionConstant.userNameClaim)?.Value,
+                TenantId = claimsPrincipal.FindFirst(PermissionConstant.tenantIdClaim)?.Value,
             };
         }
         #endregion
@@ -69,8 +71,20 @@ namespace Snail.Core.Permission
         /// <returns>用户的基本信息和token对象</returns>
         public virtual LoginResult Login(LoginDto loginDto)
         {
-            var user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account,StringComparison.OrdinalIgnoreCase));
-            if (user != null && HashPwd(loginDto.Pwd).Equals(user.GetPassword(),StringComparison.OrdinalIgnoreCase))
+            IUser user;
+            if (_permissionStore.HasTenant(out string tenantId))
+            {
+                if (string.IsNullOrEmpty(loginDto.TenantId))
+                {
+                    throw new BusinessException("多租户系统，必须传入租户id");
+                }
+                user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase) && ((ITenant<string>)a).TenantId==loginDto.TenantId);
+            }
+            else
+            {
+                user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase));
+            }
+            if (user != null && HashPwd(loginDto.Pwd).Equals(user.GetPassword(), StringComparison.OrdinalIgnoreCase))
             {
                 var roleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == user.GetKey()).Select(a => a.GetRoleKey()) ?? new List<string>();
                 var roleNames = _permissionStore.GetAllRole().Where(a => roleKeys.Contains(a.GetKey())).Select(a => a.GetName()) ?? new List<string>();
@@ -80,10 +94,14 @@ namespace Snail.Core.Permission
                     RoleKeys = roleKeys.ToList(),
                     RoleNames = roleNames.ToList(),
                     UserKey = user.GetKey(),
-                    UserName = user.GetName()
+                    UserName = user.GetName(),
                 };
+                if (user is ITenant<string> userTenant)
+                {
+                    userInfo.TenantId = userTenant.TenantId; // todo 让string为泛型
+                }
                 var claims = GetClaims(userInfo);
-                var tokenStr= GenerateTokenStr(claims);
+                var tokenStr = GenerateTokenStr(claims);
                 return new LoginResult
                 {
                     Token = tokenStr,
@@ -100,15 +118,20 @@ namespace Snail.Core.Permission
             var result = new List<ResourceRoleInfo>();
             var allResource = _permissionStore.GetAllResource();
             var allRoleResource = _permissionStore.GetAllRoleResource();
+            if (_permissionStore.HasTenant(out string tenantId))
+            {
+                var allRole = _permissionStore.GetAllRole().Where(a => ((ITenant<string>)a).TenantId == tenantId).Select(a => a.GetKey()).ToList();
+                allRoleResource = allRoleResource.Where(a => allRole.Contains(a.GetRoleKey())).ToList();
+            }
             allResource.ForEach(resource =>
             {
                 var resourceRoleKeys = allRoleResource.Where(a => a.GetResourceKey() == resource.GetKey()).Select(a => a.GetRoleKey()).Distinct().ToList();
                 result.Add(new ResourceRoleInfo
                 {
-                    ResourceCode=resource.GetResourceCode(),
-                    ResourceKey=resource.GetKey(),
-                    ResourceName=resource.GetName(),
-                    RoleKeys= resourceRoleKeys
+                    ResourceCode = resource.GetResourceCode(),
+                    ResourceKey = resource.GetKey(),
+                    ResourceName = resource.GetName(),
+                    RoleKeys = resourceRoleKeys
                 });
             });
             return result;
@@ -116,20 +139,25 @@ namespace Snail.Core.Permission
         public virtual List<ResourceRoleInfo> GetOwnedResourceRoles(string userKey)
         {
             var allResourceRoleInfo = GetAllResourceRoles();
-            var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a=>a.GetRoleKey()).ToList();
+            var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a => a.GetRoleKey()).ToList();
             return allResourceRoleInfo.Where(a => userRoleKeys.Intersect(a.RoleKeys).Any()).ToList();
         }
-        
+
         public virtual List<Claim> GetClaims(IUserInfo userInfo)
         {
-            return new List<Claim>
+            var claims= new List<Claim>
             {
                 new Claim(PermissionConstant.userIdClaim,userInfo.UserKey),
                 new Claim(PermissionConstant.userNameClaim,userInfo.UserName),
                 new Claim(PermissionConstant.accountClaim,userInfo.Account),
                 new Claim(PermissionConstant.roleIdsClaim,string.Join(",",userInfo.RoleKeys??new List<string>()) ),
-                new Claim(PermissionConstant.rolesNamesClaim,string.Join(",",userInfo.RoleNames??new List<string>()) ),
-            };
+                new Claim(PermissionConstant.rolesNamesClaim,string.Join(",",userInfo.RoleNames??new List<string>()) )
+             };
+            if (userInfo is ITenant<string> userInfoTenant)
+            {
+                claims.Add(new Claim(PermissionConstant.tenantIdClaim, userInfoTenant.TenantId));
+            }
+            return claims;
         }
         #endregion
 
@@ -145,10 +173,10 @@ namespace Snail.Core.Permission
         {
             return BitConverter.ToString(HashAlgorithm.Create(HashAlgorithmName.MD5.Name).ComputeHash(Encoding.UTF8.GetBytes(pwd))).Replace("-", "");
         }
-   
+
         public abstract string GenerateTokenStr(List<Claim> claims);
 
         public abstract void InitResource();
-        
+
     }
 }
