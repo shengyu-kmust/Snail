@@ -3,13 +3,14 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-
+using Snail.Core.Attributes;
 using System.ComponentModel;
 namespace ApplicationCore.Enums
 {
     /// <summary>
     /// <#= Model.Comment #>
     /// </summary>
+    [EnumKeyValue]
     public enum  <#= Model.Name #>
     {
 <#

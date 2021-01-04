@@ -1,11 +1,7 @@
 ﻿using Snail.Core.Attributes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
 
-namespace Snail.Web.Enums
+namespace Snail.Core.Enum
 {
     /// <summary>
     /// 字典配置的操作类型

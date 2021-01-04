@@ -56,7 +56,6 @@
 
 	<ItemGroup>
 		<Folder Include="Attributes\" />
-		<Folder Include="EntityTypeConfiguration\" />
 		<Folder Include="Services\" />
 	</ItemGroup>
 

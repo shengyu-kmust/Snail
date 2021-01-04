@@ -1,6 +1,6 @@
 ﻿using Snail.Core.Dto;
+using Snail.Core.Entity;
 using Snail.Core.Service;
-using Snail.Web.Entities;
 using System.Collections.Generic;
 
 namespace Snail.Web.IServices

@@ -4,29 +4,39 @@ using System.Text;
 
 namespace Snail.Core.Dto
 {
-    public class BaseAuditDto<T> : IDtoId<T>, IAudit<T>
+    public class BaseDto<TKey> : IDtoId<TKey>
     {
-        public T Id { get; set; }
+        public TKey Id { get; set; }
+    }
+
+    public class BaseTenantDto<TKey> : BaseDto<TKey>, ITenant<TKey>
+    {
+        public TKey TenantId { get; set; }
+    }
+
+    public class BaseAuditDto<TKey> : IDtoId<TKey>, IAudit<TKey>
+    {
+        public TKey Id { get; set; }
         public DateTime? CreateTime { get; set; }
         public DateTime? UpdateTime { get; set; }
-        public T Creater { get; set; }
-        public T Updater { get; set; }
+        public TKey Creater { get; set; }
+        public TKey Updater { get; set; }
     }
 
 
-    public class BaseAuditTenantDto<T> : BaseAuditDto<T>, ITenant<T>
+    public class BaseAuditTenantDto<TKey> : BaseAuditDto<TKey>, ITenant<TKey>
     {
-        public T TenantId { get; set; }
+        public TKey TenantId { get; set; }
     }
 
 
-    public class BaseAuditSoftDeleteDto<T> : BaseAuditDto<T>, ISoftDelete
+    public class BaseAuditSoftDeleteDto<TKey> : BaseAuditDto<TKey>, ISoftDelete
     {
         public bool IsDeleted { get; set; }
     }
 
-    public class BaseAuditSoftDeleteTenantDto<T> : BaseAuditSoftDeleteDto<T>, ITenant<T>
+    public class BaseAuditSoftDeleteTenantDto<TKey> : BaseAuditSoftDeleteDto<TKey>, ITenant<TKey>
     {
-        public T TenantId { get; set; }
+        public TKey TenantId { get; set; }
     }
 }

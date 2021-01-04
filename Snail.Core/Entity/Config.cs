@@ -1,14 +1,9 @@
-﻿using Snail.Core;
-using Snail.Core.Attributes;
-using Snail.Core.Entity;
-using Snail.Web.Enums;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Snail.Core.Attributes;
+using Snail.Core.Enum;
 
-namespace Snail.Web.Entities
+namespace Snail.Core.Entity
 {
     [EnableEntityCache]
-    [Table("Config")]
     public class Config : DefaultBaseEntity,ITenant<string>
     {
         public string Key { get; set; }

@@ -1,14 +1,12 @@
 ﻿using DotNetCore.CAP;
 using Microsoft.EntityFrameworkCore;
 using Snail.Core.Attributes;
-using Snail.Core.Default;
+using Snail.Core.Entity;
 using Snail.Core.Permission;
-using Snail.FileStore;
-using Snail.Web.Entities;
 using System;
 using System.Linq;
 
-namespace Snail.Web
+namespace Snail.Core.Default
 {
     public abstract class BaseAppDbContext<TUser,TRole,TResource,TUserRole,TRoleResource,TOrg,TUserOrg> : DbContext
         where TUser : class, IUser, new()
@@ -30,7 +28,6 @@ namespace Snail.Web
         #endregion
         #region 公共表
         public DbSet<Config> Config { get; set; }
-        public DbSet<FileInfo> FileInfo { get; set; }
         #endregion
 
         protected ICapPublisher _publisher;

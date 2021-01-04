@@ -2,8 +2,11 @@
 using Snail.Core;
 using Snail.Core.Entity;
 
-namespace Snail.Web.EntityTypeConfiguration
+namespace Snail.Core.Default
 {
+    /// <summary>
+    /// 实体的entityframework配置的基类，用于配置id,iaudit,isoftdelete等
+    /// </summary>
     public class BaseConfiguration
     {
         public void Config<TEntity>(EntityTypeBuilder<TEntity> builder) where TEntity:class

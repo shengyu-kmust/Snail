@@ -18,7 +18,7 @@ namespace Snail.Web.CodeGenerater
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+    #line 1 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class EnumTemplate : EnumTemplateBase
     {
@@ -28,24 +28,24 @@ namespace Snail.Web.CodeGenerater
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\nusing System.ComponentModel;\r\nnamespace ApplicationCore.Enums\r\n{\r\n    /// <summ" +
-                    "ary>\r\n    /// ");
+            this.Write("using Snail.Core.Attributes;\r\nusing System.ComponentModel;\r\nnamespace Application" +
+                    "Core.Enums\r\n{\r\n    /// <summary>\r\n    /// ");
             
-            #line 11 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+            #line 11 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Comment));
             
             #line default
             #line hidden
-            this.Write("\r\n    /// </summary>\r\n    public enum  ");
+            this.Write("\r\n    /// </summary>\r\n    [EnumKeyValue]\r\n    public enum  ");
             
-            #line 13 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+            #line 14 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Model.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n");
             
-            #line 15 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+            #line 16 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
 
     foreach(var item in Model.Items){
 
@@ -54,28 +54,28 @@ namespace Snail.Web.CodeGenerater
             #line hidden
             this.Write("        /// <summary>\r\n        /// ");
             
-            #line 19 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+            #line 20 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n        /// </summary>\r\n        [Description(\"");
             
-            #line 21 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+            #line 22 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Comment));
             
             #line default
             #line hidden
             this.Write("\")]\r\n        ");
             
-            #line 22 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+            #line 23 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Name));
             
             #line default
             #line hidden
             this.Write(",\r\n");
             
-            #line 23 "G:\mywork\Snail\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
+            #line 24 "D:\我的框架\Snail\Snail.Web\CodeGenerater\EnumTemplate.tt"
 
     }
 

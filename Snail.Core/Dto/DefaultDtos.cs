@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Snail.Core.Dto
 {
+
     public class DefaultBaseDto : BaseAuditSoftDeleteDto<string>
     {
     }
