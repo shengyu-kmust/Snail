@@ -5,6 +5,8 @@ using Snail.Web.IServices;
 using System.Collections.Generic;
 using System.Linq;
 using Snail.Common;
+using Snail.Core.Default.Service;
+
 namespace Snail.Web.Services
 {
     public class ConfigService : BaseService<Config, string>, IConfigService

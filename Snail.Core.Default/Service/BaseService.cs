@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Snail.Core;
+using Snail.Core.Service;
 using Snail.EntityFrameworkCore;
-using Snail.Web.IServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Snail.Web.Services
+namespace Snail.Core.Default.Service
 {
     public abstract class BaseService<TEntity,TKey> : ServiceContextBaseService, IBaseService<TEntity,TKey>
            where TEntity : class, IIdField<TKey>

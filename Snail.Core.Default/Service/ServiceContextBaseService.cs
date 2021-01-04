@@ -5,10 +5,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Snail.Cache;
 using Snail.Core.Entity;
 using Snail.Core.Interface;
-using Snail.Web.IServices;
+using Snail.Core.Service;
 using System;
 using System.Collections.Generic;
-namespace Snail.Web.Services
+namespace Snail.Core.Default.Service
 {
     public abstract class ServiceContextBaseService : IService
     {

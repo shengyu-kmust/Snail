@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Snail.Web.Services
+namespace Snail.Core.Default.Service
 {
     /// <summary>
     /// service的上下文对象，封装所有service层用到的公共或是常用的属性，方法

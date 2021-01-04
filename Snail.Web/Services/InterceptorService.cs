@@ -1,5 +1,6 @@
 ﻿using Autofac.Extras.DynamicProxy;
 using DotNetCore.CAP;
+using Snail.Core.Default.Service;
 using Snail.Web.Interceptor;
 using System;
 using System.Net.Http;
