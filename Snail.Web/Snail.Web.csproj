@@ -48,6 +48,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Snail.Cache\Snail.Cache.csproj" />
 		<ProjectReference Include="..\Snail.Common\Snail.Common.csproj" />
+		<ProjectReference Include="..\Snail.Core.Default\Snail.Core.Default.csproj" />
 		<ProjectReference Include="..\Snail.EntityFrameworkCore\Snail.EntityFrameworkCore.csproj" />
 		<ProjectReference Include="..\Snail.FileStore\Snail.FileStore.csproj" />
 		<ProjectReference Include="..\Snail.Office\Snail.Office.csproj" />
