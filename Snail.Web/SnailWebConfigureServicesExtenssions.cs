@@ -229,6 +229,7 @@ namespace Snail.Web
             });
             #endregion
 
+           
             #region profiler
             //开发环境时，打开分析工具
             if (environment.IsDevelopment())

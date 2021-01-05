@@ -24,6 +24,7 @@ namespace Snail.Web.Controllers
         protected DbContext db => controllerContext.db;
         protected IEntityCacheManager entityCacheManager => controllerContext.entityCacheManager;
         protected string currentUserId => controllerContext.applicationContext.GetCurrentUserId();
+        protected string currentTenantId => controllerContext.applicationContext.GetCurrnetTenantId();
         public DefaultBaseController(SnailControllerContext controllerContext)
         {
             this.controllerContext = controllerContext;
