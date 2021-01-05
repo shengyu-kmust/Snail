@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using DotNetCore.CAP;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Snail.Cache;
 using Snail.Core.Interface;
-using Snail.Web;
+using System;
 
 namespace Snail.Web.Controllers
 {
@@ -25,6 +28,10 @@ namespace Snail.Web.Controllers
         protected IEntityCacheManager entityCacheManager => controllerContext.entityCacheManager;
         protected string currentUserId => controllerContext.applicationContext.GetCurrentUserId();
         protected string currentTenantId => controllerContext.applicationContext.GetCurrnetTenantId();
+        public IMemoryCache memoryCache => controllerContext.memoryCache;
+        public ICapPublisher publisher => controllerContext.publisher;
+        public ISnailCache cache => controllerContext.cache;
+        public IServiceProvider serviceProvider => controllerContext.serviceProvider;
         public DefaultBaseController(SnailControllerContext controllerContext)
         {
             this.controllerContext = controllerContext;
