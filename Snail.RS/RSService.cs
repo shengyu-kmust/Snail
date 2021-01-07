@@ -114,6 +114,11 @@ namespace Snail.RS
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// 重新生成一段时间内的预约号源
+        /// </summary>
+        /// <param name="beginDate"></param>
+        /// <param name="endDate"></param>
         public void GenerateNewScheduleRemoveOld(DateTime beginDate, DateTime endDate)
         {
             var hasRecord = db.Set<RSRecord>().Where(a => a.ScheduleDate.Date >= beginDate.Date && a.ScheduleDate.Date <= endDate.Date).Select(a => a.ScheduleOfDayId).Distinct();
@@ -154,7 +159,7 @@ namespace Snail.RS
                             RuleBeginTime=rule.BeginTime,
                             RuleEndTime=rule.EndTime
                         };
-            return query.AsNoTracking();
+            return query.AsNoTracking().OrderBy(a=>a.ScheduleDate).ThenBy(a=>a.RuleBeginTime);
         }
         #endregion
 
