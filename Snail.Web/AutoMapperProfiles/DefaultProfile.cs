@@ -23,6 +23,7 @@ namespace Web.AutoMapperProfiles
             {
                 Assembly.Load("Snail.Web"),
                 Assembly.Load("Snail.Permission"),
+                Assembly.Load("Snail.Core"),
             };
             var allEntities = assemblies.Select(a => a.DefinedTypes).SelectMany(a => a)
                 .Where(a => a.GetInterfaces().Any(i => i == typeof(IEntityId<string>))).ToList();
@@ -49,5 +50,6 @@ namespace Web.AutoMapperProfiles
 
             });
         }
+        
     }
 }

@@ -33,7 +33,7 @@ namespace Snail.Web.Controllers
         private IPermissionStore _permissionStore;
         private IToken _token;
         private IApplicationContext _applicationContext;
-        public PermissionController(IPermission permission, IPermissionStore permissionStore,IToken token,IApplicationContext applicationContext)
+        public PermissionController(IPermission permission, IPermissionStore permissionStore, IToken token, IApplicationContext applicationContext)
         {
             _permission = permission;
             _permissionStore = permissionStore;
@@ -107,14 +107,14 @@ namespace Snail.Web.Controllers
         [HttpGet, Resource(Description = "查询所有用户")]
         public List<PermissionUserInfo> GetAllUserInfo()
         {
-            return _permissionStore.GetAllUser().AsQueryable().WhereIf(IsTanent(out Expression<Func<IUser,bool>> pred),pred).Select(a => new PermissionUserInfo
+            return _permissionStore.GetAllUser().AsQueryable().Where(GetTenantAndSoftDeletedPred<IUser>(true)).Select(a => new PermissionUserInfo
             {
                 Id = a.GetKey(),
                 Account = a.GetAccount(),
                 Name = a.GetName(),
             }).ToList();
         }
-   
+
         /// <summary>
         /// 用于权限的用户基本数据保存，请开发新接口以支持应用的用户保存逻辑
         /// </summary>
@@ -142,11 +142,14 @@ namespace Snail.Web.Controllers
         /// <summary>
         /// 删除用户
         /// </summary>
-        /// <param name="userKey"></param>
+        /// <param name="ids">要删除的用户id列表</param>
         [HttpPost, Resource(Description = "删除用户")]
-        public void RemoveUser(string userKey)
+        public void RemoveUser(List<string> ids)
         {
-            _permissionStore.RemoveUser(userKey);
+            ids.ForEach(id =>
+            {
+                _permissionStore.RemoveUser(id);
+            });
             _permissionStore.ReloadPemissionDatas();
         }
         #endregion
@@ -159,7 +162,7 @@ namespace Snail.Web.Controllers
         [HttpGet, Resource(Description = "查询所有角色")]
         public List<PermissionRoleInfo> GetAllRole()
         {
-            return _permissionStore.GetAllRole().AsQueryable().WhereIf(IsTanent(out Expression<Func<IRole, bool>> pred), pred).Select(a => new PermissionRoleInfo
+            return _permissionStore.GetAllRole().AsQueryable().Where(GetTenantAndSoftDeletedPred<IRole>(false)).Select(a => new PermissionRoleInfo
             {
                 Id = a.GetKey(),
                 Name = a.GetName(),
@@ -179,11 +182,15 @@ namespace Snail.Web.Controllers
         /// <summary>
         /// 删除角色
         /// </summary>
-        /// <param name="roleKey"></param>
+        /// <param name="ids">要删除的角色</param>
         [HttpPost, Resource(Description = "删除角色")]
-        public void RemoveRole(string roleKey)
+        public void RemoveRole(List<string> ids)
         {
-            _permissionStore.RemoveRole(roleKey);
+            ids.ForEach(id =>
+            {
+                _permissionStore.RemoveRole(id);
+
+            });
             _permissionStore.ReloadPemissionDatas();
         }
 
@@ -213,7 +220,7 @@ namespace Snail.Web.Controllers
         /// 获取所有的资源以及资源角色的对应关系信息
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet, AllowAnonymous]
         public List<ResourceRoleInfo> GetAllResourceRoles()
         {
             return _permission.GetAllResourceRoles();
@@ -325,19 +332,19 @@ namespace Snail.Web.Controllers
         }
         #endregion
 
-        private bool IsTanent<T>(out Expression<Func<T, bool>> pred)
+        private Expression<Func<T,bool>> GetTenantAndSoftDeletedPred<T>(bool isSoftDelete)
         {
             var isTanent = _permissionStore.HasTenant(out string tenantId);
             if (string.IsNullOrEmpty(tenantId))
             {
                 throw new BusinessException($"无法获取当前用户的租户id");
             }
-            pred = ExpressionExtensions.True<T>().AndIf(isTanent,
-                a => ((ITenant<string>)a).TenantId == tenantId 
+            var pred = ExpressionExtensions.True<T>().AndIf(isTanent,
+                a => ((ITenant<string>)a).TenantId == tenantId
                 || ((ITenant<string>)a).TenantId == ""
                 || ((ITenant<string>)a).TenantId == null
-                );
-            return isTanent;
+                ).AndIf(isSoftDelete, a => !((ISoftDelete)a).IsDeleted);
+            return pred;
         }
     }
 }

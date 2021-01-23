@@ -84,7 +84,8 @@ namespace Snail.Web.Controllers
 
         private Expression<Func<Config,bool>> GetPredByKeyQueryDto(KeyQueryDto queryDto)
         {
-            return ExpressionExtensions.True<Config>().AndIf(queryDto.KeyWord.HasValue(), a => a.Name.Contains(queryDto.KeyWord) || a.Key.Contains(queryDto.KeyWord) || a.Value.Contains(queryDto.KeyWord))
+            return ExpressionExtensions.True<Config>().AndIf(queryDto.KeyWord.HasValue(), 
+                a => a.Name.Contains(queryDto.KeyWord) || a.Key.Contains(queryDto.KeyWord) || a.Value.Contains(queryDto.KeyWord))
                .AndIf(controllerContext.serviceContext.HasTenant(out string tenantId), a => a.TenantId == "" || a.TenantId == null || a.TenantId == tenantId);
         }
     }

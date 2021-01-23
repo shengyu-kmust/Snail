@@ -157,6 +157,7 @@ namespace Snail.Core.Permission
             {
                 _db.Remove(roleResource);
             });
+            _db.SaveChanges();
             _memoryCache.Remove(roleCacheKey);
 
         }
@@ -264,6 +265,7 @@ namespace Snail.Core.Permission
                 // 账号不能重复.如果是多租户,同一租户里的账号不能重复.
                 var allUser = GetAllUser();
                 var existAccountUser = allUser.FirstOrDefault(a => a.GetAccount() == user.GetAccount());
+                // todo 如果是用户假删除，再增加同名用户怎么办？思路：IUser增加IsDeleted的接口，让界面上能看到，已经删除的也能看到，删除对应停启用，
                 if (existAccountUser != null && existAccountUser.GetKey() != user.GetKey())
                 {
                     throw new BusinessException($"已经存在账号为{existAccountUser.GetAccount()}的用户");
