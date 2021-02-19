@@ -92,18 +92,18 @@ namespace Snail.Core.Permission
         #region 查询权限基础表数据，用缓存，缓存所有的基础表数据
         public virtual List<IResource> GetAllResource()
         {
-            return _memoryCache.GetOrCreate(resourceCacheKey, a => _db.Set<TResource>().AsNoTracking().Select(i => (IResource)i).ToList());
+            return _memoryCache.GetOrCreate(resourceCacheKey, a => _db.Set<TResource>().IgnoreQueryFilters().AsNoTracking().Select(i => (IResource)i).ToList());
         }
 
         public virtual List<IRole> GetAllRole()
         {
-            return _memoryCache.GetOrCreate(roleCacheKey, a => _db.Set<TRole>().AsNoTracking().Select(i => (IRole)i).ToList());
+            return _memoryCache.GetOrCreate(roleCacheKey, a => _db.Set<TRole>().IgnoreQueryFilters().AsNoTracking().Select(i => (IRole)i).ToList());
 
         }
 
         public virtual List<IRoleResource> GetAllRoleResource()
         {
-            return _memoryCache.GetOrCreate(roleResourceCacheKey, a => _db.Set<TRoleResource>().AsNoTracking().Select(i => (IRoleResource)i).ToList());
+            return _memoryCache.GetOrCreate(roleResourceCacheKey, a => _db.Set<TRoleResource>().IgnoreQueryFilters().AsNoTracking().Select(i => (IRoleResource)i).ToList());
 
         }
 
@@ -111,7 +111,7 @@ namespace Snail.Core.Permission
         {
 
             return _memoryCache.GetOrCreate(userCacheKey,
-                a => _db.Set<TUser>().AsNoTracking().Select(i => (IUser)i).ToList());
+                a => _db.Set<TUser>().IgnoreQueryFilters().AsNoTracking().Select(i => (IUser)i).ToList());
 
         }
 
@@ -119,7 +119,7 @@ namespace Snail.Core.Permission
 
         public virtual List<IUserRole> GetAllUserRole()
         {
-            return _memoryCache.GetOrCreate(userRoleCacheKey, a => _db.Set<TUserRole>().AsNoTracking().Select(i => (IUserRole)i).ToList());
+            return _memoryCache.GetOrCreate(userRoleCacheKey, a => _db.Set<TUserRole>().IgnoreQueryFilters().AsNoTracking().Select(i => (IUserRole)i).ToList());
 
         }
 
@@ -282,8 +282,8 @@ namespace Snail.Core.Permission
 
         public virtual void SetRoleResources(string roleKey, List<string> resourceKeys)
         {
-            var allRoleResources = _db.Set<TRoleResource>().AsNoTracking().ToList().Where(a => a.GetRoleKey() == roleKey).ToList(); // 这个是否为全表查询
-            var allResources = _db.Set<TResource>().AsNoTracking().ToList();
+            var allRoleResources = _db.Set<TRoleResource>().IgnoreQueryFilters().AsNoTracking().ToList().Where(a => a.GetRoleKey() == roleKey).ToList(); // 这个是否为全表查询
+            var allResources = _db.Set<TResource>().IgnoreQueryFilters().AsNoTracking().ToList();
 
             // 删除角色权限
             allRoleResources.Where(a => !resourceKeys.Contains(a.GetResourceKey())).ToList().ForEach(a =>
@@ -310,8 +310,8 @@ namespace Snail.Core.Permission
         public virtual void SetUserRoles(string userKey, List<string> roleKeys)
         {
             // todo 全表查了
-            var allUserRoles = _db.Set<TUserRole>().AsEnumerable().Where(a => a.GetUserKey() == userKey).ToList();
-            var allRole = _db.Set<TRole>().AsNoTracking().ToList();
+            var allUserRoles = _db.Set<TUserRole>().IgnoreQueryFilters().AsEnumerable().Where(a => a.GetUserKey() == userKey).ToList();
+            var allRole = _db.Set<TRole>().IgnoreQueryFilters().AsNoTracking().ToList();
 
             // 删除授权
             allUserRoles.Where(a => !roleKeys.Contains(a.GetRoleKey())).ToList().ForEach(a =>

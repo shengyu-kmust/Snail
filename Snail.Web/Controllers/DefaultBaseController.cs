@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Snail.Cache;
 using Snail.Core.Interface;
+using Snail.Core.Permission;
 using System;
 
 namespace Snail.Web.Controllers
@@ -18,7 +19,7 @@ namespace Snail.Web.Controllers
     /// </remarks>
     [ApiController]
     [Route("api/[Controller]/[Action]")]
-    [Authorize]
+    [Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)]
     public class DefaultBaseController : ControllerBase
     {
         protected SnailControllerContext controllerContext;

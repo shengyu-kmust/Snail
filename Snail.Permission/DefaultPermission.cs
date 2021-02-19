@@ -20,6 +20,8 @@ namespace Snail.Permission
 {
     /// <summary>
     /// 权限的默认实现类
+    /// 1、角色名为SuperAdmin的为超级管理员
+    /// 2、
     /// </summary>
     public class DefaultPermission : BasePermission
     {

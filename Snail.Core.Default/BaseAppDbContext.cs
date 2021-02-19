@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Snail.Core.Attributes;
 using Snail.Core.Entity;
+using Snail.Core.Interface;
 using Snail.Core.Permission;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Snail.Core.Default
 {
@@ -31,10 +34,12 @@ namespace Snail.Core.Default
         #endregion
 
         protected ICapPublisher _publisher;
-        public BaseAppDbContext(DbContextOptions options, ICapPublisher publisher)
+        protected IApplicationContext _applicationContext;
+        public BaseAppDbContext(DbContextOptions options, ICapPublisher publisher, IApplicationContext applicationContext)
             : base(options)
         {
             _publisher = publisher;
+            _applicationContext = applicationContext;
         }
 
         public BaseAppDbContext(DbContextOptions options)
@@ -44,13 +49,28 @@ namespace Snail.Core.Default
 
 
 
-
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // 自动应用所有的IEntityTypeConfiguration配置
+            // 自动应用所有的IEntityTypeConfiguration配置的方法示例如下
             //modelBuilder.ApplyConfigurationsFromAssembly(Assembly);//，在外层配置
+
+            // 增加QueryFilter的方法示例如下
+            //if (typeof(ITenant<string>).IsAssignableFrom(typeof(TEntity)))
+            //{
+            //    builder.HasQueryFilter(a => EF.Property<string>(a, "TenantId") == "");
+            //    builder.HasQueryFilter(a => !EF.Property<bool>(a, "IsDeleted"));
+            //}
+
+            // 
+            ModelBuilderHelper.AppContextConfigSoftDeletedAndTenantQueryFilter( modelBuilder, _applicationContext);
+
         }
+
+
+
+
+
         public override int SaveChanges()
         {
             //统一在数据库上下文的操作前，触发缓存实体的数据清空。

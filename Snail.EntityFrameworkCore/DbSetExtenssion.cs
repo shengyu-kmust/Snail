@@ -164,7 +164,7 @@ namespace Snail.EntityFrameworkCore
             else
             {
                 //update
-                TenantHelper.CheckEntityTenantOper(EEntityOperType.Delete, entity, userId, tenantId);
+                TenantHelper.CheckEntityTenantOper(EEntityOperType.Update, entity, userId, tenantId);
                 updateFunc(dto, entity);
                 UpdateEntityCommonField(entity, EEntityOperType.Update, userId, tenantId);
             }

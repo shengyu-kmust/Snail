@@ -36,6 +36,13 @@ namespace Snail.Core.Permission
         }
         public abstract string GetRequestResourceCode(object obj);
 
+        /// <summary>
+        /// 权限判断
+        /// 当资源未在资源表里时，不允许访问
+        /// </summary>
+        /// <param name="resourceKey"></param>
+        /// <param name="userKey"></param>
+        /// <returns></returns>
         public virtual bool HasPermission(string resourceKey, string userKey)
         {
             var userRoleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == userKey).Select(a => a.GetRoleKey());

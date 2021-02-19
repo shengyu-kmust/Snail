@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Snail.Core;
 using Snail.Core.Entity;
 
@@ -25,7 +26,7 @@ namespace Snail.Core.Default
             {
                 builder.Property("Creater").HasMaxLength(50);
                 builder.Property("Updater").HasMaxLength(50);
-            }
+            }            
         }
     }
 }

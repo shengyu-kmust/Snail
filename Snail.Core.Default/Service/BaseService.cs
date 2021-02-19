@@ -48,12 +48,16 @@ namespace Snail.Core.Default.Service
         public virtual void Save<TSaveDto>(TSaveDto saveDto) 
             where TSaveDto : class, IIdField<TKey>
         {
-            db.Set<TEntity>().AddOrUpdate(saveDto, mapper, GetCurrentUserId());
+            db.Set<TEntity>().AddOrUpdate(saveDto, mapper, GetCurrentUserId(), GetCurrnetTenantId());
             db.SaveChanges();
         }
         private TKey GetCurrentUserId()
         {
             return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(applicationContext.GetCurrentUserId());
+        }
+        private TKey GetCurrnetTenantId()
+        {
+            return (TKey)TypeDescriptor.GetConverter(typeof(TKey)).ConvertFromString(applicationContext.GetCurrnetTenantId());
         }
     }
 }

@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Snail.Core.Permission;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Snail.Permission
@@ -13,11 +17,20 @@ namespace Snail.Permission
         }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
-            var resourceKey = _permission.GetRequestResourceKey(context.Resource);// 获取资源的key
-            var userKey = _permission.GetUserInfo(context.User).UserKey; // 根据用户的claims获取用户的key
-            if (_permission.HasPermission(resourceKey, userKey)) // 判断用户是否有权限
+            // todo 会进入3次
+            //if ((context.Resource is RouteEndpoint rep) && rep.Metadata.Any(a => a is AuthorizeWithNoPolicyAttribute))
+            //{
+            //    context.Succeed(requirement);
+            //    return Task.CompletedTask;
+            //}
+            if (context.User?.Identity?.IsAuthenticated??false)
             {
-                context.Succeed(requirement); // 如果有权限，则获得此Requirement
+                var resourceKey = _permission.GetRequestResourceKey(context.Resource);// 获取资源的key
+                var userKey = _permission.GetUserInfo(context.User).UserKey; // 根据用户的claims获取用户的key
+                if (_permission.HasPermission(resourceKey, userKey)) // 判断用户是否有权限
+                {
+                    context.Succeed(requirement); // 如果有权限，则获得此Requirement
+                }
             }
             return Task.CompletedTask;
         }

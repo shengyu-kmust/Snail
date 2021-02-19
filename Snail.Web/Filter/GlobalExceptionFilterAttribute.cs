@@ -28,7 +28,11 @@ namespace Snail.Web.Filter
             else
             {
                 // 程序异常处理
+#if DEBUG
+                context.Result = new ObjectResult(ApiResultDto.ServerErrorResult(context?.Exception?.ToString()+"\n"+context?.Exception?.InnerException?.ToString()));
+#else
                 context.Result = new ObjectResult(ApiResultDto.ServerErrorResult("未知异常"));
+#endif
                 if (_logger != null)
                 {
                     _logger.LogError("exception:{exception} \n innerException:{innerException}", context.Exception?.ToString(), context.Exception?.InnerException?.ToString());

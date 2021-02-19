@@ -37,13 +37,22 @@ namespace Snail.Core.Utilities
             return hasTenant;
         }
 
+        /// <summary>
+        /// 租户非正常操作检查
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="operType">操作类型</param>
+        /// <param name="entity">操作实体</param>
+        /// <param name="userId">操作人id</param>
+        /// <param name="tenantId">操作人tenantId</param>
         public static void CheckEntityTenantOper<TEntity, TKey>(EEntityOperType operType, TEntity entity, TKey userId, TKey tenantId)
         where TEntity : class, IIdField<TKey>
         {
             // 跨租户实体操作限制
             if (tenantId != null && TenantHelper.HasTenant(entity, out TKey tenantIdTmp) && !tenantId.Equals(tenantIdTmp))
             {
-                throw new InvalidOperationException($"不允许跨租户操作数据，操作类型:{operType}，表:{typeof(TEntity).Name}，实体id:{entity.Id}，操作人:{userId}，操作者租户:{tenantId}");
+                throw new InvalidOperationException($"不允许跨租户操作数据，操作类型:{operType}，表:{typeof(TEntity).Name}，实体id:{entity.Id}，实体租户:{tenantIdTmp}，操作人:{userId}，操作者租户:{tenantId}");
             }
         }
     }
