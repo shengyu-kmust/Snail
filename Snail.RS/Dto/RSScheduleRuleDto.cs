@@ -7,11 +7,17 @@ using System.Linq;
 
 namespace Snail.RS.Dto
 {
+    /// <summary>
+    /// 保存规则的dto
+    /// </summary>
     public class RSScheduleRuleDto :IDto, IValidatableObject
     {
+        /// <summary>
+        /// id
+        /// </summary>
         public string Id { get; set; }
         /// <summary>
-        /// 排班对象id
+        /// 排班对象id，
         /// </summary>
         [Required(ErrorMessage ="排班对象id不能为空")]
         public string TargetId { set; get; }
@@ -58,7 +64,7 @@ namespace Snail.RS.Dto
         /// <summary>
         /// 是否以时间段的形式进行预约号
         /// </summary>
-        public bool NumWithTime { get; set; }
+        public bool NumWithTime { get; set; } = true;
         /// <summary>
         /// 不包含的日期列表，以逗号隔开。例如：20171108,20171225
         /// </summary>

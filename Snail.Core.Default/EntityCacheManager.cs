@@ -57,7 +57,7 @@ namespace Snail.Core.Default
         {
             if (!Attribute.IsDefined(typeof(TEntity), typeof(EnableEntityCacheAttribute)))
             {
-                throw new BusinessException($"实体类{typeof(TEntity).Name}未启用缓存");
+                throw new InvalidOperationException($"实体类{typeof(TEntity).Name}未启用缓存");
             }
         }
 

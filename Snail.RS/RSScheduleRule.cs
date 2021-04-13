@@ -11,7 +11,7 @@ namespace Snail.RS
     public class RSScheduleRule: DefaultBaseEntity
     {
         /// <summary>
-        /// 排班对象id
+        /// 排班对象id，如：可以是医生的id，或是科室的id等
         /// </summary>
         [MaxLength(50)]
         public string TargetId { set; get; }

@@ -26,7 +26,7 @@ namespace Snail.RS
             _mapper = mapper;
         }
 
-     
+
 
         #region 规则
         /// <summary>
@@ -86,12 +86,23 @@ namespace Snail.RS
 
 
         /// <summary>
-        /// 生成排班
+        /// 生成未生成的排班
         /// </summary>
         /// <param name="beginDate"></param>
         /// <param name="endDate"></param>
-        public void GenerateSchedule(DateTime beginDate, DateTime endDate)
+        /// <param name="removeNotScheduled">是否将没有挂号的排班进行删除，重新生成排班</param>
+        public void GenerateSchedule(DateTime beginDate, DateTime endDate, bool removeNotScheduled = true)
         {
+            if (removeNotScheduled)
+            {
+                var hasRecord = db.Set<RSRecord>().Where(a => a.ScheduleDate.Date >= beginDate.Date && a.ScheduleDate.Date <= endDate.Date).Select(a => a.ScheduleOfDayId).Distinct();
+                var olds = db.Set<RSScheduleOfDay>().Where(a => !hasRecord.Contains(a.Id)).ToList();
+                foreach (var old in olds)
+                {
+                    db.Set<RSScheduleOfDay>().Remove(old);
+                }
+                db.SaveChanges();//要保存，不然在GenerateSchedule还是能找到删除的
+            }
             var existsSchedule = db.Set<RSScheduleOfDay>().Where(a => a.ScheduleDate.Date >= beginDate.Date && a.ScheduleDate.Date <= endDate.Date).Select(a => new
             {
                 a.RuleId,
@@ -113,29 +124,12 @@ namespace Snail.RS
             }
             db.SaveChanges();
         }
-
-        /// <summary>
-        /// 重新生成一段时间内的预约号源
-        /// </summary>
-        /// <param name="beginDate"></param>
-        /// <param name="endDate"></param>
-        public void GenerateNewScheduleRemoveOld(DateTime beginDate, DateTime endDate)
-        {
-            var hasRecord = db.Set<RSRecord>().Where(a => a.ScheduleDate.Date >= beginDate.Date && a.ScheduleDate.Date <= endDate.Date).Select(a => a.ScheduleOfDayId).Distinct();
-            var olds = db.Set<RSScheduleOfDay>().Where(a => !hasRecord.Contains(a.Id)).ToList();
-            foreach (var old in olds)
-            {
-                db.Set<RSScheduleOfDay>().Remove(old);
-            }
-            db.SaveChanges();//要保存，不然在GenerateSchedule还是能找到删除的
-            GenerateSchedule(beginDate, endDate);
-        }
         #endregion
 
 
-        #region 排班
+        #region 挂号
         /// <summary>
-        /// 获取排班
+        /// 获取排班信息，用于查询排班和号源
         /// </summary>
         /// <param name="queryDto"></param>
         /// <returns></returns>
@@ -155,14 +149,12 @@ namespace Snail.RS
                             TargetId = rule.TargetId,
                             TargetName = rule.TargetName,
                             TargetType = rule.TargetType,
-                            MaxNum=rule.MaxNum,
-                            RuleBeginTime=rule.BeginTime,
-                            RuleEndTime=rule.EndTime
+                            MaxNum = rule.MaxNum,
+                            RuleBeginTime = rule.BeginTime,
+                            RuleEndTime = rule.EndTime
                         };
-            return query.AsNoTracking().OrderBy(a=>a.ScheduleDate).ThenBy(a=>a.RuleBeginTime);
+            return query.AsNoTracking().OrderBy(a => a.ScheduleDate).ThenBy(a => a.RuleBeginTime);
         }
-        #endregion
-
 
         /// <summary>
         /// 预约
@@ -199,7 +191,7 @@ namespace Snail.RS
                 SubscriberPhone = makeAppointDto.SubscriberPhone,
                 NumBeginTime = numBeginEndTime.begin,
                 NumEndTime = numBeginEndTime.end,
-                ScheduleDate= scheduleOfDay.ScheduleDate
+                ScheduleDate = scheduleOfDay.ScheduleDate
             };
             db.Set<RSRecord>().Add(record);
             db.SaveChanges();
@@ -226,32 +218,39 @@ namespace Snail.RS
             db.SaveChanges();
         }
 
+        /// <summary>
+        /// 获取挂号信息
+        /// </summary>
+        /// <returns></returns>
         public IQueryable<RSRecordDto> GetRecordQuery()
         {
             var query = from a in db.Set<RSRecord>()
-                        join b in db.Set< RSScheduleOfDay>() on a.ScheduleOfDayId equals b.Id into b_group
+                        join b in db.Set<RSScheduleOfDay>() on a.ScheduleOfDayId equals b.Id into b_group
                         from b in b_group.DefaultIfEmpty()
                         join c in db.Set<RSScheduleRule>() on b.RuleId equals c.Id into c_group
                         from c in c_group.DefaultIfEmpty()
                         select new RSRecordDto
                         {
-                            Id=a.Id,
+                            Id = a.Id,
                             OrderNum = a.OrderNum,
                             ScheduleName = b.ScheduleName,
                             ScheduleOfDayId = a.ScheduleOfDayId,
                             ExtraInfo = a.ExtraInfo,
-                            NumBeginTime=a.NumBeginTime,
-                            NumEndTime=a.NumEndTime,
-                            RuleBeginTime=c.BeginTime,
-                            RuleEndTime=c.EndTime,
-                            SubscriberId=a.SubscriberId,
-                            SubscriberName=a.SubscriberName,
-                            SubscriberPhone=a.SubscriberPhone,
-                            TargetName=c.TargetName,
-                            ScheduleDate=a.ScheduleDate
+                            NumBeginTime = a.NumBeginTime,
+                            NumEndTime = a.NumEndTime,
+                            RuleBeginTime = c.BeginTime,
+                            RuleEndTime = c.EndTime,
+                            SubscriberId = a.SubscriberId,
+                            SubscriberName = a.SubscriberName,
+                            SubscriberPhone = a.SubscriberPhone,
+                            TargetName = c.TargetName,
+                            ScheduleDate = a.ScheduleDate
                         };
             return query;
         }
+        #endregion
+
+
 
 
         #region 帮助类方法
@@ -338,7 +337,7 @@ namespace Snail.RS
         /// <returns>remainNum：剩余多少号，remainNums：剩余号，orderNum：预约到哪个号</returns>
         public static (int remainNum, string remainNums, int orderNum) Occupy(string remainNums, int occupyNum)
         {
-            var remainList = remainNums.Split(new char[] { ','}, StringSplitOptions.RemoveEmptyEntries).OrderBy(a => int.Parse(a)).ToList();
+            var remainList = remainNums.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).OrderBy(a => int.Parse(a)).ToList();
             if (!remainList.Any())
             {
                 throw new BusinessException("余号不足");
@@ -398,11 +397,11 @@ namespace Snail.RS
         public static void DealWithRSScheduleOfDayDto(RSScheduleOfDayDto dto)
         {
             dto.RemainNumsDto = new List<RemainNumDto>();
-            (dto.RemainNums ?? "").Split(',').Select(a=>int.Parse(a)).OrderBy(a=>a).ToList().ForEach(num =>
-            {
-                var beginEnd = RSService.GetNumBeginEndTime(dto.RuleBeginTime, dto.RuleEndTime, dto.MaxNum, num);
-                dto.RemainNumsDto.Add(new RemainNumDto { Num = num, TimeBegin = beginEnd.begin, TimeEnd = beginEnd.end });
-            });
+            (dto.RemainNums ?? "").Split(',').Select(a => int.Parse(a)).OrderBy(a => a).ToList().ForEach(num =>
+                {
+                    var beginEnd = RSService.GetNumBeginEndTime(dto.RuleBeginTime, dto.RuleEndTime, dto.MaxNum, num);
+                    dto.RemainNumsDto.Add(new RemainNumDto { Num = num, TimeBegin = beginEnd.begin, TimeEnd = beginEnd.end });
+                });
         }
         #endregion
 
