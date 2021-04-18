@@ -85,13 +85,20 @@ namespace Snail.Core.Permission
                 {
                     throw new BusinessException("多租户系统，必须传入租户id");
                 }
-                user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase) && ((ITenant<string>)a).TenantId==loginDto.TenantId);
+                user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase) && ((ITenant<string>)a).TenantId == loginDto.TenantId);
             }
             else
             {
                 user = _permissionStore.GetAllUser().FirstOrDefault(a => a.GetAccount().Equals(loginDto.Account, StringComparison.OrdinalIgnoreCase));
             }
-            if (user != null && HashPwd(loginDto.Pwd).Equals(user.GetPassword(), StringComparison.OrdinalIgnoreCase))
+            if (
+                user != null &&
+                (
+                    loginDto.IgnorePwd
+                    ||
+                    HashPwd(loginDto.Pwd).Equals(user.GetPassword(), StringComparison.OrdinalIgnoreCase)
+                )
+               )
             {
                 var roleKeys = _permissionStore.GetAllUserRole().Where(a => a.GetUserKey() == user.GetKey()).Select(a => a.GetRoleKey()) ?? new List<string>();
                 var roleNames = _permissionStore.GetAllRole().Where(a => roleKeys.Contains(a.GetKey())).Select(a => a.GetName()) ?? new List<string>();
@@ -152,7 +159,7 @@ namespace Snail.Core.Permission
 
         public virtual List<Claim> GetClaims(IUserInfo userInfo)
         {
-            var claims= new List<Claim>
+            var claims = new List<Claim>
             {
                 new Claim(PermissionConstant.userIdClaim,userInfo.UserKey),
                 new Claim(PermissionConstant.userNameClaim,userInfo.UserName),
