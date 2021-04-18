@@ -28,6 +28,7 @@ namespace Snail.Web
     {
         public static void ConfigSnailWebApplicationBuilder(this IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider,IConfiguration configuration)
         {
+            // todo，后台代理前端，使开发的地址访问路径和生产的效果是一样的，不用再打开两个端口地址
             // 获取autofac容器
             var testName = configuration.GetValue<string>("test:name");
             Console.WriteLine($"--------------test:name:-------------{testName}");
@@ -85,9 +86,23 @@ namespace Snail.Web
 
 
             //静态文件
-            app.UseStaticFiles();
-            //spa前端静态文件
-            app.UseSpaStaticFiles();
+            app.UseStaticFiles();//todo 和下面重复？当前路径为static路径？
+            #region spa前端静态文件
+            //app.UseSpaStaticFiles(); //由外层调用，如果有多个前端，如管理端和移动端，则不适合用这种方法
+            #region 多前端示例如下
+            //app.Map("/client", client =>
+            //{
+            //    app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(Path.Combine(rootPath, "ClientApp/dist")) });
+            //    client.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(Path.Combine(rootPath, "ClientApp/dist")) });
+            //});
+            //app.Map("/mobile", mobile =>
+            //{
+            //    app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(Path.Combine(rootPath, "MobileApp/dist")) });
+            //    mobile.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(Path.Combine(rootPath, "MobileApp/dist")) });
+            //});
+            #endregion
+
+            #endregion
             app.UseStaticFiles(new StaticFileOptions
             {
                 RequestPath = "/" + serviceProvider.GetService<IOptions<StaticFileUploadOption>>().Value.StaticFilePath,
@@ -143,16 +158,15 @@ namespace Snail.Web
             #endregion
 
 
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp/dist";
-                //下面是vs模板对spa应用的默认配置，推荐关闭，改用 webpack-dev-server + api proxy 来提高开发速度
-                //if (env.IsDevelopment())
-                //{
-                //    spa.UseReactDevelopmentServer(npmScript: "start");
-                //}
-            });
-
+            //app.UseSpa(spa =>
+            //{
+            //    spa.Options.SourcePath = "ClientApp/dist";
+            //    //下面是vs模板对spa应用的默认配置，推荐关闭，改用 webpack-dev-server + api proxy 来提高开发速度
+            //    //if (env.IsDevelopment())
+            //    //{
+            //    //    spa.UseReactDevelopmentServer(npmScript: "start");
+            //    //}
+            //});
 
         }
     }

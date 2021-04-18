@@ -115,10 +115,11 @@ namespace Snail.Web
 
             #region 前端界面配置
             // In production, the front end files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            // 在startup里设置，services.AddSpaStaticFiles和app.UseSpaStaticFiles是一对
+            //services.AddSpaStaticFiles(configuration =>
+            //{
+            //    configuration.RootPath = "ClientApp/dist";//RootPath为相对路径，它的绝对路径为IWebHostEnvironment.ContentRootPath，配合app.UseSpaStaticFiles()使用。
+            //});
             #endregion
 
 
