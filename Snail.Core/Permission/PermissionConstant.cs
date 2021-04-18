@@ -7,6 +7,7 @@ namespace Snail.Core.Permission
     public class PermissionConstant
     {
         public const string PermissionAuthorizePolicy = nameof(PermissionAuthorizePolicy);
+        public const string OnlyAuthenticationPolicy = nameof(OnlyAuthenticationPolicy);
         public const string PermissionScheme = nameof(PermissionScheme);
         public const string userIdClaim = "userId";
         public const string tenantIdClaim = "tenantId";

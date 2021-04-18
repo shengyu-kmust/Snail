@@ -18,11 +18,14 @@ namespace Snail.Permission
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
             // todo 会进入3次
-            //if ((context.Resource is RouteEndpoint rep) && rep.Metadata.Any(a => a is AuthorizeWithNoPolicyAttribute))
-            //{
-            //    context.Succeed(requirement);
-            //    return Task.CompletedTask;
-            //}
+            if (context.Requirements.Any(a=>a is OnlyAuthenticationRequirement))
+            {
+                foreach (var req in context.Requirements)
+                {
+                    context.Succeed(req);
+                }
+                return Task.CompletedTask;
+            }
             if (context.User?.Identity?.IsAuthenticated??false)
             {
                 var resourceKey = _permission.GetRequestResourceKey(context.Resource);// 获取资源的key

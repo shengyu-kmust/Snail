@@ -122,6 +122,10 @@ namespace Snail.Permission
                 {
                     policyBuilder.AddRequirements(new PermissionRequirement());
                 });
+                options.AddPolicy(PermissionConstant.OnlyAuthenticationPolicy, policyBuilder =>
+                 {
+                     policyBuilder.AddRequirements(new OnlyAuthenticationRequirement());
+                 });
             });
             services.AddScoped<IAuthorizationHandler, PermissionRequirementHandler>();
             services.AddMemoryCache();
