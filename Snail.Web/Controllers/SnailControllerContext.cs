@@ -32,6 +32,9 @@ namespace Snail.Web.Controllers
             this.db = db;
             this.entityCacheManager = entityCacheManager;
             this.serviceContext = serviceContext;
+            this.serviceProvider = serviceProvider;
+            this.cache = cache;
+            this.memoryCache = memoryCache;
         }
     }
 }

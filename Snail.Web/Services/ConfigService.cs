@@ -37,7 +37,7 @@ namespace Snail.Web.Services
         {
             var allConfig = entityCacheManager.Get<Config>();
             var parent = allConfig.AsQueryable().WhereIf(serviceContext.HasTenant(out string tenantId),a=>a.TenantId=="" || a.TenantId==null || a.TenantId==tenantId)
-                .FirstOrDefault(a => a.Key == parentKey);
+                .FirstOrDefault(a => a.Key.ToLower() == parentKey.ToLower());
             string keyField=string.Empty, valueField=string.Empty;
             if (parent == null)
             {

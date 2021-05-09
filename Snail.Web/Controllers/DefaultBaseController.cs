@@ -19,7 +19,8 @@ namespace Snail.Web.Controllers
     /// </remarks>
     [ApiController]
     [Route("api/[Controller]/[Action]")]
-    [Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)]
+    [Authorize]
+    //[Authorize(Policy = PermissionConstant.PermissionAuthorizePolicy)] //
     public class DefaultBaseController : ControllerBase
     {
         protected SnailControllerContext controllerContext;

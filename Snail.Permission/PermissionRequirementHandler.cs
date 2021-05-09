@@ -17,15 +17,22 @@ namespace Snail.Permission
         }
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
-            // todo 会进入3次
-            if (context.Requirements.Any(a=>a is OnlyAuthenticationRequirement))
-            {
-                foreach (var req in context.Requirements)
-                {
-                    context.Succeed(req);
-                }
-                return Task.CompletedTask;
-            }
+            /*
+             权限最佳做法：
+            1、所有Controller继承拥有AuthorizeAttribute的BaseController
+            2、不用控制权限的Action加AllowAnonymousAttribute
+            3、要进行特殊授权的，用[Authorize(Policy=PermissionConstant.PermissionAuthorizePolicy)]
+
+             
+             */
+            //if (context.Requirements.Any(a=>a is OnlyAuthenticationRequirement))
+            //{
+            //    foreach (var req in context.Requirements)
+            //    {
+            //        context.Succeed(req);
+            //    }
+            //    return Task.CompletedTask;
+            //}
             if (context.User?.Identity?.IsAuthenticated??false)
             {
                 var resourceKey = _permission.GetRequestResourceKey(context.Resource);// 获取资源的key
