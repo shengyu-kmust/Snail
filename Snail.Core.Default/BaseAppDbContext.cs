@@ -61,10 +61,6 @@ namespace Snail.Core.Default
             //    builder.HasQueryFilter(a => EF.Property<string>(a, "TenantId") == "");
             //    builder.HasQueryFilter(a => !EF.Property<bool>(a, "IsDeleted"));
             //}
-
-            // 
-            ModelBuilderHelper.AppContextConfigSoftDeletedAndTenantQueryFilter( modelBuilder, _applicationContext);
-
         }
 
 
@@ -89,6 +85,68 @@ namespace Snail.Core.Default
             return base.SaveChanges();
         }
 
-        // 不用要SeedData进行数据初始化，此方法会在每次migration时删除和创建数据
+        // 不要用SeedData进行数据初始化，此方法会在每次migration时删除和创建数据
+
+        #region softdelete and tenant queryfilter
+        /// <summary>
+        /// 增加软删除和多租户的查询过滤器
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        /// <param name="applicationContext"></param>
+        public void AppContextConfigSoftDeletedAndTenantQueryFilter(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Model.GetEntityTypes().Select(a => a.ClrType).ToList().ForEach(entityType =>
+            {
+                //SoftDeleteAndTenantQueryFilter(modelBuilder, entityType);
+            });
+        }
+
+        /// <summary>
+        /// 增加软删除和多租户的查询过滤器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="modelBuilder"></param>
+        /// <param name="applicationContext"></param>
+        public void SoftDeleteAndTenantQueryFilter<T>(ModelBuilder modelBuilder)
+            where T:class
+        {
+            var isSoftDeleted = typeof(ISoftDelete).IsAssignableFrom(typeof(T));
+            var isTenant = typeof(ITenant<string>).IsAssignableFrom(typeof(T));
+            // 注意：目前ef的queryFilter只能对一个Entity执行一次，不能是多次，所以用下面的写法。
+            if (isSoftDeleted && !isTenant)
+            {
+                modelBuilder.Entity<T>().HasQueryFilter(a => !((ISoftDelete)a).IsDeleted);
+            }
+            else if (isSoftDeleted && isTenant)
+            {
+                modelBuilder.Entity<T>().HasQueryFilter(a => !((ISoftDelete)a).IsDeleted
+                &&
+                (
+                ((ITenant<string>)a).TenantId == null
+                ||
+                ((ITenant<string>)a).TenantId == ""
+                ||
+                ((ITenant<string>)a).TenantId == _applicationContext.GetCurrnetTenantId()
+                )
+                );
+
+            }
+            else if (!isSoftDeleted && isTenant)
+            {
+                modelBuilder.Entity<T>().HasQueryFilter(a =>
+                ((ITenant<string>)a).TenantId == null
+                ||
+                ((ITenant<string>)a).TenantId == ""
+                ||
+                ((ITenant<string>)a).TenantId == _applicationContext.GetCurrnetTenantId()
+                );
+            }
+            else
+            {
+
+            }
+        }
+
+        #endregion
     }
 }

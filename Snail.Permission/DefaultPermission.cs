@@ -166,10 +166,15 @@ namespace Snail.Permission
 
         }
 
+        /// <summary>
+        /// 这个要对性能要求高，不能每次都去计算 // todo 
+        /// </summary>
+        /// <param name="userKey"></param>
+        /// <returns></returns>
         private bool IsSuperAdmin(string userKey)
         {
-            var superRole = _permissionStore.GetAllRole().FirstOrDefault(a => a.GetName().Equals(DefaultPermission.superAdminRoleName, StringComparison.OrdinalIgnoreCase));
-            return _permissionStore.GetAllUserRole().Any(a => a.GetUserKey() == userKey && a.GetRoleKey() == superRole.GetKey());
+            var superRole = _permissionStore.GetAllRole().Where(a => a.GetName().Equals(DefaultPermission.superAdminRoleName, StringComparison.OrdinalIgnoreCase)).Select(a=>a.GetKey()).ToList();
+            return _permissionStore.GetAllUserRole().Any(a => a.GetUserKey() == userKey && superRole.Contains(a.GetRoleKey()));
         }
 
         /// <summary>

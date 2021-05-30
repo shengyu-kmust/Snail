@@ -244,7 +244,7 @@ namespace Snail.EntityFrameworkCore
             // 增加或更新
             foreach (var dto in dtos.Where(a => !removeIds.Contains(a.Id)))
             {
-                AddOrUpdateInternal(entities, dto, addFunc, updateFunc, userId, tenantId);
+                AddOrUpdateInternal(entities, dto, addFunc, updateFunc, userId, tenantId,existEntities);
             }
         }
 
@@ -365,14 +365,14 @@ namespace Snail.EntityFrameworkCore
                 {
                     auditEntity.Creater = userId;
                     auditEntity.CreateTime = DateTime.Now;
-                    if (entity is ITenant<TKey> tenantEntity)
-                    {
-                        tenantEntity.TenantId = tenantId;
-                    }
                 }
                 if (entity is IIdField<TKey> idEntity && idEntity.Id==null)
                 {
                     idEntity.Id = IdGenerator.Generate<TKey>();
+                }
+                if (entity is ITenant<TKey> tenantEntity)
+                {
+                    tenantEntity.TenantId = tenantId;
                 }
                 auditEntity.Updater = userId;
                 auditEntity.UpdateTime = DateTime.Now;

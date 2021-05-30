@@ -29,7 +29,8 @@ namespace Snail.Web.Controllers
         [HttpGet]
         public List<ConfigResultDto> QueryList([FromQuery]KeyQueryDto queryDto)
         {
-            return controllerContext.mapper.ProjectTo<ConfigResultDto>(_service.QueryList(GetPredByKeyQueryDto(queryDto))).ToList();
+            var result= controllerContext.mapper.ProjectTo<ConfigResultDto>(_service.QueryList(GetPredByKeyQueryDto(queryDto))).ToList();
+            return result;
         }
 
         [Resource(Description = "查询配置树")]

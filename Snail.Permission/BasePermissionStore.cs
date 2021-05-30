@@ -211,7 +211,7 @@ namespace Snail.Core.Permission
         public virtual void SaveResource(IResource resource)
         {
             var resourceTmp = EasyMap.MapToNew<TResource>(resource);
-            var resourceEntity = _db.Set<TResource>().AddOrUpdate(resourceTmp, CurrentUserId, default, null);
+            var resourceEntity = _db.Set<TResource>().AddOrUpdate(resourceTmp, CurrentUserId, CurrentTenantId);
             resourceEntity.SetName(resourceTmp.GetName());
             resourceEntity.SetParentKey(resourceTmp.GetParentKey());
             _db.SaveChanges();
