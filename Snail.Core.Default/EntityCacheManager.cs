@@ -50,7 +50,7 @@ namespace Snail.Core.Default
             EnsureEnableCache<TEntity>();
             var key = GenerateEntityCacheKey<TEntity>();
             _entityKeyMaps.TryAdd(typeof(TEntity).Name, key);
-            return _db.Set<TEntity>().AsNoTracking().ToList();
+            return _db.Set<TEntity>().IgnoreQueryFilters().AsNoTracking().ToList();
         }
 
         private void EnsureEnableCache<TEntity>()

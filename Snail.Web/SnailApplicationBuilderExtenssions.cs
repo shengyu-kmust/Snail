@@ -86,9 +86,12 @@ namespace Snail.Web
 
 
             //静态文件
-            app.UseStaticFiles();//todo 和下面重复？当前路径为static路径？
+            app.UseStaticFiles();//用wwwroot下面的目录为静态文件目录
             #region spa前端静态文件
-            //app.UseSpaStaticFiles(); //由外层调用，如果有多个前端，如管理端和移动端，则不适合用这种方法
+            #region 单前端示例
+            //app.UseSpaStaticFiles(); //必须先配置spa的静态目录services.AddSpaStaticFiles(cfg=>cfg.RootPath= "ClientApp/dist");
+
+            #endregion
             #region 多前端示例如下
             //app.Map("/client", client =>
             //{
@@ -156,17 +159,6 @@ namespace Snail.Web
             }
 
             #endregion
-
-
-            //app.UseSpa(spa =>
-            //{
-            //    spa.Options.SourcePath = "ClientApp/dist";
-            //    //下面是vs模板对spa应用的默认配置，推荐关闭，改用 webpack-dev-server + api proxy 来提高开发速度
-            //    //if (env.IsDevelopment())
-            //    //{
-            //    //    spa.UseReactDevelopmentServer(npmScript: "start");
-            //    //}
-            //});
 
         }
     }

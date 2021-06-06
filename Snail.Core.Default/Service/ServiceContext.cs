@@ -54,7 +54,7 @@ namespace Snail.Core.Default.Service
             }
             return cache.GetOrSet<List<TEntityCache>>(cacheKey, key =>
             {
-                return mapper.ProjectTo<TEntityCache>(db.Set<TEntity>().AsNoTracking()).ToList();
+                return mapper.ProjectTo<TEntityCache>(db.Set<TEntity>().IgnoreQueryFilters().AsNoTracking()).ToList();
             }, null);
         }
 

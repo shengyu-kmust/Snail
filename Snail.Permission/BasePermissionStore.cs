@@ -264,11 +264,24 @@ namespace Snail.Core.Permission
             {
                 // 账号不能重复.如果是多租户,同一租户里的账号不能重复.
                 var allUser = GetAllUser();
-                var existAccountUser = allUser.FirstOrDefault(a => a.GetAccount() == user.GetAccount());
-                // todo 如果是用户假删除，再增加同名用户怎么办？思路：IUser增加IsDeleted的接口，让界面上能看到，已经删除的也能看到，删除对应停启用，
-                if (existAccountUser != null && existAccountUser.GetKey() != user.GetKey())
+                var existSameAccountUser = false;
+                var sameAccountUsers = allUser.Where(a => a.GetAccount() == user.GetAccount()).ToList();
+                if (HasTenant(out string tenantId))
                 {
-                    throw new BusinessException($"已经存在账号为{existAccountUser.GetAccount()}的用户");
+                    existSameAccountUser = allUser.Any(a =>
+                      a.GetAccount() == user.GetAccount()
+                      && ((ITenant<string>)a).TenantId == tenantId
+                      && a.GetKey() != user.GetKey());
+                }
+                else
+                {
+                    existSameAccountUser = allUser.Any(a =>
+                     a.GetAccount() == user.GetAccount()
+                     && a.GetKey() != user.GetKey());
+                }
+                if (existSameAccountUser)
+                {
+                    throw new BusinessException($"已经存在账号为{user.GetAccount()}的用户");
                 }
                 var userTmp = EasyMap.MapToNew<TUser>(user);
                 var userEntity = _db.Set<TUser>().AddOrUpdate(userTmp, CurrentUserId, CurrentTenantId, null);
